@@ -1,0 +1,28 @@
+import BaseModel from "./BaseModel.js";
+import type Character from "./Character.js";
+import ResourceIDs from "../generated/ResourceIDs.js";
+import type WolferyJS from "../WolferyJS.js";
+import type { CharacterDetailsProperties } from "../generated/models/types.js";
+import { CharacterDetailsDefinition } from "../generated/models/definitions.js";
+import type { ResClient } from "resclient-ts";
+
+declare interface CharacterDetails extends BaseModel, CharacterDetailsProperties {}
+class CharacterDetails extends BaseModel implements CharacterDetailsProperties {
+    constructor(client: WolferyJS, api: ResClient, rid: string) {
+        super(client, api, rid, { definition: CharacterDetailsDefinition });
+    }
+
+    get avatarURL(): string | null {
+        return this.avatar === "" ? null : `${this.client.fileURL}/core/char/avatar/${this.avatar}`;
+    }
+
+    get fullname(): string {
+        return `${this.name} ${this.surname}`.trim();
+    }
+
+    async getChar(): Promise<Character> {
+        return this.api.get<Character>(ResourceIDs.CHARACTER({ id: this.id }));
+    }
+}
+
+export default CharacterDetails;

@@ -1,0 +1,16 @@
+import BaseCollection from "./BaseCollection.js";
+import type Exit from "../models/Exit.js";
+import type WolferyJS from "../WolferyJS.js";
+import { toID } from "../util/Util.js";
+import type ResClient from "resclient-ts";
+
+export default class Exits extends BaseCollection<Exit> {
+    constructor(client: WolferyJS, api: ResClient, rid: string) {
+        super(client, api, rid, { idCallback: toID });
+    }
+
+    // @TODO
+    async getHidden(): Promise<unknown> {
+        return this.api.get(`${this.rid}.hidden`);
+    }
+}

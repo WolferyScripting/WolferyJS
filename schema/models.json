@@ -1,0 +1,1576 @@
+[
+  {
+    "description": "A partial room seen as an exit target.",
+    "id": ["AFAR_ROOM(core.room.{id}.afar)"],
+    "name": "AfarRoom",
+    "props": {
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the room."
+      },
+      "name": { "type": "string", "description": "The name of the room." },
+      "awake": {
+        "collection": "RoomCharactersAwake",
+        "description": "The characters in the room that are awake."
+      }
+    }
+  },
+  {
+    "description": "An area.",
+    "id": ["AREA(core.area.{id})"],
+    "name": "Area",
+    "props": {
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the area."
+      },
+      "name": { "type": "string", "description": "The name of the area." }
+    }
+  },
+  {
+    "description": "A child of an area.",
+    "id": ["AREA_CHILD(core.area.{id}.child)"],
+    "name": "AreaChild",
+    "props": {
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the area child."
+      },
+      "mapX": {
+        "type": "number",
+        "description": "The X coordinate on the map."
+      },
+      "mapY": {
+        "type": "number",
+        "description": "The Y coordinate on the map."
+      },
+      "name": {
+        "type": "string",
+        "description": "The name of the area child."
+      },
+      "pop": {
+        "type": "number",
+        "description": "The population of the area child."
+      },
+      "shortDesc": {
+        "type": "string",
+        "description": "A short description of the area child."
+      },
+      "type": {
+        "type": "string",
+        "literal": "\"area\"",
+        "description": "The type of the area child."
+      }
+    }
+  },
+  {
+    "collection": true,
+    "description": "The child areas of an area.",
+    "id": ["AREA_CHILDREN(core.area.{id}.children)"],
+    "name": "AreaChildren",
+    "model": "AreaChild"
+  },
+  {
+    "description": "A detailed area, seen by a controlled character.",
+    "id": ["AREA_DETAILS(core.area.{id}.details)"],
+    "name": "AreaDetails",
+    "props": {
+      "about": { "type": "string", "description": "The about of the area." },
+      "children": {
+        "model": "AreaChildren",
+        "description": "The child areas of the area."
+      },
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the area."
+      },
+      "image": { "model": "?Image", "description": "The image of the area." },
+      "mapX": {
+        "type": "number",
+        "description": "The X coordinate on the map."
+      },
+      "mapY": {
+        "type": "number",
+        "description": "The Y coordinate on the map."
+      },
+      "name": { "type": "string", "description": "The name of the area." },
+      "owner": {
+        "model": "Character",
+        "description": "The owner of the area."
+      },
+      "parent": { "model": "?AreaDetails", "description": "The parent area." },
+      "pop": { "type": "number", "description": "The population of the area." },
+      "private": {
+        "type": "boolean",
+        "description": "Whether the area is private."
+      },
+      "prv": {
+        "type": "number",
+        "description": "The privacy level of the area."
+      },
+      "rules": { "type": "string", "description": "The rules of the area." },
+      "shortDesc": {
+        "type": "string",
+        "description": "A short description of the area."
+      }
+    }
+  },
+  {
+    "collection": true,
+    "description": "The awake characters in the realm.",
+    "id": ["AWAKE_CHARACTERS(core.chars.awake)"],
+    "name": "AwakeCharacters",
+    "model": "Character"
+  },
+  {
+    "description": "The user when logged in with a bot token.",
+    "id": ["BOT(core.bot.{id})"],
+    "name": "Bot",
+    "props": {
+      "char": {
+        "model": "OwnedCharacter",
+        "description": "The owned character of the bot."
+      },
+      "controlled": {
+        "model": "?ControlledCharacter",
+        "description": "The controlled character of the bot."
+      }
+    }
+  },
+  {
+    "description": "A character",
+    "id": ["CHARACTER(core.char.{id})"],
+    "name": "Character",
+    "props": {
+      "avatar": {
+        "type": "string",
+        "description": "The avatar of the character."
+      },
+      "awake": {
+        "type": "boolean",
+        "description": "Whether the character is awake."
+      },
+      "deleted": {
+        "type": "?number",
+        "description": "The deletion timestamp of the character."
+      },
+      "gender": {
+        "type": "string",
+        "description": "The gender of the character."
+      },
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the character."
+      },
+      "idle": {
+        "type": "number",
+        "oneOf": [0, 1, 2, 3],
+        "description": "The idle state of the character."
+      },
+      "lastAwake": {
+        "type": "number",
+        "description": "The last awake timestamp of the character."
+      },
+      "name": { "type": "string", "description": "The name of the character." },
+      "puppeteer": {
+        "model": "?Character",
+        "description": "The puppeteer of the character."
+      },
+      "rp": {
+        "type": "string",
+        "oneOf": ["lfrp", ""],
+        "description": "The RP status of the character."
+      },
+      "species": {
+        "type": "string",
+        "description": "The species of the character."
+      },
+      "state": {
+        "type": "string",
+        "oneOf": ["awake", "asleep"],
+        "description": "The state of the character."
+      },
+      "status": {
+        "type": "string",
+        "description": "The status of the character."
+      },
+      "surname": {
+        "type": "string",
+        "description": "The surname of the character."
+      },
+      "tags": {
+        "model": "CharacterTags",
+        "description": "The tags associated with the character."
+      },
+      "type": {
+        "type": "string",
+        "oneOf": ["player", "puppet"],
+        "description": "The type of the character."
+      }
+    }
+  },
+  {
+    "description": "A character with extra details, seen when looking at a character.",
+    "id": ["CHARACTER_DETAILS(core.char.{id}.details)"],
+    "name": "CharacterDetails",
+    "props": {
+      "about": { "type": "string", "description": "About the character." },
+      "avatar": {
+        "type": "string",
+        "description": "The avatar of the character."
+      },
+      "desc": {
+        "type": "string",
+        "description": "The description of the character."
+      },
+      "gender": {
+        "type": "string",
+        "description": "The gender of the character."
+      },
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the character."
+      },
+      "idle": {
+        "type": "number",
+        "oneOf": [0, 1, 2, 3],
+        "description": "The idle state of the character."
+      },
+      "name": { "type": "string", "description": "The name of the character." },
+      "species": {
+        "type": "string",
+        "description": "The species of the character."
+      },
+      "state": {
+        "type": "string",
+        "oneOf": ["awake", "asleep"],
+        "description": "The state of the character."
+      },
+      "status": {
+        "type": "string",
+        "description": "The status of the character."
+      },
+      "surname": {
+        "type": "string",
+        "description": "The surname of the character."
+      },
+      "tags": {
+        "model": "CharacterTags",
+        "description": "The tags associated with the character."
+      },
+      "image": {
+        "model": "?Image",
+        "description": "The image of the character."
+      },
+      "type": {
+        "type": "string",
+        "oneOf": ["player", "puppet"],
+        "description": "The type of the character."
+      }
+    }
+  },
+  {
+    "description": "Extra info about a character. Reliability of lfrpDesc seems patchy at best.",
+    "id": ["CHARACTER_INFO(core.char.{id}.info)"],
+    "name": "CharacterInfo",
+    "props": {
+      "about": { "type": "string", "description": "About the character." },
+      "lfrpDesc": {
+        "type": "string",
+        "description": "The LFRP description of the character."
+      }
+    }
+  },
+  {
+    "description": "A minimal character, seen in the list of muted and focused characters.",
+    "id": ["CHARACTER_MIN(core.char.{id}.min)"],
+    "name": "CharacterMin",
+    "props": {
+      "avatar": {
+        "type": "string",
+        "description": "The avatar of the character."
+      },
+      "gender": {
+        "type": "string",
+        "description": "The gender of the character."
+      },
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the character."
+      },
+      "name": { "type": "string", "description": "The name of the character." },
+      "species": {
+        "type": "string",
+        "description": "The species of the character."
+      },
+      "surname": {
+        "type": "string",
+        "description": "The surname of the character."
+      }
+    }
+  },
+  {
+    "description": "A controlled character.",
+    "id": ["CONTROLLED_CHARACTER(core.char.{id}.ctrl)", "CONTROLLED_PUPPET(core.char.{char}.puppet.{puppet}.ctrl)"],
+    "name": "ControlledCharacter",
+    "props": {
+      "about": { "type": "string", "description": "About the character." },
+      "avatar": {
+        "type": "string",
+        "description": "The avatar of the character."
+      },
+      "ctrlSince": {
+        "type": "number",
+        "description": "The timestamp when control started."
+      },
+      "customTeleportMsgs": {
+        "type": "boolean",
+        "description": "Whether the character has custom teleport messages enabled."
+      },
+      "desc": {
+        "type": "string",
+        "description": "The description of the character."
+      },
+      "gender": {
+        "type": "string",
+        "description": "The gender of the character."
+      },
+      "home": {
+        "model": "Room",
+        "description": "The home room of the character."
+      },
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the character."
+      },
+      "idle": {
+        "type": "number",
+        "oneOf": [0, 1, 2, 3],
+        "description": "The idle state of the character."
+      },
+      "image": {
+        "model": "?Image",
+        "description": "The image of the character."
+      },
+      "inRoom": {
+        "model": "RoomDetails",
+        "description": "The room the character is currently in."
+      },
+      "lfrpDesc": {
+        "type": "?string",
+        "description": "The LFRP description of the character."
+      },
+      "lookedAt": {
+        "model": "LookedAt",
+        "description": "Information about who is looking at the character."
+      },
+      "lookingAt": {
+        "model": "?LookAt",
+        "description": "Information about who the character is looking at."
+      },
+      "name": { "type": "string", "description": "The name of the character." },
+      "nodes": {
+        "collection": "CharacterNodes",
+        "description": "The nodes associated with the character."
+      },
+      "ownedAreas": {
+        "collection": "OwnedAreas",
+        "description": "The areas owned by the character."
+      },
+      "ownedRooms": {
+        "collection": "OwnedRooms",
+        "description": "The rooms owned by the character."
+      },
+      "profiles": {
+        "collection": "Profiles",
+        "description": "The profiles associated with the character."
+      },
+      "puppeteer": {
+        "model": "?Character",
+        "description": "The puppeteer controlling the character, if any."
+      },
+      "puppetInfo": {
+        "model": "?PuppetInfo",
+        "description": "Information about the character's puppet, if any."
+      },
+      "rp": {
+        "type": "string",
+        "oneOf": ["lfrp", ""],
+        "description": "The roleplay style of the character."
+      },
+      "settings": {
+        "model": "Settings",
+        "description": "The settings associated with the character."
+      },
+      "species": {
+        "type": "string",
+        "description": "The species of the character."
+      },
+      "state": {
+        "type": "string",
+        "oneOf": ["awake", "asleep"],
+        "description": "The state of the character."
+      },
+      "status": {
+        "type": "string",
+        "description": "The status of the character."
+      },
+      "surname": {
+        "type": "string",
+        "description": "The surname of the character."
+      },
+      "tags": {
+        "model": "CharacterTags",
+        "description": "The tags associated with the character."
+      },
+      "teleportArriveMsg": {
+        "type": "string",
+        "description": "The message displayed when the character arrives via teleportation."
+      },
+      "teleportLeaveMsg": {
+        "type": "string",
+        "description": "The message displayed when the character leaves via teleportation."
+      },
+      "teleportTravelMsg": {
+        "type": "string",
+        "description": "The message displayed during the character's teleportation travel."
+      },
+      "type": {
+        "type": "string",
+        "oneOf": ["player", "puppet"],
+        "description": "The type of the character."
+      }
+    }
+  },
+  {
+    "description": "An exit.",
+    "id": ["EXIT(core.exit.{id})"],
+    "name": "Exit",
+    "props": {
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the exit."
+      },
+      "keys": {
+        "type": "array[string]",
+        "description": "The keys associated with the exit."
+      },
+      "icon": {
+        "type": "string",
+        "oneOf": ["n", "ne", "e", "se", "s", "sw", "w", "nw", ""],
+        "description": "The icon representing the exit direction."
+      },
+      "nav": {
+        "type": "string",
+        "oneOf": ["n", "ne", "e", "se", "s", "sw", "w", "nw", "up", "down", "in", "out", ""],
+        "description": "The navigation direction of the exit."
+      },
+      "name": { "type": "string", "description": "The name of the exit." },
+      "target": { "model": "AfarRoom", "description": "The target room of the exit." },
+      "targetId": { "type": "string", "description": "The ID of the target room." }
+    }
+  },
+  {
+    "description": "A detailed exit.",
+    "id": ["EXIT_DETAILS(core.exit.{id}.details)"],
+    "name": "ExitDetails",
+    "props": {
+      "arriveMsg": {
+        "type": "string",
+        "description": "The message seen by the target room."
+      },
+      "created": {
+        "type": "number",
+        "description": "The timestamp when the exit was created."
+      },
+      "hidden": {
+        "type": "boolean",
+        "description": "Whether the exit is hidden."
+      },
+      "icon": {
+        "type": "string",
+        "oneOf": ["n", "ne", "e", "se", "s", "sw", "w", "nw", ""],
+        "description": "The icon representing the exit direction."
+      },
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the exit."
+      },
+      "inactive": {
+        "type": "boolean",
+        "description": "Whether the exit is inactive."
+      },
+      "keys": {
+        "type": "array[string]",
+        "description": "The keys associated with the exit."
+      },
+      "leaveMsg": {
+        "type": "string",
+        "description": "The message seen when leaving through the exit."
+      },
+      "name": { "type": "string", "description": "The name of the exit." },
+      "nav": {
+        "type": "string",
+        "oneOf": ["n", "ne", "e", "se", "s", "sw", "w", "nw", "up", "down", "in", "out", ""],
+        "description": "The navigation direction of the exit."
+      },
+      "targetRoom": {
+        "model": "Room",
+        "description": "The target room of the exit."
+      },
+      "transparent": {
+        "type": "boolean",
+        "description": "Whether the exit is transparent."
+      },
+      "travelMsg": {
+        "type": "string",
+        "description": "The message displayed during travel through the exit."
+      }
+    }
+  },
+  {
+    "description": "The focus options for a character.",
+    "id": ["CHARACTER_FOCUS(core.char.{id}.focus)", "PUPPET_FOCUS(core.char.{char}.puppet.{puppet}.focus)"],
+    "name": "Focus",
+    "props": {}
+  },
+  {
+    "collection": true,
+    "description": "The characters being focused on.",
+    "id": ["CHARACTER_FOCUS_CHARS(core.char.{id}.focus.chars)", "PUPPET_FOCUS_CHARS(core.char.{char}.puppet.{puppet}.focus.chars)"],
+    "name": "FocusChars",
+    "model": "CharacterMin"
+  },
+  {
+    "description": "The logged in player's identity.",
+    "id": ["IDENTITY(identity.user.{id})"],
+    "name": "Identity",
+    "props": {
+      "allowNewsletter": {
+        "type": "boolean",
+        "description": "Whether the user allows newsletters."
+      },
+      "created": {
+        "type": "number",
+        "description": "The timestamp when the identity was created."
+      },
+      "email": {
+        "type": "?string",
+        "description": "The email address of the user."
+      },
+      "emailVerified": {
+        "type": "boolean",
+        "description": "Whether the user's email is verified."
+      },
+      "hasLogin": {
+        "type": "boolean",
+        "description": "Whether the user has login credentials."
+      },
+      "hasOpenId": {
+        "type": "boolean",
+        "description": "Whether the user has an OpenID."
+      },
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the identity."
+      },
+      "idRoles": {
+        "type": "array[string]",
+        "description": "The roles associated with the identity."
+      },
+      "name": { "type": "string", "description": "The name of the user." },
+      "openIdProvider": {
+        "type": "?string",
+        "description": "The OpenID provider, if any."
+      },
+      "username": {
+        "type": "string",
+        "description": "The username of the user."
+      }
+    }
+  },
+  {
+    "description": "An image.",
+    "id": ["AREA_IMAGE(core.area.img.{id})", "CHARACTER_IMAGE(core.char.img.{id})", "ROOM_IMAGE(core.room.img.{id})"],
+    "name": "Image",
+    "props": {
+      "filename": {
+        "type": "string",
+        "description": "The filename of the image."
+      },
+      "height": {
+        "type": "number",
+        "description": "The height of the image in pixels."
+      },
+      "href": {
+        "type": "string",
+        "description": "The URL or path to the image."
+      },
+      "mime": {
+        "type": "string",
+        "description": "The MIME type of the image."
+      },
+      "sha256": {
+        "type": "string",
+        "description": "The SHA-256 hash of the image file."
+      },
+      "size": {
+        "type": "number",
+        "description": "The size of the image file in bytes."
+      },
+      "width": {
+        "type": "number",
+        "description": "The width of the image in pixels."
+      }
+    }
+  },
+  {
+    "description": "The character being looked at.",
+    "id": ["LOOK_AT(core.lookat.char.{char}.inroom.{room})"],
+    "name": "LookAt",
+    "props": {
+      "charId": {
+        "type": "string",
+        "description": "The unique identifier of the character being looked at."
+      },
+      "char": {
+        "model": "?CharacterDetails",
+        "description": "The character being looked at, if they are still in the room."
+      },
+      "unseen": {
+        "model": "?Character",
+        "description": "The character being looked at, if they are no longer in the room."
+      }
+    }
+  },
+  {
+    "description": "The characters looking at an owned character.",
+    "id": ["LOOKED_AT(core.lookedat.char.{char}.inroom.{room})", "LOOKED_AT_INSTANCE(core.instance.{instance}.lookedat.char.{char}.inroom.{room})"],
+    "name": "LookedAt",
+    "props": {}
+  },
+  {
+    "description": "A mail message.",
+    "id": ["MAIL_MESSAGE(mail.message.{id})"],
+    "name": "MailMessage",
+    "props": {
+      "ooc": {
+        "type": "boolean",
+        "description": "Out of character message flag."
+      },
+      "pose": {
+        "type": "boolean",
+        "description": "Whether the message is a pose."
+      },
+      "text": {
+        "type": "string",
+        "description": "The content of the mail message."
+      }
+    }
+  },
+  {
+    "collection": true,
+    "description": "The characters that are muted.",
+    "id": ["MUTED_CHARACTERS(core.player.{id}.mutedchars)"],
+    "name": "MutedCharacters",
+    "model": "CharacterMin"
+  },
+  {
+    "description": "A teleportation node.",
+    "id": ["NODE(core.node.{id})"],
+    "name": "Node",
+    "props": {
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the node."
+      },
+      "key": {
+        "type": "string",
+        "description": "The key associated with the node."
+      },
+      "room": {
+        "model": "Room",
+        "description": "The room this node is associated with."
+      }
+    }
+  },
+  {
+    "description": "A note on a character.",
+    "id": ["NOTE(note.player.{player}.note.{char})"],
+    "name": "Note",
+    "props": {
+      "char": {
+        "model": "Character",
+        "description": "The character this note is about."
+      },
+      "text": { "type": "string", "description": "The content of the note." }
+    }
+  },
+  {
+    "collection": true,
+    "description": "All notes.",
+    "id": ["NOTES(note.player.{id}.notes)"],
+    "name": "Notes",
+    "model": "ResRef"
+  },
+  {
+    "description": "An owned character.",
+    "id": ["CHARACTER_OWNED(core.char.{id}.owned)"],
+    "name": "OwnedCharacter",
+    "props": {
+      "avatar": {
+        "type": "string",
+        "description": "The avatar unique identifier."
+      },
+      "created": {
+        "type": "number",
+        "description": "The timestamp when the character was created."
+      },
+      "desc": {
+        "type": "string",
+        "description": "The description of the character."
+      },
+      "gender": {
+        "type": "string",
+        "description": "The gender of the character."
+      },
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the character."
+      },
+      "idle": {
+        "type": "number",
+        "oneOf": [0, 1, 2, 3],
+        "description": "The idle state of the character."
+      },
+      "image": {
+        "model": "?Image",
+        "description": "The image associated with the character."
+      },
+      "inRoom": {
+        "model": "Room",
+        "description": "The room the character is currently in."
+      },
+      "lastAwake": {
+        "type": "number",
+        "description": "The timestamp when the character was last awake."
+      },
+      "name": { "type": "string", "description": "The name of the character." },
+      "settings": {
+        "model": "Settings",
+        "description": "The settings for the character."
+      },
+      "species": {
+        "type": "string",
+        "description": "The species of the character."
+      },
+      "state": {
+        "type": "string",
+        "oneOf": ["awake", "asleep"],
+        "description": "The current state of the character."
+      },
+      "status": {
+        "type": "string",
+        "description": "The status message of the character."
+      },
+      "surname": {
+        "type": "string",
+        "description": "The surname of the character."
+      },
+      "type": {
+        "type": "string",
+        "oneOf": ["player", "puppet"],
+        "description": "The type of character."
+      }
+    }
+  },
+  {
+    "description": "The logged in player.",
+    "id": ["PLAYER(core.player.{id})"],
+    "name": "Player",
+    "props": {
+      "chars": {
+        "collection": "OwnedCharacters",
+        "description": "The characters owned by the player."
+      },
+      "controlled": {
+        "collection": "ControlledCharacters",
+        "description": "The characters currently controlled by the player."
+      },
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the player."
+      },
+      "mutedChars": {
+        "model": "MutedCharacters",
+        "description": "The characters muted by the player."
+      },
+      "notifyOnEvent": {
+        "type": "boolean",
+        "description": "Whether the player wants notifications for events."
+      },
+      "notifyOnMatched": {
+        "type": "boolean",
+        "description": "Whether the player wants notifications for matches."
+      },
+      "notifyOnMention": {
+        "type": "boolean",
+        "description": "Whether the player wants notifications for mentions."
+      },
+      "notifyOnRequests": {
+        "type": "boolean",
+        "description": "Whether the player wants notifications for requests."
+      },
+      "notifyOnWakeup": {
+        "type": "boolean",
+        "description": "Whether the player wants notifications for wakeup calls."
+      },
+      "notifyOnWatched": {
+        "type": "boolean",
+        "description": "Whether the player wants notifications for watched characters."
+      },
+      "puppets": {
+        "collection": "Puppets",
+        "description": "The puppets controlled by the player."
+      }
+    }
+  },
+  {
+    "description": "A mail message.",
+    "id": ["PLAYER_MAIL_MESSAGE(mail.player.{player}.message.{message})"],
+    "name": "PlayerMailMessage",
+    "props": {
+      "from": { "type": "object", "description": "The sender of the mail." },
+      "read": {
+        "type": "?number",
+        "description": "The timestamp when the mail was read."
+      },
+      "received": {
+        "type": "number",
+        "description": "The timestamp when the mail was received."
+      },
+      "to": { "type": "object", "description": "The recipient of the mail." }
+    }
+  },
+  {
+    "description": "A character profile.",
+    "id": ["PROFILE(core.profile.{id})"],
+    "name": "Profile",
+    "props": {
+      "avatar": {
+        "type": "string",
+        "description": "The unique identifier of the avatar image."
+      },
+      "gender": {
+        "type": "string",
+        "description": "The gender of the character."
+      },
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the profile."
+      },
+      "image": {
+        "type": "string",
+        "description": "The URL of the profile image."
+      },
+      "key": {
+        "type": "string",
+        "description": "The key associated with the profile."
+      },
+      "lastUsed": {
+        "type": "number",
+        "description": "The timestamp when the profile was last used."
+      },
+      "name": { "type": "string", "description": "The name of the character." },
+      "species": {
+        "type": "string",
+        "description": "The species of the character."
+      }
+    }
+  },
+  {
+    "description": "A puppet.",
+    "id": ["PUPPET(core.char.{char}.puppet.{puppet})"],
+    "name": "Puppet",
+    "props": {
+      "lastUsed": {
+        "type": "number",
+        "description": "The timestamp when the puppet was last used."
+      },
+      "registered": {
+        "type": "number",
+        "description": "The timestamp when the puppet was registered."
+      },
+      "char": {
+        "model": "OwnedCharacter",
+        "description": "The character that has registered the puppet."
+      },
+      "puppet": {
+        "model": "Character",
+        "description": "The character being puppeted."
+      },
+      "settings": {
+        "model": "Settings",
+        "description": "The settings for the puppet."
+      }
+    }
+  },
+  {
+    "description": "The info for a puppet.",
+    "id": ["PUPPET_INFO(core.puppet.{id}.info)"],
+    "name": "PuppetInfo",
+    "props": {
+      "boundingArea": {
+        "type": "any",
+        "description": "The bounding area of the puppet. @TODO unknown, only seen null"
+      },
+      "howToPlay": {
+        "type": "string",
+        "description": "Instructions on how to play the puppet."
+      }
+    }
+  },
+  {
+    "description": "A request for changing ownership of areas and rooms, creating exits, etc.",
+    "id": ["REQUEST(core.request.{id})"],
+    "name": "Request",
+    "props": {
+      "answered": {
+        "type": "number",
+        "description": "The timestamp when the request was answered."
+      },
+      "created": {
+        "type": "number",
+        "description": "The timestamp when the request was created."
+      },
+      "error": {
+        "type": "any",
+        "description": "Any error associated with the request."
+      },
+      "expires": {
+        "type": "number",
+        "description": "The timestamp when the request expires."
+      },
+      "from": {
+        "model": "Character",
+        "description": "The character who made the request."
+      },
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the request."
+      },
+      "params": {
+        "model": "RequestParams",
+        "description": "The parameters for the request."
+      },
+      "state": {
+        "type": "string",
+        "description": "The current state of the request."
+      },
+      "to": {
+        "model": "Character",
+        "description": "The character to whom the request is directed."
+      },
+      "type": { "type": "string", "description": "The type of the request." }
+    }
+  },
+  {
+    "description": "The parameters for a request.",
+    "id": ["REQUEST_PARAMS(core.request.{id}.params)"],
+    "name": "RequestParams",
+    "props": {
+      "area": {
+        "model": "?Area",
+        "description": "The area related to the request."
+      },
+      "room": {
+        "model": "?Room",
+        "description": "The room related to the request."
+      }
+    }
+  },
+  {
+    "description": "A room.",
+    "id": ["ROOM(core.room.{id})"],
+    "name": "Room",
+    "props": {
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the room."
+      },
+      "name": { "type": "string", "description": "The name of the room." }
+    }
+  },
+  {
+    "description": "A character in the current room.",
+    "id": ["ROOM_CHARACTER(core.char.{id}.inroom)"],
+    "name": "RoomCharacter",
+    "props": {
+      "avatar": {
+        "type": "string",
+        "description": "The unique identifier of the character's avatar image."
+      },
+      "gender": {
+        "type": "string",
+        "description": "The gender of the character."
+      },
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the character."
+      },
+      "idle": {
+        "type": "number",
+        "oneOf": [0, 1, 2, 3],
+        "description": "The idle state of the character."
+      },
+      "name": { "type": "string", "description": "The name of the character." },
+      "rp": {
+        "type": "string",
+        "oneOf": ["lfrp", ""],
+        "description": "The roleplay status of the character."
+      },
+      "species": {
+        "type": "string",
+        "description": "The species of the character."
+      },
+      "state": {
+        "type": "string",
+        "oneOf": ["awake", "asleep"],
+        "description": "The current state of the character."
+      },
+      "status": {
+        "type": "string",
+        "description": "The status message of the character."
+      },
+      "surname": {
+        "type": "string",
+        "description": "The surname of the character."
+      },
+      "type": {
+        "type": "string",
+        "oneOf": ["player", "puppet"],
+        "description": "The type of the character."
+      }
+    }
+  },
+  {
+    "description": "A child room of an area.",
+    "id": ["ROOM_CHILD(core.room.{id}.child)"],
+    "name": "RoomChild",
+    "props": {
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the child room."
+      },
+      "mapX": {
+        "type": "number",
+        "description": "The X coordinate of the child room on the map."
+      },
+      "mapY": {
+        "type": "number",
+        "description": "The Y coordinate of the child room on the map."
+      },
+      "name": {
+        "type": "string",
+        "description": "The name of the child room."
+      },
+      "pop": {
+        "type": "number",
+        "description": "The population of the child room."
+      },
+      "type": {
+        "type": "string",
+        "oneOf": ["room", "instanceRoom"],
+        "description": "The type of the child room."
+      }
+    }
+  },
+  {
+    "description": "A command in a room.",
+    "id": ["ROOM_COMMAND(core.roomcmd.{id})"],
+    "name": "RoomCommand",
+    "props": {
+      "cmd": {
+        "type": "object",
+        "literal": "Record<\"pattern\" | \"desc\", string>",
+        "description": "The command object."
+      },
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the command."
+      },
+      "priority": {
+        "type": "number",
+        "description": "The priority of the command."
+      }
+    }
+  },
+  {
+    "collection": true,
+    "description": "The commands in a room.",
+    "id": ["ROOM_COMMANDS(core.room.{id}.cmds)"],
+    "name": "RoomCommands",
+    "model": "RoomCommand"
+  },
+  {
+    "description": "A detailed view of a room.",
+    "id": ["ROOM_DETAILS(core.room.{id}.details)"],
+    "name": "RoomDetails",
+    "props": {
+      "area": {
+        "model": "?AreaDetails",
+        "description": "The area this room belongs to."
+      },
+      "autosweep": {
+        "type": "boolean",
+        "description": "Whether autosweep is enabled."
+      },
+      "autosweepDelay": {
+        "type": "number",
+        "description": "The delay for autosweep in seconds."
+      },
+      "chars": {
+        "collection": "RoomCharacters",
+        "description": "The characters present in the room."
+      },
+      "cmds": {
+        "model": "RoomCommands",
+        "description": "The commands available in the room."
+      },
+      "desc": {
+        "type": "string",
+        "description": "The description of the room."
+      },
+      "exits": {
+        "collection": "Exits",
+        "description": "The exits from the room."
+      },
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the room."
+      },
+      "image": {
+        "model": "?Image",
+        "description": "The image associated with the room."
+      },
+      "isDark": {
+        "type": "boolean",
+        "description": "Whether the room is dark."
+      },
+      "isHome": {
+        "type": "boolean",
+        "description": "Whether the room is a home."
+      },
+      "isInstance": {
+        "type": "boolean",
+        "description": "Whether the room is an instance."
+      },
+      "isQuiet": {
+        "type": "boolean",
+        "description": "Whether the room is quiet."
+      },
+      "isTeleport": {
+        "type": "boolean",
+        "description": "Whether teleportation is allowed in the room."
+      },
+      "listen": {
+        "type": "boolean",
+        "description": "Whether listening is enabled in the room."
+      },
+      "mapX": {
+        "type": "number",
+        "description": "The X coordinate of the room on the map."
+      },
+      "mapY": {
+        "type": "number",
+        "description": "The Y coordinate of the room on the map."
+      },
+      "name": { "type": "string", "description": "The name of the room." },
+      "owner": {
+        "model": "Character",
+        "description": "The owner of the room."
+      },
+      "pop": { "type": "number", "description": "The population of the room." },
+      "private": {
+        "type": "boolean",
+        "description": "Whether the room is private (population hidden in area)."
+      }
+    }
+  },
+  {
+    "description": "A detailed view of a room instance.",
+    "id": ["ROOM_INSTANCE_DETAILS(core.instance.{instance}.room.{room}.details)"],
+    "name": "RoomInstanceDetails",
+    "props": {
+      "area": {
+        "model": "?AreaDetails",
+        "description": "The area this room belongs to."
+      },
+      "autosweep": {
+        "type": "boolean",
+        "description": "Whether autosweep is enabled."
+      },
+      "autosweepDelay": {
+        "type": "number",
+        "description": "The delay for autosweep in seconds."
+      },
+      "chars": {
+        "collection": "RoomCharacters",
+        "description": "The characters present in the room."
+      },
+      "cmds": {
+        "model": "RoomCommands",
+        "description": "The commands available in the room."
+      },
+      "desc": {
+        "type": "string",
+        "description": "The description of the room."
+      },
+      "exits": {
+        "collection": "Exits",
+        "description": "The exits from the room."
+      },
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the room."
+      },
+      "image": {
+        "model": "?Image",
+        "description": "The image associated with the room."
+      },
+      "instanceId": {
+        "type": "string",
+        "description": "The instance identifier of the room."
+      },
+      "isDark": {
+        "type": "boolean",
+        "description": "Whether the room is dark."
+      },
+      "isHome": {
+        "type": "boolean",
+        "description": "Whether the room can be set as a home."
+      },
+      "isInstance": {
+        "type": "boolean",
+        "description": "Whether the room is an instance."
+      },
+      "isQuiet": {
+        "type": "boolean",
+        "description": "Whether the room is quiet."
+      },
+      "isTeleport": {
+        "type": "boolean",
+        "description": "Whether the room can be registered as a teleport node."
+      },
+      "listen": {
+        "type": "boolean",
+        "description": "Whether listening is enabled in the room."
+      },
+      "mapX": {
+        "type": "number",
+        "description": "The X coordinate of the room on the map."
+      },
+      "mapY": {
+        "type": "number",
+        "description": "The Y coordinate of the room on the map."
+      },
+      "name": { "type": "string", "description": "The name of the room." },
+      "owner": {
+        "model": "Character",
+        "description": "The owner of the room."
+      },
+      "pop": { "type": "number", "description": "The population of the room." },
+      "private": {
+        "type": "boolean",
+        "description": "Whether the room is private."
+      }
+    }
+  },
+  {
+    "description": "A profile of a room.",
+    "id": ["ROOM_PROFILE(core.roomprofile.{id})"],
+    "name": "RoomProfile",
+    "props": {
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the profile."
+      },
+      "image": {
+        "type": "string",
+        "description": "The image associated with the profile."
+      },
+      "key": { "type": "string", "description": "The key of the profile." },
+      "lastUsed": {
+        "type": "number",
+        "description": "The last time the profile was used."
+      },
+      "name": { "type": "string", "description": "The name of the profile." }
+    }
+  },
+  {
+    "description": "A room script.",
+    "id": ["ROOMSCRIPT(core.roomscript.{id})"],
+    "name": "RoomScript",
+    "props": {
+      "active": {
+        "type": "boolean",
+        "description": "Whether the script is active."
+      },
+      "created": {
+        "type": "number",
+        "description": "The time the script was created."
+      },
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the script."
+      },
+      "key": { "type": "string", "description": "The key of the script." },
+      "updated": {
+        "type": "number",
+        "description": "The time the script was last updated."
+      },
+      "version": {
+        "type": "string",
+        "description": "The version of the script."
+      }
+    }
+  },
+  {
+    "description": "A detailed room script.",
+    "id": ["ROOMSCRIPT_DETAILS(core.roomscript.{id}.details)"],
+    "name": "RoomScriptDetails",
+    "props": {
+      "active": {
+        "type": "boolean",
+        "description": "Whether the script is active."
+      },
+      "address": {
+        "type": "string",
+        "description": "The address of the script."
+      },
+      "binary": {
+        "model": "?ScriptBinary",
+        "description": "The binary data of the script."
+      },
+      "created": {
+        "type": "number",
+        "description": "The time the script was created."
+      },
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the script."
+      },
+      "key": { "type": "string", "description": "The key of the script." },
+      "logs": {
+        "collection": "ScriptLogs",
+        "description": "The logs of the script."
+      },
+      "room": {
+        "model": "Room",
+        "description": "The room associated with the script."
+      },
+      "target": {
+        "type": "string",
+        "description": "The target of the script."
+      },
+      "updated": {
+        "type": "number",
+        "description": "The time the script was last updated."
+      },
+      "version": {
+        "type": "string",
+        "description": "The version of the script."
+      }
+    }
+  },
+  {
+    "description": "The user when logged in with a management token.",
+    "id": ["SAFE_USER(auth.user.{id}.safe)"],
+    "name": "SafeUser",
+    "props": {
+      "created": {
+        "type": "number",
+        "description": "The time the user was created."
+      },
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the user."
+      },
+      "roles": {
+        "type": "any",
+        "description": "The roles assigned to the user. @TODO only seen null"
+      },
+      "trust": {
+        "type": "string",
+        "description": "The trust of the user. @TODO never seen a non-empty value"
+      }
+    }
+  },
+  {
+    "description": "The binary for a room script.",
+    "id": ["SCRIPT_BINARY(core.script.{script}.binary.{binary})"],
+    "name": "ScriptBinary",
+    "props": {
+      "filename": { "type": "string", "description": "The name of the file." },
+      "href": { "type": "string", "description": "The URL to the binary." },
+      "mime": {
+        "type": "string",
+        "description": "The MIME type of the binary."
+      },
+      "sha256": {
+        "type": "string",
+        "description": "The SHA-256 hash of the binary."
+      },
+      "size": {
+        "type": "number",
+        "description": "The size of the binary in bytes."
+      }
+    }
+  },
+  {
+    "description": "A log for a room script.",
+    "id": ["SCRIPT_LOG(core.script.log.{id})"],
+    "name": "ScriptLog",
+    "props": {
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the log."
+      },
+      "lvl": { "type": "string", "description": "The level of the log." },
+      "msg": { "type": "string", "description": "The message of the log." },
+      "time": {
+        "type": "number",
+        "description": "The time the log was created."
+      }
+    }
+  },
+  {
+    "description": "The settings for a character or puppet.",
+    "id": ["CHARACTER_SETTINGS(core.char.{id}.settings)", "PUPPET_SETTINGS(core.char.{ctrl}.puppet.{puppet}.settings)"],
+    "name": "Settings",
+    "props": {
+      "dnd": { "type": "boolean", "description": "Do Not Disturb status." },
+      "dndMsg": {
+        "type": "string",
+        "description": "The Do Not Disturb message."
+      },
+      "focus": { "model": "Focus", "description": "The current focus." },
+      "muteMessage": {
+        "type": "boolean",
+        "description": "Whether messages are muted."
+      },
+      "muteOoc": { "type": "boolean", "description": "Whether OOC is muted." },
+      "muteTravel": {
+        "type": "boolean",
+        "description": "Whether travel is muted."
+      },
+      "notifyOnAll": {
+        "type": "boolean",
+        "description": "Whether to notify on all messages."
+      },
+      "lfrpDesc": { "type": "string", "description": "The LFRP description." },
+      "triggers": {
+        "collection": "Triggers",
+        "description": "The triggers associated with the settings."
+      }
+    }
+  },
+  {
+    "description": "A tag.",
+    "id": ["TAG(tag.tag.{id})"],
+    "name": "Tag",
+    "props": {
+      "custom": {
+        "type": "boolean",
+        "description": "Whether the tag is custom."
+      },
+      "desc": {
+        "type": "string",
+        "description": "The description of the tag."
+      },
+      "group": { "type": "?string", "description": "The group of the tag." },
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the tag."
+      },
+      "idRole": {
+        "type": "?string",
+        "oneOf": ["supporter", "pioneer"],
+        "description": "The id role of the tag."
+      },
+      "key": { "type": "string", "description": "The key of the tag." },
+      "role": {
+        "type": "?string",
+        "oneOf": ["builder", "helper", "moderator", "admin"],
+        "description": "The role associated with the tag."
+      }
+    }
+  },
+  {
+    "collection": true,
+    "description": "The tags of a character.",
+    "id": ["CHARACTER_TAGS(tag.char.{id}.tags)"],
+    "name": "CharacterTags",
+    "model": "Tag"
+  },
+  {
+    "collection": true,
+    "description": "Unread mail.",
+    "id": ["UNREAD_MAIL(mail.player.{id}.unread)"],
+    "name": "UnreadMail",
+    "model": "ResRef"
+  },
+  {
+    "description": "The user when logging in with username/password.",
+    "id": ["USER(auth.user.{id})"],
+    "name": "User",
+    "props": {
+      "created": {
+        "type": "number",
+        "description": "The time the user was created."
+      },
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the user."
+      },
+      "roles": {
+        "type": "any",
+        "description": "The roles assigned to the user. @TODO only seen null"
+      },
+      "trust": {
+        "type": "string",
+        "description": "The trust of the user. @TODO never seen a non-empty value"
+      },
+      "identity": {
+        "model": "Identity",
+        "description": "The identity associated with the user."
+      }
+    }
+  },
+  {
+    "description": "A watched character.",
+    "id": ["WATCH(note.player.{player}.watch.{char})"],
+    "name": "Watch",
+    "props": {
+      "char": {
+        "model": "Character",
+        "description": "The character being watched."
+      },
+      "created": {
+        "type": "number",
+        "description": "The time the watch was created."
+      },
+      "watchers": {
+        "type": "array[string]",
+        "description": "The list of watchers."
+      }
+    }
+  },
+  {
+    "collection": true,
+    "description": "Watched characters.",
+    "id": ["WATCHES(note.player.{id}.watches)"],
+    "name": "Watches",
+    "model": "ResRef"
+  }
+]

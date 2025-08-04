@@ -1,0 +1,51 @@
+/** @module TypedEmitter */
+import { Debug } from "./Debug.js";
+import { UncaughtError, UnsubscribeError } from "./Errors.js";
+import EventEmitter from "node:events";
+/* eslint-disable @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument */
+
+declare interface TypedEmitter<Events extends Record<string | symbol, any>> extends EventEmitter {
+    addListener<K extends keyof Events>(event: K, listener: (...args: Events[K]) => void): this;
+    emit<K extends keyof Events>(eventName: K, ...args: Events[K]): boolean;
+    listenerCount(eventName: keyof Events): number;
+    listeners(eventName: keyof Events): Array<Function>;
+    off<K extends keyof Events>(event: K, listener: (...args: Events[K]) => void): this;
+    on<K extends keyof Events>(event: K, listener: (...args: Events[K]) => void): this;
+    once<K extends keyof Events>(event: K, listener: (...args: Events[K]) => void): this;
+    prependListener<K extends keyof Events>(event: K, listener: (...args: Events[K]) => void): this;
+    prependOnceListener<K extends keyof Events>(event: K, listener: (...args: Events[K]) => void): this;
+    rawListeners(eventName: keyof Events): Array<Function>;
+    removeAllListeners(event?: keyof Events): this;
+    removeListener<K extends keyof Events>(event: K, listener: (...args: Events[K]) => void): this;
+    /* eventNames is excluded */
+}
+
+class TypedEmitter<Events extends Record<string | symbol, any>> extends EventEmitter {
+    override emit<K extends keyof Events>(eventName: K, ...args: Events[K]): boolean {
+        if (this.listenerCount(eventName) === 0) {
+            switch (eventName) {
+                case "error": {
+                    throw new UncaughtError(args[0]);
+                }
+
+                case "unsubscribe": {
+                    throw new UnsubscribeError();
+                }
+
+                case "missingCollection": {
+                    Debug("missingCollection", args[0]);
+                    break;
+                }
+
+                case "missingModel": {
+                    Debug("missingModel", args[0]);
+                    break;
+                }
+            }
+            return false;
+        }
+        return super.emit(eventName as string, ...args as Array<any>);
+    }
+}
+
+export default TypedEmitter;

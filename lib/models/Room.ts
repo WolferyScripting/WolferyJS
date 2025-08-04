@@ -1,0 +1,20 @@
+import BaseModel from "./BaseModel.js";
+import type WolferyJS from "../WolferyJS.js";
+import ResourceIDs from "../generated/ResourceIDs.js";
+import type RoomProfiles from "../collections/RoomProfiles.js";
+import type { RoomProperties } from "../generated/models/types.js";
+import { RoomDefinition } from "../generated/models/definitions.js";
+import type { ResClient } from "resclient-ts";
+
+declare interface Room extends BaseModel, RoomProperties {}
+class Room extends BaseModel implements RoomProperties {
+    constructor(client: WolferyJS, api: ResClient, rid: string) {
+        super(client, api, rid, { definition: RoomDefinition });
+    }
+
+    async getProfiles(): Promise<RoomProfiles> {
+        return this.api.get<RoomProfiles>(ResourceIDs.ROOM_PROFILES({ id: this.id }));
+    }
+}
+
+export default Room;

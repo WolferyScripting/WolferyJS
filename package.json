@@ -1,0 +1,82 @@
+{
+  "name": "wolfery.js",
+  "version": "0.0.1-beta.0",
+  "description": "",
+  "types": "./dist/esm/index.d.mts",
+  "main": "./dist/cjs/index.mjs",
+  "module": "./dist/esm/index.cjs",
+  "exports": {
+    ".": {
+      "types": "./dist/esm/index.d.mts",
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/cjs/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "npm run build:schema && sh build.sh",
+    "lint": "eslint lib",
+    "lint:fix": "eslint lib --fix",
+    "prepack": "npm run build",
+    "build:schema": "node --no-warnings --no-deprecation --experimental-specifier-resolution=node --enable-source-maps --loader ts-node/esm/transpile-only -r tsconfig-paths/register schema/Builder.ts",
+    "build:schema:collections": "node --no-warnings --no-deprecation --experimental-specifier-resolution=node --enable-source-maps --loader ts-node/esm/transpile-only -r tsconfig-paths/register schema/Builder.ts - collections",
+    "build:schema:models": "node --no-warnings --no-deprecation --experimental-specifier-resolution=node --enable-source-maps --loader ts-node/esm/transpile-only -r tsconfig-paths/register schema/Builder.ts - models",
+    "build:schema:definitions": "npm run build:schema -- definitions",
+    "build:schema:definitions:collections": "npm run build:schema -- definitions collections",
+    "build:schema:definitions:models": "npm run build:schema -- definitions models",
+    "build:schema:exports": "npm run build:schema -- exports",
+    "build:schema:exports:collections": "npm run build:schema -- exports collections",
+    "build:schema:exports:models": "npm run build:schema -- exports models",
+    "build:schema:types": "npm run build:schema -- types",
+    "build:schema:types:collections": "npm run build:schema -- types collections",
+    "build:schema:types:models": "npm run build:schema -- types models",
+    "build:schema:resourceids": "npm run build:schema -- resourceids",
+    "build:schema:registry": "npm run build:schema -- registry",
+    "build:schema:registry:collections": "npm run build:schema -- registry collections",
+    "build:schema:registry:models": "npm run build:schema -- registry models"
+  },
+  "keywords": [],
+  "author": "",
+  "type": "module",
+  "license": "MIT",
+  "dependencies": {
+    "file-type": "^21.0.0",
+    "resclient-ts": "1.1.1",
+    "tslib": "^2.8.1",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "@sinclair/typebox": "^0.34.40",
+    "@swc/core": "^1.13.2",
+    "@swc/helpers": "^0.5.17",
+    "@types/debug": "^4.1.12",
+    "@types/node": "^24.1.0",
+    "@types/ws": "^8.18.1",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "@uwu-codes/eslint-config": "^1.1.28",
+    "@uwu-codes/tsconfig": "1.0.7",
+    "ajv": "^8.17.1",
+    "copyfiles": "^2.4.1",
+    "debug": "^4.4.1",
+    "eslint": "^8.57.1",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-import-newlines": "^1.4.0",
+    "eslint-plugin-jsdoc": "^50.6.11",
+    "eslint-plugin-json": "^4.0.1",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
+    "eslint-plugin-unicorn": "^56.0.1",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "pnpm": "^10.13.1",
+    "rimraf": "^6.0.1",
+    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.16",
+    "tsconfig-paths": "^4.2.0",
+    "types-tsconfig": "^2.1.1",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=22.17.1",
+    "pnpm": ">=10.13.1"
+  },
+  "engineStrict": true
+}

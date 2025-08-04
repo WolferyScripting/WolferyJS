@@ -1,0 +1,104 @@
+[
+  {
+    "description": "The teleport nodes a character has.",
+    "id": ["CHARACTER_NODES(core.char.{id}.nodes)"],
+    "name": "CharacterNodes",
+    "model": "Node"
+  },
+  {
+    "description": "The controlled characters.",
+    "id": ["CONTROLLED_CHARACTERS(core.player.{id}.ctrls)"],
+    "name": "ControlledCharacters",
+    "model": "ControlledCharacter"
+  },
+  {
+    "description": "The exits in a room.",
+    "id": ["EXITS(core.room.{id}.exits)"],
+    "name": "Exits",
+    "model": "Exit"
+  },
+  {
+    "description": "The global teleport nodes.",
+    "id": ["NODES(core.nodes)"],
+    "name": "GlobalTeleports",
+    "model": "Node"
+  },
+  {
+    "description": "The player's mail inbox.",
+    "id": ["INBOX(mail.player.{id}.inbox)"],
+    "name": "Inbox",
+    "model": "PlayerMailMessage"
+  },
+  {
+    "description": "The areas owned by a character.",
+    "id": ["OWNED_AREAS(core.char.{id}.areas)"],
+    "name": "OwnedAreas",
+    "model": "Area"
+  },
+  {
+    "description": "The characters owned by the player.",
+    "id": ["OWNED_CHARACTERS(core.player.{id}.chars)"],
+    "name": "OwnedCharacters",
+    "model": "Character"
+  },
+  {
+    "description": "The rooms owned by a character.",
+    "id": ["OWNED_ROOMS(core.char.{id}.rooms)"],
+    "name": "OwnedRooms",
+    "model": "Room"
+  },
+  {
+    "description": "The profiles for a character.",
+    "id": ["PROFILES(core.char.{id}.profiles)"],
+    "name": "Profiles",
+    "model": "Profile"
+  },
+  {
+    "description": "The puppets that the player can control.",
+    "id": ["PUPPETS(core.player.{id}.puppets)"],
+    "name": "Puppets",
+    "model": "Puppet"
+  },
+  {
+    "description": "The requests for the player.",
+    "id": ["OUTGOING_REQUESTS(core.player.{id}.outgoing.requests)", "INCOMING_REQUESTS(core.player.{id}.incoming.requests)"],
+    "name": "Requests",
+    "model": "Request"
+  },
+  {
+    "description": "The characters in a room.",
+    "id": ["ROOM_CHARACTERS(core.room.{id}.chars)", "ROOM_INSTANCE_CHARACTERS(core.instance.{instance}.room.{room}.chars)"],
+    "name": "RoomCharacters",
+    "model": "Character"
+  },
+  {
+    "description": "The awake characters in a room.",
+    "id": ["ROOM_CHARACTERS_AWAKE(core.room.{id}.chars.awake)", "ROOM_INSTANCE_CHARACTERS_AWAKE(core.instance.{instance}.room.{room}.chars.awake)"],
+    "name": "RoomCharactersAwake",
+    "model": "Character"
+  },
+  {
+    "description": "The profiles in a room.",
+    "id": ["ROOM_PROFILES(core.room.{id}.profiles)"],
+    "name": "RoomProfiles",
+    "model": "Profile"
+  },
+  {
+    "description": "The logs for a room script.",
+    "id": ["SCRIPT_LOGS(core.script.{id}.logs)"],
+    "name": "ScriptLogs",
+    "model": "ScriptLog"
+  },
+  {
+    "description": "The triggers for a character or puppet.",
+    "id": [
+      "CHARACTER_SETTINGS_TRIGGERS(core.char.{id}.settings.triggers)",
+      "PUPPET_SETTINGS_TRIGGERS(core.char.{ctrl}.puppet.{puppet}.settings.triggers)"
+    ],
+    "name": "Triggers",
+    "model": null,
+    "object": {
+      "key": { "type": "string", "description": "The key for the trigger." }
+    }
+  }
+]
