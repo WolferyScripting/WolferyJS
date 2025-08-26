@@ -1,27 +1,27 @@
 import BaseModel from "./BaseModel.js";
 import type WolferyJS from "../WolferyJS.js";
-import type { TokenProperties } from "../generated/models/types.js";
-import { TokenDefinition } from "../generated/models/definitions.js";
+import type { BotProperties } from "../generated/models/types.js";
+import { BotDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
-declare interface Token extends BaseModel, TokenProperties {}
+declare interface Bot extends BaseModel, BotProperties {}
 // do not edit the first line of the class comment
 /**
- * A management token.
- * @resourceID TOKEN(auth.token.{id})
+ * A bot.
+ * @resourceID BOT(auth.user.{user}.bot.{bot})
  */
-class Token extends BaseModel implements TokenProperties {
+class Bot extends BaseModel implements BotProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
-        super(client, api, rid, { definition: TokenDefinition });
+        super(client, api, rid, { definition: BotDefinition });
     }
 
-    /** Delete this token. */
+    /** Delete this bot. */
     async delete(): Promise<null> {
         return this.call<null>("delete");
     }
 
     /**
-     * Renew this token.
+     * Renew this bot.
      * @note The client attempts to call this but it always returns `system.notImplemented`.
      */
     async renew(): Promise<null> {
@@ -29,4 +29,4 @@ class Token extends BaseModel implements TokenProperties {
     }
 }
 
-export default Token;
+export default Bot;

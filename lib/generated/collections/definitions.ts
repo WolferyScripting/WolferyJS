@@ -46,3 +46,5 @@ export const ScriptLogsDefinition: Record<string, PropertyDefinition> = {};
 export const TriggersDefinition: Record<string, PropertyDefinition> = {};
 
 export const NoticesDefinition: Record<string, PropertyDefinition> = {};
+
+export const TokensDefinition: Record<string, PropertyDefinition> = {};

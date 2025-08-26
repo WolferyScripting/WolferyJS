@@ -1761,10 +1761,21 @@
     }
   },
   {
+    "description": "A bot.",
+    "id": ["BOT(auth.user.{user}.bot.{bot})"],
+    "name": "Bot",
+    "props": {
+      "char": { "model": "Character", "description": "The character associated with the bot." },
+      "created": { "type": "number", "description": "The creation timestamp of the bot." },
+      "issued": { "type": "number", "description": "The issuance timestamp of the bot." },
+      "token": { "type": "string", "description": "The token of the bot." }
+    }
+  },
+  {
     "collection": true,
-    "description": "The authenticated user's management tokens.",
-    "id": ["TOKENS(auth.user.{id}.tokens)"],
-    "name": "Tokens",
-    "model": "Token"
+    "description": "The authenticated user's bots.",
+    "id": ["BOTS(auth.user.{id}.bots)"],
+    "name": "Bots",
+    "model": "Bot"
   }
 ]

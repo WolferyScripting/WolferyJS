@@ -1075,5 +1075,17 @@ export interface TokenProperties {
     secret: string;
 }
 
-/** The authenticated user's management tokens. */
-export interface TokensProperties {}
+/** A bot. */
+export interface BotProperties {
+    /** The character associated with the bot. */
+    char: Character;
+    /** The creation timestamp of the bot. */
+    created: number;
+    /** The issuance timestamp of the bot. */
+    issued: number;
+    /** The token of the bot. */
+    token: string;
+}
+
+/** The authenticated user's bots. */
+export interface BotsProperties {}

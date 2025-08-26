@@ -1,7 +1,7 @@
 import { createDebug } from "./Debug.js";
 import type { Messages } from "./types.js";
 import type WolferyJS from "../WolferyJS.js";
-import type { AnyObject, AnyRes, ResModel } from "resclient-ts";
+import type { AnyClass, AnyObject, AnyRes, ResModel } from "resclient-ts";
 import { setTimeout } from "node:timers/promises";
 
 export function assign(target: object, ...sources: Array<object>): void {
@@ -162,3 +162,23 @@ export const DefToType =  {
     "function":       "Function",
     "?function":      "Function | null"
 };
+
+export function ridOnlyClass<C extends AnyClass>(clazz: C, rid: string): InstanceType<C> {
+    return new ({ [clazz.name]: class {
+        rid: string;
+        constructor() {
+            this.rid = rid;
+        }
+    } }[clazz.name]!)() as InstanceType<C>;
+}
+
+export function ridOnlyClassAndList<C extends AnyClass>(clazz: C, rid: string, list: Array<unknown>): InstanceType<C> {
+    return new ({ [clazz.name]: class {
+        list: Array<unknown>;
+        rid: string;
+        constructor() {
+            this.rid = rid;
+            this.list = list;
+        }
+    } }[clazz.name]!)() as InstanceType<C>;
+}

@@ -22,6 +22,7 @@ import RoomScripts from "../../collections/RoomScripts.js";
 import ScriptLogs from "../../collections/ScriptLogs.js";
 import Triggers from "../../collections/Triggers.js";
 import Notices from "../../collections/Notices.js";
+import Tokens from "../../collections/Tokens.js";
 
 export default function registerCollections(client: WolferyJS, res: ResClient): void {
     res.registerCollectionType(ResourceIDs.CHARACTER_NODES({ id: "*" }), (api, rid) => new CharacterNodes(client, api, rid));
@@ -47,4 +48,5 @@ export default function registerCollections(client: WolferyJS, res: ResClient): 
     res.registerCollectionType(ResourceIDs.PUPPET_SETTINGS_TRIGGERS({ ctrl: "*", puppet: "*" }), (api, rid) => new Triggers(client, api, rid));
     res.registerCollectionType(ResourceIDs.AUTH_NOTICES({ id: "*" }), (api, rid) => new Notices(client, api, rid));
     res.registerCollectionType(ResourceIDs.IDENTITY_NOTICES({ id: "*" }), (api, rid) => new Notices(client, api, rid));
+    res.registerCollectionType(ResourceIDs.TOKENS({ id: "*" }), (api, rid) => new Tokens(client, api, rid));
 }

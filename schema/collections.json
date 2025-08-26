@@ -118,5 +118,11 @@
     "id": ["AUTH_NOTICES(auth.user.{id}.notices)", "IDENTITY_NOTICES(identity.user.{id}.notices)"],
     "name": "Notices",
     "model": "Notice"
+  },
+  {
+    "description": "The authenticated user's management tokens.",
+    "id": ["TOKENS(auth.user.{id}.tokens)"],
+    "name": "Tokens",
+    "model": "Token"
   }
 ]

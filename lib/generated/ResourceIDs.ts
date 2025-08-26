@@ -73,6 +73,8 @@ namespace ResourceIDs {
     const script = arg("script");
     const binary = arg("binary");
     const ctrl = arg("ctrl");
+    const user = arg("user");
+    const bot = arg("bot");
     export const AFAR_ROOM = f`core.room.${id}.afar`;
     export const AREA = f`core.area.${id}`;
     export const AREA_CHILD = f`core.area.${id}.child`;
@@ -145,7 +147,8 @@ namespace ResourceIDs {
     export const WEB_CLIENT_INFO = "web.client.info";
     export const NOTICE = "notice";
     export const TOKEN = f`auth.token.${id}`;
-    export const TOKENS = f`auth.user.${id}.tokens`;
+    export const BOT = f`auth.user.${user}.bot.${bot}`;
+    export const BOTS = f`auth.user.${id}.bots`;
     export const CHARACTER_NODES = f`core.char.${id}.nodes`;
     export const CONTROLLED_CHARACTERS = f`core.player.${id}.ctrls`;
     export const EXITS = f`core.room.${id}.exits`;
@@ -169,6 +172,7 @@ namespace ResourceIDs {
     export const PUPPET_SETTINGS_TRIGGERS = f`core.char.${ctrl}.puppet.${puppet}.settings.triggers`;
     export const AUTH_NOTICES = f`auth.user.${id}.notices`;
     export const IDENTITY_NOTICES = f`identity.user.${id}.notices`;
+    export const TOKENS = f`auth.user.${id}.tokens`;
 
     export const ROLLER = f`roller.char.${id}`;
     export const LOG_EVENTS = "log.events";

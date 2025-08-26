@@ -19,3 +19,4 @@ export { default as RoomScripts } from "../../collections/RoomScripts.js";
 export { default as ScriptLogs } from "../../collections/ScriptLogs.js";
 export { default as Triggers } from "../../collections/Triggers.js";
 export { default as Notices } from "../../collections/Notices.js";
+export { default as Tokens } from "../../collections/Tokens.js";

@@ -1,6 +1,6 @@
 import type { IdleState } from "./Constants.js";
 import type { Messages } from "./types.js";
-import type Bot from "../models/BotUser.ts";
+import type BotUser from "../models/BotUser.ts";
 import type ControlledCharacter from "../models/ControlledCharacter.js";
 import type Player from "../models/Player.js";
 import type User from "../models/User.js";
@@ -9,7 +9,7 @@ import type OwnedCharacter from "../models/OwnedCharacter.js";
 import type Puppet from "../models/Puppet.js";
 import type Room from "../models/Room.js";
 import type Character from "../models/Character.js";
-import type SafeUser from "../models/TokenUser.ts";
+import type TokenUser from "../models/TokenUser.ts";
 import type Area from "../models/Area.ts";
 import type Profile from "../models/Profile.ts";
 import type RoomCharacter from "../models/RoomCharacter.ts";
@@ -28,6 +28,8 @@ import { type TagPref } from "../models/CharacterTags.ts";
 import type RoomDetails from "../models/RoomDetails.ts";
 import type AfarRoom from "../models/AfarRoom.ts";
 import type PlayerMailMessage from "../models/PlayerMailMessage.ts";
+import type Bot from "../models/Bot.ts";
+import type Token from "../models/Token.ts";
 import type { MessageEvent } from "ws";
 import type { AnyObject } from "resclient-ts";
 
@@ -106,6 +108,8 @@ export interface CharacterEvents {
 }
 
 export interface PlayerEvents {
+    "bots.add": [bot: Bot];
+    "bots.remove": [bot: Bot];
     "mutedCharacters.add": [char: CharacterMin];
     "mutedCharacters.remove": [char: CharacterMin];
     "notes.add": [note: Note, char: Character];
@@ -125,6 +129,8 @@ export interface PlayerEvents {
     "requests.outgoing.rejected": [request: Request];
     "requests.outgoing.remove": [request: Request];
     "requests.outgoing.revoked": [request: Request];
+    "tokens.add": [token: Token];
+    "tokens.remove": [token: Token];
     "unreadMail.add": [mail: PlayerMailMessage];
     "unreadMail.remove": [mail: PlayerMailMessage];
 }
@@ -154,7 +160,7 @@ export interface MiscEvents {
 }
 
 export interface ClientEvents {
-    connected: [user: User, player: Player] | [user: SafeUser, player: null] | [bot: Bot, player: null];
+    connected: [user: User, player: Player] | [user: TokenUser, player: null] | [bot: BotUser, player: null];
     /** Emitted when the client is manually disconnected. */
     disconnected: [];
     error: [error: unknown];

@@ -621,4 +621,11 @@ export const TokenDefinition: Record<string, PropertyDefinition> = {
     secret: { type: "string" }
 };
 
-export const TokensDefinition: Record<string, PropertyDefinition> = {};
+export const BotDefinition: Record<string, PropertyDefinition> = {
+    char: modelProperty("char", Character, false, false),
+    created: { type: "number" },
+    issued: { type: "number" },
+    token: { type: "string" }
+};
+
+export const BotsDefinition: Record<string, PropertyDefinition> = {};

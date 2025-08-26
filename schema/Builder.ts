@@ -8,11 +8,13 @@ import {
 } from "./common.js";
 import { DefToType } from "../lib/util/Util.js";
 import { parseTSConfigJSON  } from "types-tsconfig";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile, access } from "node:fs/promises";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isDeepStrictEqual } from "node:util";
+import type { PathLike } from "node:fs";
 
+const exists = (path: PathLike): Promise<boolean> => access(path).then(() => true, () => false);
 const tsconfig = parseTSConfigJSON(JSON.parse(await readFile(new URL("../tsconfig.json", import.meta.url), "utf8")))!;
 const tsconfigBase = resolve(fileURLToPath(new URL("..", import.meta.url)), tsconfig.compilerOptions!.baseUrl!);
 const writeFileWithAliases = async(path: string, data: string): Promise<void> => {
@@ -269,6 +271,10 @@ class Builder<T extends BuilderType = BuilderType> {
         if (!this.data) throw new Error("Builder not loaded");
         for (const resource of this.data.schema) {
             const path = resolve(dirname(fileURLToPath(import.meta.url)), pathTo(resource.name, this.type.slice(0, -1) as "model" | "collection", "ts"));
+            if (!await exists(path)) {
+                console.log(`insertClassComments: File for ${this.type.slice(0, -1)} ${resource.name} seems to not exist, skipping..`);
+                continue;
+            }
             const contents = (await readFile(path, "utf8")).split("\n");
             const originalContents = Array.from(contents);
             const classStart = contents.findIndex(line => line.includes(`class ${resource.name}`));

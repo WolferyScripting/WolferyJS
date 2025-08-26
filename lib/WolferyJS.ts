@@ -62,6 +62,8 @@ export interface Options {
         startup?: boolean;
         /** If awake characters should be tracked. Defaults to `true`. */
         trackAwake?: boolean;
+        /** If the player's bots should be tracked. Defaults to `true`. */
+        trackBots?: boolean;
         /** If incoming requests should be tracked. Defaults to `true`. */
         trackIncomingRequests?: boolean;
         /** If unread mail should be tracked. Defaults to `true` if `authentication.type` === "password", has no effect otherwise. */
@@ -72,6 +74,8 @@ export interface Options {
         trackNotes?: boolean;
         /** If outgoing requests should be tracked. Defaults to `true`. */
         trackOutgoingRequests?: boolean;
+        /** If the player's tokens should be tracked. Defaults to `true`. */
+        trackTokens?: boolean;
         /** If watched characters should be tracked. Defaults to the same as `trackAwake`. */
         trackWatched?: boolean;
     };
@@ -90,11 +94,13 @@ export interface InstanceOptions {
         charInfoOffline: boolean;
         startup: boolean;
         trackAwake: boolean;
+        trackBots: boolean;
         trackIncomingRequests: boolean;
         trackMail: boolean;
         trackNoteChanges: boolean;
         trackNotes: boolean;
         trackOutgoingRequests: boolean;
+        trackTokens: boolean;
         trackWatched: boolean;
     };
     pingCharacters: boolean;
@@ -162,11 +168,13 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
                 charInfoOffline:       options.fetch?.charInfoOffline ?? false,
                 startup:               options.fetch?.startup ?? true,
                 trackAwake:            options.fetch?.trackAwake ?? true,
+                trackBots:             options.fetch?.trackBots ?? true,
                 trackIncomingRequests: options.fetch?.trackIncomingRequests ?? true,
                 trackMail:             options.fetch?.trackMail ?? options.authentication.type === "password",
                 trackNoteChanges:      options.fetch?.trackNoteChanges ?? false,
                 trackNotes:            options.fetch?.trackNotes ?? true,
                 trackOutgoingRequests: options.fetch?.trackOutgoingRequests ?? true,
+                trackTokens:           options.fetch?.trackTokens ?? true,
                 trackWatched:          options.fetch?.trackWatched ?? options.fetch?.trackAwake ?? true
             },
             pingCharacters:   options.pingCharacters ?? true,
@@ -203,6 +211,12 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
                 }
                 if (this.options.fetch.trackOutgoingRequests) {
                     promises.push(this.api.subscribe(ResourceIDs.OUTGOING_REQUESTS({ id: player.id }), true));
+                }
+                if (this.options.fetch.trackBots) {
+                    promises.push(this.api.subscribe(ResourceIDs.BOTS({ id: player.id }), true));
+                }
+                if (this.options.fetch.trackTokens) {
+                    promises.push(this.api.subscribe(ResourceIDs.TOKENS({ id: player.id }), true));
                 }
                 if (this.options.fetch.trackNotes) {
                     if (this.options.fetch.trackNoteChanges) {
@@ -433,17 +447,6 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             if (this._user?.char.inRoom.id === roomId) return this._user.controlled;
         } else if (this.isPlayer()) {
             const char = this._player?.controlled.find(c => c.state === "awake" && c.inRoom.id === roomId);
-            if (char) return char;
-        }
-        return null;
-    }
-
-    async getCharacterInRoomExit(exitId: string): Promise<ControlledCharacter | null> {
-        if (this.isBot()) {
-            if (this._user?.controlled?.inRoom.exits.find(e => e.id === exitId)) return this._user.controlled;
-        } else if (this.isPlayer()) {
-            console.log(this._player!.controlled.map(c => c.inRoom.exits.map(e => e.id)));
-            const char = this._player?.controlled.find(c => c.state === "awake" && c.inRoom.exits.find(e => e.id === exitId));
             if (char) return char;
         }
         return null;

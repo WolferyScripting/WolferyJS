@@ -58,3 +58,6 @@ export interface TriggersProperties {}
 
 /** The notices for the logged in user. */
 export interface NoticesProperties {}
+
+/** The authenticated user's management tokens. */
+export interface TokensProperties {}

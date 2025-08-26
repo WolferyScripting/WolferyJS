@@ -66,4 +66,5 @@ export { default as WebClientInfo } from "../../models/WebClientInfo.js";
 export { default as Notice } from "../../models/Notice.js";
 export { default as MailUser } from "../../models/MailUser.js";
 export { default as Token } from "../../models/Token.js";
-export { default as Tokens } from "../../models/Tokens.js";
+export { default as Bot } from "../../models/Bot.js";
+export { default as Bots } from "../../models/Bots.js";
