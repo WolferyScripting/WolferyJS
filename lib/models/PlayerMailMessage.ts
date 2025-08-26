@@ -6,6 +6,10 @@ import { PlayerMailMessageDefinition } from "../generated/models/definitions.js"
 import type { AnyObject, ResClient } from "resclient-ts";
 
 declare interface PlayerMailMessage extends BaseModel, PlayerMailMessageProperties {}
+// do not edit the first line of the class comment
+/**
+ * A mail message.
+ */
 class PlayerMailMessage extends BaseModel implements PlayerMailMessageProperties {
     from!: MailUser;
     to!: MailUser;

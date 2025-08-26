@@ -5,6 +5,10 @@ import { RequestDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface Request extends BaseModel, RequestProperties {}
+// do not edit the first line of the class comment
+/**
+ * A request for changing ownership of areas and rooms, creating exits, etc.
+ */
 class Request extends BaseModel implements RequestProperties {
     private onChange = this._onChange.bind(this);
     constructor(client: WolferyJS, api: ResClient, rid: string) {

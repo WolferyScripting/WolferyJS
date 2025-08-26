@@ -7,6 +7,10 @@ import { RoomScriptDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface RoomScript extends BaseModel, RoomScriptProperties {}
+// do not edit the first line of the class comment
+/**
+ * A room script.
+ */
 class RoomScript extends BaseModel implements RoomScriptProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: RoomScriptDefinition });

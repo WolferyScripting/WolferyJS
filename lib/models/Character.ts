@@ -9,6 +9,10 @@ import { CharacterDefinition } from "../generated/models/definitions.js";
 import type { ResModelOptions , ResClient } from "resclient-ts";
 
 declare interface Character extends BaseModel, CharacterProperties {}
+// do not edit the first line of the class comment
+/**
+ * A character
+ */
 class Character extends BaseModel implements CharacterProperties {
     private _info!: CharacterInfo | null;
     private onChange = this._onChange.bind(this);

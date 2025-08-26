@@ -8,6 +8,10 @@ import { ResRef, type ResClient } from "resclient-ts";
 
 // key-value (id, true) collection model
 interface LookedAt extends BaseModel, LookedAtProperties {}
+// do not edit the first line of the class comment
+/**
+ * The characters looking at an owned character.
+ */
 class LookedAt extends BaseModel implements LookedAtProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: LookedAtDefinition });

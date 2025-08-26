@@ -3,6 +3,10 @@ import CharacterMin from "./CharacterMin.js";
 import type WolferyJS from "../WolferyJS.js";
 import type { CollectionModelAddRemove, ResClient } from "resclient-ts";
 
+// do not edit the first line of the class comment
+/**
+ * The characters that are muted.
+ */
 class MutedCharacters extends BaseCollectionModel<CharacterMin>  {
     private onAdd = this._onAdd.bind(this);
     private onRemove = this._onRemove.bind(this);

@@ -76,16 +76,19 @@ function idsToResources<T extends "collection" | "model">(ids: Array<string>, na
     return resources;
 }
 
+export function pathTo(name: string, type: "model" | "collection", ext = "js"): string {
+    if (type === "model") {
+        return `../lib/models/${name}.${ext}`;
+    } else if (type === "collection") {
+        return `../lib/collections/${name}.${ext}`;
+    }
+    throw new Error(`Unknown import type: ${String(type)}`);
+}
+
 export function formatImports(imports: Array<string>, from: string, types: boolean): string {
     return imports.map(imp => {
-        const [type, name] = imp.split(":");
-        if (type === "model") {
-            const r = relative(from, resolve(fileURLToPath(new URL("../lib/models", import.meta.url))));
-            return `import${types ? " type" : ""} ${name} from "${r}/${name}.js";`;
-        } else if (type === "collection") {
-            const r = relative(from, resolve(fileURLToPath(new URL("../lib/collections", import.meta.url))));
-            return `import${types ? " type" : ""} ${name} from "${r}/${name}.js";`;
-        }
-        return "";
+        const [type, name] = imp.split(":") as ["model" | "collection", string];
+        const r = relative(from, resolve(fileURLToPath(new URL(pathTo(name, type), import.meta.url))));
+        return `import${types ? " type" : ""} ${name} from "${r}";`;
     }).join("\n");
 }

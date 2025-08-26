@@ -5,6 +5,10 @@ import { TagGroupDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface TagGroup extends BaseModel, TagGroupProperties {}
+// do not edit the first line of the class comment
+/**
+ * A tag group.
+ */
 class TagGroup extends BaseModel implements TagGroupProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: TagGroupDefinition });

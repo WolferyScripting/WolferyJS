@@ -5,6 +5,10 @@ import { MailInfoDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface MailInfo extends BaseModel, MailInfoProperties {}
+// do not edit the first line of the class comment
+/**
+ * The mail info.
+ */
 class MailInfo extends BaseModel implements MailInfoProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: MailInfoDefinition });

@@ -5,6 +5,10 @@ import { LookAtDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface LookAt extends BaseModel, LookAtProperties {}
+// do not edit the first line of the class comment
+/**
+ * The character being looked at.
+ */
 class LookAt extends BaseModel implements LookAtProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: LookAtDefinition });

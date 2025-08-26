@@ -5,6 +5,10 @@ import { ScriptLogDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface ScriptLog extends BaseModel, ScriptLogProperties {}
+// do not edit the first line of the class comment
+/**
+ * A log for a room script.
+ */
 class ScriptLog extends BaseModel implements ScriptLogProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: ScriptLogDefinition });

@@ -5,6 +5,10 @@ import { CoreInfoDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface CoreInfo extends BaseModel, CoreInfoProperties {}
+// do not edit the first line of the class comment
+/**
+ * The core info about the realm.
+ */
 class CoreInfo extends BaseModel implements CoreInfoProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: CoreInfoDefinition });

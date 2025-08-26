@@ -4,6 +4,10 @@ import type WolferyJS from "../WolferyJS.js";
 import { type CollectionModelAddRemove, type ResClient, ResRef } from "resclient-ts";
 
 // @TODO
+// do not edit the first line of the class comment
+/**
+ * Unread mail.
+ */
 class UnreadMail extends BaseCollectionModel<ResRef<PlayerMailMessage>> {
     private onAdd = this._onAdd.bind(this);
     private onRemove = this._onRemove.bind(this);

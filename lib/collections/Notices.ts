@@ -4,6 +4,10 @@ import { toID } from "../util/Util.js";
 import type Notice from "../models/Notice.js";
 import type { ResClient, CollectionAddRemove } from "resclient-ts";
 
+// do not edit the first line of the class comment
+/**
+ * The notices for the logged in user.
+ */
 export default class Notices extends BaseCollection<Notice> {
     private onAdd = this._onAdd.bind(this);
     private onRemove = this._onRemove.bind(this);

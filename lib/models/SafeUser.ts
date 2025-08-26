@@ -5,6 +5,10 @@ import { SafeUserDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface SafeUser extends BaseModel, SafeUserProperties {}
+// do not edit the first line of the class comment
+/**
+ * The user when logged in with a management token.
+ */
 class SafeUser extends BaseModel implements SafeUserProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: SafeUserDefinition });

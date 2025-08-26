@@ -6,6 +6,10 @@ import { NodeDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface Node extends BaseModel, NodeProperties {}
+// do not edit the first line of the class comment
+/**
+ * A teleportation node.
+ */
 class Node extends BaseModel implements NodeProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: NodeDefinition });

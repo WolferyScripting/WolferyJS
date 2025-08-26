@@ -5,6 +5,10 @@ import { NoticeDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface Notice extends BaseModel, NoticeProperties {}
+// do not edit the first line of the class comment
+/**
+ * A notice. @TODO Have not been able to inspect a notice, so the rid and full properties are not known
+ */
 class Notice extends BaseModel implements NoticeProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: NoticeDefinition });

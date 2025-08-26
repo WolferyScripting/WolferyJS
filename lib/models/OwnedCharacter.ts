@@ -7,6 +7,10 @@ import { OwnedCharacterDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface OwnedCharacter extends BaseModel, OwnedCharacterProperties {}
+// do not edit the first line of the class comment
+/**
+ * An owned character.
+ */
 class OwnedCharacter extends BaseModel implements OwnedCharacterProperties {
     private onChange = this._onChange.bind(this);
     constructor(client: WolferyJS, api: ResClient, rid: string) {

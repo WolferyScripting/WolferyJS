@@ -6,6 +6,10 @@ import type WolferyJS from "../WolferyJS.js";
 import type OwnedCharacter from "../models/OwnedCharacter.js";
 import type { ResClient, CollectionAddRemove } from "resclient-ts";
 
+// do not edit the first line of the class comment
+/**
+ * The profiles for a character.
+ */
 export default class Profiles extends BaseCollection<Profile> {
     private onAdd = this._onAdd.bind(this);
     private onRemove = this._onRemove.bind(this);

@@ -6,6 +6,10 @@ import { RoomCommandsDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface RoomCommands extends BaseCollectionModel<RoomCommand>, RoomCommandsProperties {}
+// do not edit the first line of the class comment
+/**
+ * The commands in a room.
+ */
 class RoomCommands extends BaseCollectionModel<RoomCommand> implements RoomCommandsProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, RoomCommand, { definition: RoomCommandsDefinition });

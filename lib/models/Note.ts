@@ -8,6 +8,10 @@ import { NoteDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface Note extends BaseModel, NoteProperties {}
+// do not edit the first line of the class comment
+/**
+ * A note on a character.
+ */
 class Note extends BaseModel implements NoteProperties {
     private onChange = this._onChange.bind(this);
     constructor(client: WolferyJS, api: ResClient, rid: string) {

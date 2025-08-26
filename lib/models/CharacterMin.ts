@@ -5,6 +5,10 @@ import { CharacterMinDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface CharacterMin extends BaseModel, CharacterMinProperties {}
+// do not edit the first line of the class comment
+/**
+ * A minimal character, seen in the list of muted and focused characters.
+ */
 class CharacterMin extends BaseModel implements CharacterMinProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: CharacterMinDefinition });

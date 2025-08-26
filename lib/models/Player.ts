@@ -16,6 +16,10 @@ import type OutgoingRequests from "../collections/OutgoingRequests.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface Player extends BaseModel, PlayerProperties {}
+// do not edit the first line of the class comment
+/**
+ * The logged in player.
+ */
 class Player extends BaseModel implements PlayerProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: PlayerDefinition });

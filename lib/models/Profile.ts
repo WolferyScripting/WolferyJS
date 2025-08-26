@@ -5,6 +5,10 @@ import { ProfileDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface Profile extends BaseModel, ProfileProperties {}
+// do not edit the first line of the class comment
+/**
+ * A character profile.
+ */
 class Profile extends BaseModel implements ProfileProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: ProfileDefinition });

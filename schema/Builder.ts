@@ -1,9 +1,16 @@
-import { formatImports, getCollections, getModels, type Resource } from "./common.js";
+import {
+    formatImports,
+    getCollections,
+    getModels,
+    pathTo,
+    type Resource
+} from "./common.js";
 import { DefToType } from "../lib/util/Util.js";
 import { parseTSConfigJSON  } from "types-tsconfig";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { isDeepStrictEqual } from "node:util";
 
 const tsconfig = parseTSConfigJSON(JSON.parse(await readFile(new URL("../tsconfig.json", import.meta.url), "utf8")))!;
 const tsconfigBase = resolve(fileURLToPath(new URL("..", import.meta.url)), tsconfig.compilerOptions!.baseUrl!);
@@ -36,10 +43,11 @@ class Builder<T extends BuilderType = BuilderType> {
         this.generatedTypesFile = join(this.generatedDir, "types.d.ts");
     }
 
-    static async build(buildType: Omit<TemplateTypes, "resourceids">, type: BuilderType): Promise<void>;
+    static async build(buildType: Omit<TemplateTypes, "resourceids"> | "comments", type: BuilderType): Promise<void>;
     static async build(buildType: "resourceids"): Promise<void>;
-    static async build(buildType: TemplateTypes, type?: BuilderType): Promise<void> {
+    static async build(buildType: TemplateTypes | "comments", type?: BuilderType): Promise<void> {
         switch (buildType) {
+            case "comments": return (await new Builder(type!).load()).insertClassComments();
             case "definitions": return (await new Builder(type!).load()).buildDefinitions();
             case "exports": return (await new Builder(type!).load()).buildExports();
             case "registry": return (await new Builder(type!).load()).buildRegistry();
@@ -77,7 +85,7 @@ class Builder<T extends BuilderType = BuilderType> {
     }
 
     async buildDefinitions(): Promise<void> {
-        if (!this.data) throw new Error("Builder not setup");
+        if (!this.data) throw new Error("Builder not loaded");
         const t = new Template("definitions");
         await t.load();
 
@@ -131,7 +139,7 @@ class Builder<T extends BuilderType = BuilderType> {
     }
 
     async buildExports(): Promise<void> {
-        if (!this.data) throw new Error("Builder not setup");
+        if (!this.data) throw new Error("Builder not loaded");
         const t = new Template("exports");
         await t.load();
         const exports: Array<string> = [
@@ -151,7 +159,7 @@ class Builder<T extends BuilderType = BuilderType> {
     }
 
     async buildRegistry(): Promise<void> {
-        if (!this.data) throw new Error("Builder not setup");
+        if (!this.data) throw new Error("Builder not loaded");
         const t = new Template("registry");
         await t.load();
 
@@ -182,7 +190,7 @@ class Builder<T extends BuilderType = BuilderType> {
     }
 
     async buildTypes(): Promise<void> {
-        if (!this.data) throw new Error("Builder not setup");
+        if (!this.data) throw new Error("Builder not loaded");
         const t = new Template("types");
         await t.load();
 
@@ -241,6 +249,52 @@ class Builder<T extends BuilderType = BuilderType> {
             types:   types.join("\n")
         });
         await writeFileWithAliases(this.generatedTypesFile, content);
+    }
+
+    async insertClassComments(): Promise<void> {
+        if (!this.data) throw new Error("Builder not loaded");
+        for (const resource of this.data.schema) {
+            const path = resolve(dirname(fileURLToPath(import.meta.url)), pathTo(resource.name, this.type.slice(0, -1) as "model" | "collection", "ts"));
+            const contents = (await readFile(path, "utf8")).split("\n");
+            const originalContents = Array.from(contents);
+            const classStart = contents.findIndex(line => line.includes(`class ${resource.name}`));
+            const commentStart = contents.findIndex((line, index) => index < classStart && line.match(/^\s*\/\*\*/));
+            if (commentStart === -1) {
+                // no comment, create a multi-line comment
+                contents.splice(classStart, 0, "/**", ` * ${resource.description}`, " */");
+            } else {
+                const commentEnd = contents.findIndex((line, index) => index >= commentStart && line.endsWith("*/"));
+                const docLine = (str: string): string => ` * ${(str.trim().startsWith("*") ? str.trim().slice(1) : str).trim()}`;
+                if (commentEnd === commentStart) {
+                    // a comment exists, but only spans a single line. Assume it's a third party comment and keep it below our comment
+                    const currentComment = contents[commentStart]!;
+                    contents.splice(commentStart, 1, "/**", docLine(resource.description), docLine(currentComment.slice(currentComment.indexOf("*") + 3, currentComment.lastIndexOf("*") - 1)), " */");
+                } else {
+                    // a comment exists, and spans multiple lines. Assume the first line is our comment and replace it
+                    const currentCommentLines = contents.slice(commentStart, commentEnd + 1);
+                    const newCommentLines = [
+                        "/**",
+                        docLine(resource.description),
+                        ...currentCommentLines.slice(2, -1).map(docLine),
+                        " */"
+                    ];
+                    contents.splice(commentStart, commentEnd - commentStart + 1, ...newCommentLines);
+                }
+            }
+
+            const nowClassStart = contents.findIndex(line => line.includes(`class ${resource.name}`));
+            const nowComment = contents.findIndex((line, index) => index < nowClassStart && line.match(/^\s*\/\*\*/));
+            if (nowComment === -1) throw new Error(`Failed to insert comment into ${resource.name} ${this.type.slice(0, -1)}`);
+
+            const notice = "// do not edit the first line of the class comment";
+            if (contents.at(nowComment - 1) !== notice) {
+                contents.splice(nowComment, 0, notice);
+            }
+
+            if (!isDeepStrictEqual(contents, originalContents)) {
+                await writeFile(path, contents.join("\n"), "utf8");
+            }
+        }
     }
 
     async load(): Promise<this> {
@@ -318,11 +372,17 @@ class Template {
 }
 
 async function buildAll(type?: BuilderType): Promise<void> {
+    await insertClassComments(type);
     await buildDefinitions(type);
     await buildExports(type);
     await buildRegistry(type);
     await buildTypes(type);
     await buildResourceIDs();
+}
+async function insertClassComments(type?: BuilderType): Promise<void> {
+    console.log(`Inserting class comments:${type ?? "all"}`);
+    if (!type || type === "collections") await Builder.build("comments", "collections");
+    if (!type || type === "models") await Builder.build("comments", "models");
 }
 async function buildDefinitions(type?: BuilderType): Promise<void> {
     console.log(`Building definitions:${type ?? "all"}`);
@@ -348,8 +408,9 @@ async function buildResourceIDs(): Promise<void> {
     console.log("Building resourceids");
     await Builder.build("resourceids");
 }
-async function cli(buildType?: TemplateTypes, type?: BuilderType): Promise<void> {
+async function cli(buildType?: TemplateTypes | "comments", type?: BuilderType): Promise<void> {
     switch (buildType) {
+        case "comments": return insertClassComments(type);
         case "definitions": return buildDefinitions(type);
         case "exports": return buildExports(type);
         case "registry": return buildRegistry(type);

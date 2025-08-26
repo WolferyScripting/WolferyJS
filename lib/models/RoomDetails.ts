@@ -5,6 +5,10 @@ import type { RoomDetailsProperties } from "../generated/models/types.js";
 import type { ResClient, ResModelOptions } from "resclient-ts";
 
 declare interface RoomDetails extends BaseModel, RoomDetailsProperties {}
+// do not edit the first line of the class comment
+/**
+ * A detailed view of a room.
+ */
 class RoomDetails extends BaseModel implements RoomDetailsProperties {
     // eslint-disable-next-line unicorn/no-object-as-default-parameter
     constructor(client: WolferyJS, api: ResClient, rid: string, options: ResModelOptions = { definition: RoomDetailsDefinition }) {

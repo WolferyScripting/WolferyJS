@@ -7,6 +7,10 @@ import { CharacterDetailsDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface CharacterDetails extends BaseModel, CharacterDetailsProperties {}
+// do not edit the first line of the class comment
+/**
+ * A character with extra details, seen when looking at a character.
+ */
 class CharacterDetails extends BaseModel implements CharacterDetailsProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: CharacterDetailsDefinition });

@@ -8,6 +8,10 @@ import type ControlledCharacter from "../models/ControlledCharacter.js";
 import type { ResClient, CollectionAddRemove } from "resclient-ts";
 import assert from "node:assert";
 
+// do not edit the first line of the class comment
+/**
+ * The profiles in a room.
+ */
 export default class RoomProfiles extends BaseCollection<RoomProfile> {
     private onAdd = this._onAdd.bind(this);
     private onRemove = this._onRemove.bind(this);

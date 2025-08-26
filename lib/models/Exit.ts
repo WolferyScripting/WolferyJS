@@ -6,6 +6,10 @@ import { ExitDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface Exit extends BaseModel, ExitProperties {}
+// do not edit the first line of the class comment
+/**
+ * An exit.
+ */
 class Exit extends BaseModel implements ExitProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: ExitDefinition });

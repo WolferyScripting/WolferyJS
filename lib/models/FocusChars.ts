@@ -6,6 +6,10 @@ import { FocusCharsDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface FocusChars extends BaseCollectionModel<CharacterMin>, FocusCharsProperties {}
+// do not edit the first line of the class comment
+/**
+ * The characters being focused on.
+ */
 class FocusChars extends BaseCollectionModel<CharacterMin> implements FocusCharsProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, CharacterMin, { definition: FocusCharsDefinition });

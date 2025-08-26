@@ -7,6 +7,10 @@ import { PuppetDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface Puppet extends BaseModel, PuppetProperties {}
+// do not edit the first line of the class comment
+/**
+ * A puppet.
+ */
 class Puppet extends BaseModel implements PuppetProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: PuppetDefinition });

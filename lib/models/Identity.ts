@@ -5,6 +5,10 @@ import { IdentityDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface Identity extends BaseModel, IdentityProperties {}
+// do not edit the first line of the class comment
+/**
+ * The logged in player's identity.
+ */
 class Identity extends BaseModel implements IdentityProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: IdentityDefinition });

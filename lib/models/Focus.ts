@@ -7,6 +7,10 @@ import { FocusDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 interface Focus extends BaseModel, FocusProperties {}
+// do not edit the first line of the class comment
+/**
+ * The focus options for a character.
+ */
 class Focus extends BaseModel implements FocusProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: FocusDefinition });

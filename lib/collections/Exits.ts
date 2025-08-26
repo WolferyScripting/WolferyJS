@@ -4,6 +4,10 @@ import type WolferyJS from "../WolferyJS.js";
 import { toID } from "../util/Util.js";
 import type { ResClient } from "resclient-ts";
 
+// do not edit the first line of the class comment
+/**
+ * The exits in a room.
+ */
 export default class Exits extends BaseCollection<Exit> {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { idCallback: toID });

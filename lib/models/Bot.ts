@@ -7,6 +7,10 @@ import { BotDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface Bot extends BaseModel, BotProperties {}
+// do not edit the first line of the class comment
+/**
+ * The user when logged in with a bot token.
+ */
 class Bot extends BaseModel {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: BotDefinition });

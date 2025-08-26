@@ -6,6 +6,10 @@ import { toID } from "../util/Util.js";
 import type OwnedCharacter from "../models/OwnedCharacter.js";
 import type { ResClient, CollectionAddRemove } from "resclient-ts";
 
+// do not edit the first line of the class comment
+/**
+ * The areas owned by a character.
+ */
 export default class OwnedAreas extends BaseCollection<Area> {
     private onAdd = this._onAdd.bind(this);
     private onRemove = this._onRemove.bind(this);

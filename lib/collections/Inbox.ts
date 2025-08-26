@@ -6,6 +6,10 @@ import type Character from "../models/Character.js";
 import type { BasicCharacterResponse } from "../util/types.js";
 import type { ResClient } from "resclient-ts";
 
+// do not edit the first line of the class comment
+/**
+ * The player's mail inbox.
+ */
 class Inbox extends BaseCollection<PlayerMailMessage> {
     private onAdd = this._onAdd.bind(this);
     private onRemove = this._onRemove.bind(this);

@@ -5,6 +5,10 @@ import { RequestParamsDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface RequestParams extends BaseModel, RequestParamsProperties {}
+// do not edit the first line of the class comment
+/**
+ * The parameters for a request.
+ */
 class RequestParams extends BaseModel implements RequestParamsProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: RequestParamsDefinition });

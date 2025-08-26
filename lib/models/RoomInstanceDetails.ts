@@ -5,6 +5,10 @@ import { RoomInstanceDetailsDefinition } from "../generated/models/definitions.j
 import type { ResClient } from "resclient-ts";
 
 declare interface RoomInstanceDetails extends RoomDetails, RoomInstanceDetailsProperties {}
+// do not edit the first line of the class comment
+/**
+ * A detailed view of a room instance.
+ */
 class RoomInstanceDetails extends RoomDetails implements RoomInstanceDetailsProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: RoomInstanceDetailsDefinition });

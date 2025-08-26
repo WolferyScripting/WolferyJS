@@ -6,6 +6,10 @@ import { WatchesDefinition } from "../generated/models/definitions.js";
 import { type ResClient, ResRef } from "resclient-ts";
 
 declare interface Watches extends BaseCollectionModel<ResRef<Watch>>, WatchesProperties {}
+// do not edit the first line of the class comment
+/**
+ * Watched characters.
+ */
 class Watches extends BaseCollectionModel<ResRef<Watch>> {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, ResRef, { definition: WatchesDefinition });

@@ -7,6 +7,10 @@ import { AreaChildrenDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 interface AreaChildren extends BaseCollectionModel<AreaChild | RoomChild>, AreaChildrenProperties {}
+// do not edit the first line of the class comment
+/**
+ * The child areas of an area.
+ */
 class AreaChildren extends BaseCollectionModel<AreaChild | RoomChild> implements AreaChildrenProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, [AreaChild, RoomChild], { definition: AreaChildrenDefinition });

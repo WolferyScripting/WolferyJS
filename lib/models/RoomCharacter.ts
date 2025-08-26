@@ -5,6 +5,10 @@ import { RoomCharacterDefinition } from "../generated/models/definitions.js";
 import type {  ResClient } from "resclient-ts";
 
 declare interface RoomCharacter extends BaseModel, RoomCharacterProperties {}
+// do not edit the first line of the class comment
+/**
+ * A character in the current room.
+ */
 class RoomCharacter extends BaseModel implements RoomCharacterProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: RoomCharacterDefinition });

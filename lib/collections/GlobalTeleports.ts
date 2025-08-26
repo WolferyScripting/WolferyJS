@@ -4,6 +4,10 @@ import type WolferyJS from "../WolferyJS.js";
 import { toID } from "../util/Util.js";
 import type { ResClient, CollectionAddRemove } from "resclient-ts";
 
+// do not edit the first line of the class comment
+/**
+ * The global teleport nodes.
+ */
 export default class GlobalTeleports extends BaseCollection<Node> {
     private onAdd = this._onAdd.bind(this);
     private onRemove = this._onRemove.bind(this);

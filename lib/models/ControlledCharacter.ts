@@ -29,6 +29,10 @@ import { fileTypeFromBuffer } from "file-type";
 import type { AnyFunction, CollectionAddRemove, ResClient } from "resclient-ts";
 
 declare interface ControlledCharacter extends BaseModel, ControlledCharacterProperties {}
+// do not edit the first line of the class comment
+/**
+ * A controlled character.
+ */
 class ControlledCharacter extends BaseModel implements ControlledCharacterProperties {
     private _pingTimeout!: NodeJS.Timeout | null;
     private onChange = this._onChange.bind(this);

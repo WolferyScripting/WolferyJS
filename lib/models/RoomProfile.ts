@@ -8,6 +8,10 @@ import { RoomProfileDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface RoomProfile extends BaseModel, RoomProfileProperties {}
+// do not edit the first line of the class comment
+/**
+ * A profile of a room.
+ */
 class RoomProfile extends BaseModel implements RoomProfileProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: RoomProfileDefinition });

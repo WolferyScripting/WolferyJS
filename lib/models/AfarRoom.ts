@@ -6,6 +6,10 @@ import type { ResClient } from "resclient-ts";
 
 
 declare interface AfarRoom extends BaseModel, AfarRoomProperties {}
+// do not edit the first line of the class comment
+/**
+ * A partial room seen as an exit target.
+ */
 class AfarRoom extends BaseModel implements AfarRoomProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: AfarRoomDefinition });
