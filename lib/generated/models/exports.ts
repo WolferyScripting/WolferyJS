@@ -65,3 +65,5 @@ export { default as SupportInfo } from "../../models/SupportInfo.js";
 export { default as WebClientInfo } from "../../models/WebClientInfo.js";
 export { default as Notice } from "../../models/Notice.js";
 export { default as MailUser } from "../../models/MailUser.js";
+export { default as Token } from "../../models/Token.js";
+export { default as Tokens } from "../../models/Tokens.js";

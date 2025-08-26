@@ -857,6 +857,7 @@
     "name": "PlayerMailMessage",
     "props": {
       "from": { "type": "object", "description": "The sender of the mail." },
+      "message": { "model": "MailMessage", "description": "The mail message content." },
       "read": {
         "type": "?number",
         "description": "The timestamp when the mail was read."
@@ -1049,6 +1050,7 @@
         "description": "The idle state of the character."
       },
       "name": { "type": "string", "description": "The name of the character." },
+      "puppeteer": { "model": "?Character", "description": "The puppeteer controlling the character." },
       "rp": {
         "type": "string",
         "oneOf": ["lfrp", ""],
@@ -1745,5 +1747,23 @@
       "surname": { "type": "string", "description": "The surname of the user." },
       "type": { "type": "string", "oneOf": ["char", "puppet"], "ts": "MailCharacterType", "description": "The type of the user." }
     }
+  },
+  {
+    "description": "A management token.",
+    "id": ["TOKEN(auth.token.{id})"],
+    "name": "Token",
+    "props": {
+      "created": { "type": "number", "description": "The creation timestamp of the token." },
+      "id": { "type": "string", "description": "The unique identifier of the token." },
+      "issued": { "type": "number", "description": "The issuance timestamp of the token." },
+      "secret": { "type": "string", "description": "The secret key associated with the token." }
+    }
+  },
+  {
+    "collection": true,
+    "description": "The authenticated user's management tokens.",
+    "id": ["TOKENS(auth.user.{id}.tokens)"],
+    "name": "Tokens",
+    "model": "Token"
   }
 ]

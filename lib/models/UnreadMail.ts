@@ -17,11 +17,13 @@ class UnreadMail extends BaseCollectionModel<ResRef<PlayerMailMessage>> {
     }
 
     private async _onAdd(data: CollectionModelAddRemove<ResRef<PlayerMailMessage>>): Promise<void> {
-        console.log("add unread mail", data);
+        const mail = await data.item.get();
+        this.client.emit("unreadMail.add", mail);
     }
 
     private async _onRemove(data: CollectionModelAddRemove<ResRef<PlayerMailMessage>>): Promise<void> {
-        console.log("remove unread mail", data);
+        const mail = await data.item.get();
+        this.client.emit("unreadMail.remove", mail);
     }
 
     protected override async _listen(on: boolean): Promise<void> {

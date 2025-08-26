@@ -193,7 +193,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             if (type === "password") {
                 const player = await this.core.getPlayer();
                 if (this.options.fetch.trackAwake) {
-                    promises.push(this.api.subscribe(ResourceIDs.WATCHES({ id: player.id }), true), this.api.subscribe(ResourceIDs.NOTES({ id: player.id }), true));
+                    promises.push(this.api.subscribe(ResourceIDs.WATCHES({ id: player.id }), true));
                 }
                 if (this.options.fetch.trackMail) {
                     promises.push(this.api.subscribe(ResourceIDs.UNREAD_MAIL({ id: player.id }), true));

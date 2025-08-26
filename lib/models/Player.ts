@@ -4,6 +4,7 @@ import type Note from "./Note.js";
 import BaseModel from "./BaseModel.js";
 import type Watches from "./Watches.js";
 import type Notes from "./Notes.js";
+import type UnreadMail from "./UnreadMail.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
 import type { BasicCharacterResponse, LookupCharacter } from "../util/types.js";
 import type WolferyJS from "../WolferyJS.js";
@@ -158,6 +159,13 @@ class Player extends BaseModel implements PlayerProperties {
      */
     async getOutgoingRequests(): Promise<OutgoingRequests> {
         return this.api.get<OutgoingRequests>(ResourceIDs.OUTGOING_REQUESTS({ id: this.id }));
+    }
+
+    /**
+     * Get the unread mail for the player.
+     */
+    async getUnreadMail(): Promise<UnreadMail> {
+        return this.api.get<UnreadMail>(ResourceIDs.UNREAD_MAIL({ id: this.id }));
     }
 
     /**

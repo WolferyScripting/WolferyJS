@@ -27,6 +27,7 @@ import type Notice from "../models/Notice.ts";
 import { type TagPref } from "../models/CharacterTags.ts";
 import type RoomDetails from "../models/RoomDetails.ts";
 import type AfarRoom from "../models/AfarRoom.ts";
+import type PlayerMailMessage from "../models/PlayerMailMessage.ts";
 import type { MessageEvent } from "ws";
 import type { AnyObject } from "resclient-ts";
 
@@ -124,6 +125,8 @@ export interface PlayerEvents {
     "requests.outgoing.rejected": [request: Request];
     "requests.outgoing.remove": [request: Request];
     "requests.outgoing.revoked": [request: Request];
+    "unreadMail.add": [mail: PlayerMailMessage];
+    "unreadMail.remove": [mail: PlayerMailMessage];
 }
 
 export interface UserEvents {

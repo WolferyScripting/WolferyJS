@@ -282,5 +282,11 @@ declare namespace Commands {
             text: string;
         }
     }
+
+    export namespace Identity {
+        export interface SetOptions {
+            allowNewsletter?: boolean;
+        }
+    }
 }
 export default Commands;

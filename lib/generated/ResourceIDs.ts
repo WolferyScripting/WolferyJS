@@ -144,6 +144,8 @@ namespace ResourceIDs {
     export const SUPPORT_INFO = "support.info";
     export const WEB_CLIENT_INFO = "web.client.info";
     export const NOTICE = "notice";
+    export const TOKEN = f`auth.token.${id}`;
+    export const TOKENS = f`auth.user.${id}.tokens`;
     export const CHARACTER_NODES = f`core.char.${id}.nodes`;
     export const CONTROLLED_CHARACTERS = f`core.player.${id}.ctrls`;
     export const EXITS = f`core.room.${id}.exits`;

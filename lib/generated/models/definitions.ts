@@ -31,6 +31,7 @@ import OwnedCharacters from "../../collections/OwnedCharacters.js";
 import ControlledCharacters from "../../collections/ControlledCharacters.js";
 import MutedCharacters from "../../models/MutedCharacters.js";
 import Puppets from "../../collections/Puppets.js";
+import MailMessage from "../../models/MailMessage.js";
 import RequestParams from "../../models/RequestParams.js";
 import Area from "../../models/Area.js";
 import RoomCharacters from "../../collections/RoomCharacters.js";
@@ -292,6 +293,7 @@ export const PlayerDefinition: Record<string, PropertyDefinition> = {
 
 export const PlayerMailMessageDefinition: Record<string, PropertyDefinition> = {
     from: { type: "object" },
+    message: modelProperty("message", MailMessage, false, false),
     read: { type: "?number" },
     received: { type: "number" },
     to: { type: "object" }
@@ -351,6 +353,7 @@ export const RoomCharacterDefinition: Record<string, PropertyDefinition> = {
     id: { type: "string" },
     idle: { type: "number" },
     name: { type: "string" },
+    puppeteer: modelProperty("puppeteer", Character, true, false),
     rp: { type: "string" },
     species: { type: "string" },
     state: { type: "string" },
@@ -610,3 +613,12 @@ export const MailUserDefinition: Record<string, PropertyDefinition> = {
     surname: { type: "string" },
     type: { type: "string" }
 };
+
+export const TokenDefinition: Record<string, PropertyDefinition> = {
+    created: { type: "number" },
+    id: { type: "string" },
+    issued: { type: "number" },
+    secret: { type: "string" }
+};
+
+export const TokensDefinition: Record<string, PropertyDefinition> = {};

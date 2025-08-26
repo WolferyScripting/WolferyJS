@@ -24,6 +24,7 @@ import type OwnedCharacters from "../../collections/OwnedCharacters.js";
 import type ControlledCharacters from "../../collections/ControlledCharacters.js";
 import type MutedCharacters from "../../models/MutedCharacters.js";
 import type Puppets from "../../collections/Puppets.js";
+import type MailMessage from "../../models/MailMessage.js";
 import type RequestParams from "../../models/RequestParams.js";
 import type Area from "../../models/Area.js";
 import type RoomCharacters from "../../collections/RoomCharacters.js";
@@ -490,6 +491,8 @@ export interface PlayerProperties {
 export interface PlayerMailMessageProperties {
     /** The sender of the mail. */
     from: object;
+    /** The mail message content. */
+    message: MailMessage;
     /** The timestamp when the mail was read. */
     read: number | null;
     /** The timestamp when the mail was received. */
@@ -594,6 +597,8 @@ export interface RoomCharacterProperties {
     idle: IdleState;
     /** The name of the character. */
     name: string;
+    /** The puppeteer controlling the character. */
+    puppeteer: Character | null;
     /** The roleplay status of the character. */
     rp: "lfrp" | "";
     /** The species of the character. */
@@ -1057,3 +1062,18 @@ export interface MailUserProperties {
     /** The type of the user. */
     type: MailCharacterType;
 }
+
+/** A management token. */
+export interface TokenProperties {
+    /** The creation timestamp of the token. */
+    created: number;
+    /** The unique identifier of the token. */
+    id: string;
+    /** The issuance timestamp of the token. */
+    issued: number;
+    /** The secret key associated with the token. */
+    secret: string;
+}
+
+/** The authenticated user's management tokens. */
+export interface TokensProperties {}
