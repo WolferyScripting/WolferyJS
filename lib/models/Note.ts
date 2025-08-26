@@ -9,8 +9,22 @@ import type { ResClient } from "resclient-ts";
 
 declare interface Note extends BaseModel, NoteProperties {}
 class Note extends BaseModel implements NoteProperties {
+    private onChange = this._onChange.bind(this);
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: NoteDefinition });
+    }
+
+    private async _onChange(data: Partial<NoteProperties>): Promise<void> {
+        if (data.text !== undefined) {
+            const char = await this.char.get();
+            this.client.emit("notes.textChange", this, char, this.text, data.text);
+        }
+    }
+
+    protected override async _listen(on: boolean): Promise<void> {
+        await super._listen(on);
+        const m = on ? "resourceOn" : "resourceOff";
+        this[m]("change", this.onChange);
     }
 
     get id(): string {

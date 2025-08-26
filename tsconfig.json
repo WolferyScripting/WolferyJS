@@ -34,6 +34,6 @@
       "@root/*": ["lib/*"]
     }
   },
-  "include": ["lib/**/*", "test/**/*", "schema/**/*"],
+  "include": ["lib/**/*", "local/**/*", "test/**/*", "schema/**/*"],
   "exclude": ["node_modules", "dist"]
 }

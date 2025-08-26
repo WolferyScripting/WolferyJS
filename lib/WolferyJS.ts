@@ -1,4 +1,4 @@
-import type { BotAuthentication, ClientEvents, PasswordAuthentication, TokenAuthentication } from "./util/types.js";
+import type { BotAuthentication, PasswordAuthentication, TokenAuthentication } from "./util/types.js";
 import TypedEmitter from "./util/TypedEmitter.js";
 import User from "./models/User.js";
 import Bot from "./models/Bot.js";
@@ -8,12 +8,13 @@ import type GlobalTeleports from "./collections/GlobalTeleports.js";
 import type AwakeCharacters from "./models/AwakeCharacters.js";
 import SafeUser from "./models/SafeUser.js";
 import { waitForCached, waitForEvent, type WaitForEventOptions, type WaitForCachedOptions } from "./util/Util.js";
-import type Commands from "./util/commands.js";
 import type OwnedCharacter from "./models/OwnedCharacter.js";
 import ControlledCharacter from "./models/ControlledCharacter.js";
 import ResourceIDs from "./generated/ResourceIDs.js";
 import registerCollections from "./generated/collections/registry.js";
 import registerModels from "./generated/models/registry.js";
+import type { Events } from "./util/events.js";
+import type Notes from "./models/Notes.js";
 import {
     ResClient,
     type ClientOptions,
@@ -61,12 +62,23 @@ export interface Options {
         startup?: boolean;
         /** If awake characters should be tracked. Defaults to `true`. */
         trackAwake?: boolean;
+        /** If incoming requests should be tracked. Defaults to `true`. */
+        trackIncomingRequests?: boolean;
         /** If unread mail should be tracked. Defaults to `true` if `authentication.type` === "password", has no effect otherwise. */
         trackMail?: boolean;
+        /** If note changes should be tracked. Each note must be fetched individually to track changes, so this can potentially flood the server with requests and expand the cache significantly. */
+        trackNoteChanges?: boolean;
+        /** If note additions & removals should be tracked. This will not track text changes in individual notes. Defaults to `true` */
+        trackNotes?: boolean;
+        /** If outgoing requests should be tracked. Defaults to `true`. */
+        trackOutgoingRequests?: boolean;
         /** If watched characters should be tracked. Defaults to the same as `trackAwake`. */
         trackWatched?: boolean;
     };
-    wsFactory?(this: void): WebSocket;
+    /** If pings should be sent to prevent being released for inactivity. Defaults to `true` */
+    pingCharacters?: boolean;
+    resClientFactory?(this: void, client: WolferyJS): ResClient;
+    wsFactory?(this: void, client: WolferyJS): WebSocket;
 }
 
 export interface InstanceOptions {
@@ -78,14 +90,20 @@ export interface InstanceOptions {
         charInfoOffline: boolean;
         startup: boolean;
         trackAwake: boolean;
+        trackIncomingRequests: boolean;
         trackMail: boolean;
+        trackNoteChanges: boolean;
+        trackNotes: boolean;
+        trackOutgoingRequests: boolean;
         trackWatched: boolean;
     };
-    wsFactory(this: void): WebSocket;
+    pingCharacters: boolean;
+    resClientFactory(this: void, client: WolferyJS): ResClient;
+    wsFactory(this: void, client: WolferyJS): WebSocket;
 }
 
 type AnyUser = User | SafeUser | Bot;
-export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter<ClientEvents> {
+export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter<Events> {
     private _player!: Player | null;
     private _res!: ResClient | null;
     private _user!: U | null;
@@ -109,14 +127,20 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
                     },
                     domain: options.apiDomain ?? "wolfery.com",
                     fetch:  {
-                        charInfo:        options.fetch?.charInfo ?? false,
-                        charInfoOffline: options.fetch?.charInfoOffline ?? false,
-                        startup:         options.fetch?.startup ?? true,
-                        trackAwake:      options.fetch?.trackAwake ?? true,
-                        trackWatched:    options.fetch?.trackWatched ?? options.fetch?.trackAwake ?? true,
-                        trackMail:       options.fetch?.trackMail ?? options.authentication.type === "password"
+                        charInfo:              options.fetch?.charInfo ?? false,
+                        charInfoOffline:       options.fetch?.charInfoOffline ?? false,
+                        startup:               options.fetch?.startup ?? true,
+                        trackAwake:            options.fetch?.trackAwake ?? true,
+                        trackIncomingRequests: options.fetch?.trackIncomingRequests ?? true,
+                        trackMail:             options.fetch?.trackMail ?? options.authentication.type === "password",
+                        trackNoteChanges:      options.fetch?.trackNoteChanges ?? false,
+                        trackNotes:            options.fetch?.trackNotes ?? true,
+                        trackOutgoingRequests: options.fetch?.trackOutgoingRequests ?? true,
+                        trackWatched:          options.fetch?.trackWatched ?? options.fetch?.trackAwake ?? true
                     },
-                    wsFactory: options.wsFactory ?? ((): WebSocket => new WebSocket(this.wsURL, { handshakeTimeout: 5000 }))
+                    pingCharacters:   options.pingCharacters ?? true,
+                    wsFactory:        options.wsFactory ?? ((client: WolferyJS): WebSocket => new WebSocket(client.wsURL, { handshakeTimeout: 5000 })),
+                    resClientFactory: options.resClientFactory ?? ((client: WolferyJS): ResClient => new ResClient(() => client.options.wsFactory(client), client.options.clientOptions))
                 } satisfies Omit<InstanceOptions, "authentication">,
                 enumerable: false,
                 writable:   true
@@ -183,6 +207,22 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
                 }
                 if (this.options.fetch.trackMail) {
                     promises.push(this.api.subscribe(ResourceIDs.UNREAD_MAIL({ id: player.id }), true));
+                }
+                if (this.options.fetch.trackIncomingRequests) {
+                    promises.push(this.api.subscribe(ResourceIDs.INCOMING_REQUESTS({ id: player.id }), true));
+                }
+                if (this.options.fetch.trackOutgoingRequests) {
+                    promises.push(this.api.subscribe(ResourceIDs.OUTGOING_REQUESTS({ id: player.id }), true));
+                }
+                if (this.options.fetch.trackNotes) {
+                    if (this.options.fetch.trackNoteChanges) {
+                        const notes = await this.api.get<Notes>(ResourceIDs.NOTES({ id: player.id }), true);
+                        for (const note of notes.list) {
+                            promises.push(this.api.get(note.rid, true));
+                        }
+                    } else {
+                        promises.push(this.api.get(ResourceIDs.NOTES({ id: player.id }), true));
+                    }
                 }
             }
         }
@@ -344,7 +384,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             }
         }
 
-        const res = this._res = new ResClient(this.options.wsFactory, this.options.clientOptions);
+        const res = this._res = this.options.resClientFactory(this);
         registerCollections(this, res);
         registerModels(this, res);
         res.setOnConnect(async() => {
@@ -374,6 +414,14 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         await res.connect();
     }
 
+    async disconnect(): Promise<void> {
+        await this._res?.disconnect();
+        this._player = null;
+        this._user = null;
+        this._res = null;
+        this.emit("disconnected");
+    }
+
     async getAllPaginated<T extends ResModel>(resourceId: string, pageSize = 10): Promise<Array<T>> {
         this._ensureRes(this._res);
         const results: Array<T> = [];
@@ -394,13 +442,30 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         return this.api.get<AwakeCharacters>(ResourceIDs.AWAKE_CHARACTERS);
     }
 
-    async getGlobalTeleports(): Promise<GlobalTeleports> {
-        return this.api.get<GlobalTeleports>(ResourceIDs.NODES);
+    async getCharacterInRoom(roomId: string): Promise<ControlledCharacter | null> {
+        if (this.isBot()) {
+            if (this._user?.char.inRoom.id === roomId) return this._user.controlled;
+        } else if (this.isPlayer()) {
+            const char = this._player?.controlled.find(c => c.state === "awake" && c.inRoom.id === roomId);
+            if (char) return char;
+        }
+        return null;
     }
 
-    async getLogEvents(charId: string, startTime?: number): Promise<Commands.LogEvents> {
-        this._ensureRes(this._res);
-        return this.api.call<Commands.LogEvents>("log.events", "get", { charId, startTime });
+    async getCharacterInRoomExit(exitId: string): Promise<ControlledCharacter | null> {
+        console.log(exitId);
+        if (this.isBot()) {
+            if (this._user?.controlled?.inRoom.exits.find(e => e.id === exitId)) return this._user.controlled;
+        } else if (this.isPlayer()) {
+            console.log(this._player!.controlled.map(c => c.inRoom.exits.map(e => e.id)));
+            const char = this._player?.controlled.find(c => c.state === "awake" && c.inRoom.exits.find(e => e.id === exitId));
+            if (char) return char;
+        }
+        return null;
+    }
+
+    async getGlobalTeleports(): Promise<GlobalTeleports> {
+        return this.api.get<GlobalTeleports>(ResourceIDs.NODES);
     }
 
     async getPlayer(): Promise<Player> {

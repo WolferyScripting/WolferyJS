@@ -1,0 +1,8 @@
+{
+  "include": ["lib/**/*.ts"],
+  "exclude": ["**/*.d.ts", "test/**/*.ts"],
+  "reporter": ["text", "html"],
+  "all": true,
+  "require": ["source-map-support/register"],
+  "report-dir": "coverage"
+}

@@ -8,6 +8,9 @@ import type RoomProfile from "./RoomProfile.js";
 import type RoomScript from "./RoomScript.js";
 import type OwnedCharacter from "./OwnedCharacter.js";
 import type Puppet from "./Puppet.js";
+import type RoomCharacter from "./RoomCharacter.js";
+import type RoomDetails from "./RoomDetails.js";
+import type AfarRoom from "./AfarRoom.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
 import {
     type KeyBasicResponse,
@@ -21,31 +24,86 @@ import type Commands from "../util/commands.js";
 import ResEventObserver from "../util/ResEventObserver.js";
 import type { ControlledCharacterProperties } from "../generated/models/types.js";
 import { ControlledCharacterDefinition } from "../generated/models/definitions.js";
+import { PING_DURATION } from "../util/Constants.js";
 import { fileTypeFromBuffer } from "file-type";
-import type { ResClient } from "resclient-ts";
+import type { AnyFunction, CollectionAddRemove, ResClient } from "resclient-ts";
 
 declare interface ControlledCharacter extends BaseModel, ControlledCharacterProperties {}
 class ControlledCharacter extends BaseModel implements ControlledCharacterProperties {
+    private _pingTimeout!: NodeJS.Timeout | null;
     private onChange = this._onChange.bind(this);
+    private onExitAdd = this._onExitAdd.bind(this);
+    private onExitChange = this._onExitChange.bind(this);
+    private onExitRemove = this._onExitRemove.bind(this);
     private onLookedAtChange = this._onLookedAtChange.bind(this);
     private onOut = this._onOut.bind(this);
+    private onRoomCharAdd = this._onRoomCharAdd.bind(this);
+    private onRoomCharRemove = this._onRoomCharRemove.bind(this);
+    private roomExitAwakeCharAddListeners!: Array<{ exit: Exit; fn: AnyFunction; }>;
+    private roomExitAwakeCharRemoveListeners!: Array<{ exit: Exit; fn: AnyFunction; }>;
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: ControlledCharacterDefinition });
+        this.p
+            .writable("_pingTimeout", null)
+            .writable("onChange")
+            .writable("onExitAdd")
+            .writable("onExitChange")
+            .writable("onExitRemove")
+            .writable("onLookedAtChange")
+            .writable("onOut")
+            .writable("onRoomCharAdd")
+            .writable("onRoomCharRemove")
+            .writable("roomExitAwakeCharAddListeners", [])
+            .writable("roomExitAwakeCharRemoveListeners", []);
     }
 
     private async _onChange(data: Partial<this>): Promise<void> {
-        if (data.inRoom !== undefined) {
-            this.client.emit("roomChange", this, this.inRoom, data.inRoom);
-        }
-
         if (data.lookingAt !== undefined) {
             this.client.emit("lookAtChange", this, this.lookingAt?.char ?? null, data.lookingAt?.char ?? null);
         }
 
         if (data.lookedAt !== undefined) {
-            data.lookedAt.resourceOff("change", this.onLookedAtChange);
-            await this.listenLookedAt(true);
+            await this._listenLookedAt(false);
+            await this._listenLookedAt(true);
         }
+
+        if (data.inRoom !== undefined) {
+            this._listenInRoom(false, data.inRoom);
+            this._listenInRoom(true, this.inRoom);
+        }
+    }
+
+    private _onExitAdd(data: CollectionAddRemove<Exit>): void {
+        this._listenExit(true, data.item);
+        data.item.resourceOn("change", this.onExitChange);
+        this.client.emit("exits.add", this, this.inRoom, data.item);
+    }
+
+    private _onExitChange(data: Partial<Exit>, exit: Exit): void {
+        this.client.emit("exits.change", this, this.inRoom, exit, data);
+        if (data.target !== undefined) {
+            if (data.target === null) {
+                this._listenExit(false, exit);
+                this._listenExit(true, exit);
+            } else {
+                const add = this.roomExitAwakeCharAddListeners.find(e => e.exit.id === exit.id);
+                const remove = this.roomExitAwakeCharRemoveListeners.find(e => e.exit.id === exit.id);
+                if (add) {
+                    data.target.awake?.resourceOff("add", add.fn);
+                    this.roomExitAwakeCharAddListeners.splice(this.roomExitAwakeCharAddListeners.indexOf(add), 1);
+                }
+                if (remove) {
+                    data.target.awake?.resourceOff("remove", remove.fn);
+                    this.roomExitAwakeCharRemoveListeners.splice(this.roomExitAwakeCharRemoveListeners.indexOf(remove), 1);
+                }
+            }
+        }
+    }
+
+    private _onExitRemove(data: CollectionAddRemove<Exit>): void {
+        this._listenExit(false, data.item);
+        data.item.resourceOff("change", this.onExitChange);
+        this.client.emit("exits.remove", this, this.inRoom, data.item);
     }
 
     private async _onLookedAtChange(data: Record<string, true>): Promise<void> {
@@ -65,12 +123,12 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         // we could mess around with RoomCharacter instances, but they can be unreliable, and we aren't missing anything
         for (const add of added) {
             const char = await this.api.get<Character>(ResourceIDs.CHARACTER({ id: add }));
-            this.client.emit("lookedAtAdd", this, char);
+            this.client.emit("lookedAt.add", this, char);
         }
 
         for (const remove of removed) {
             const char =  await this.api.get<Character>(ResourceIDs.CHARACTER({ id: remove }));
-            this.client.emit("lookedAtRemove", this, char);
+            this.client.emit("lookedAt.remove", this, char);
         }
     }
 
@@ -137,9 +195,20 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         }
     }
 
-    private async listenLookedAt(on: boolean): Promise<void> {
-        const m = on ? "resourceOn" : "resourceOff";
-        this.lookedAt[m]("change", this.onLookedAtChange);
+    private _onRoomCharAdd(data: CollectionAddRemove<RoomCharacter>): void {
+        this.client.emit("roomCharacters.add", this, this.inRoom, data.item);
+    }
+
+    private _onRoomCharRemove(data: CollectionAddRemove<RoomCharacter>): void {
+        this.client.emit("roomCharacters.remove", this, this.inRoom, data.item);
+    }
+
+    private _onRoomExitAwakeCharAdd(char: Character, exit: Exit, room: AfarRoom): void {
+        this.client.emit("roomCharacters.exit.add", this, room, exit, char);
+    }
+
+    private _onRoomExitAwakeCharRemove(char: Character, exit: Exit, room: AfarRoom): void {
+        this.client.emit("roomCharacters.exit.remove", this, room, exit, char);
     }
 
     protected override async _listen(on: boolean): Promise<void> {
@@ -147,7 +216,76 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         const m = on ? "resourceOn" : "resourceOff";
         this[m]("change", this.onChange);
         this[m]("out", this.onOut);
-        await this.listenLookedAt(on);
+        await this._listenLookedAt(on);
+
+        if (this.client.options.pingCharacters) {
+            if (on) {
+                this._pingTimeout = setInterval(() => this.ping(),  PING_DURATION);
+            } else if (this._pingTimeout) {
+                clearInterval(this._pingTimeout);
+            }
+        }
+
+        this._listenInRoom(on, this.inRoom);
+    }
+
+    protected _listenExit(on: boolean, exit: Exit): void {
+        console.log(exit.id, exit.target);
+        if (on && exit.target?.awake) {
+            const room = exit.target;
+            console.log("listen exit", this.fullname, exit.id);
+            const add = (data: CollectionAddRemove<Character>): void => this._onRoomExitAwakeCharAdd(data.item, exit, room);
+            const remove = (data: CollectionAddRemove<Character>): void => this._onRoomExitAwakeCharRemove(data.item, exit, room);
+            exit.target.awake.resourceOn("add", add);
+            exit.target.awake.resourceOn("remove", remove);
+            this.roomExitAwakeCharAddListeners.push({ exit, fn: add });
+            this.roomExitAwakeCharRemoveListeners.push({ exit, fn: remove });
+        } else if  (!on) {
+            const add = this.roomExitAwakeCharAddListeners.find(e => e.exit.id === exit.id);
+            const remove = this.roomExitAwakeCharRemoveListeners.find(e => e.exit.id === exit.id);
+            if (add) {
+                exit.target?.awake?.resourceOff("add", add.fn);
+                this.roomExitAwakeCharAddListeners.splice(this.roomExitAwakeCharAddListeners.indexOf(add), 1);
+            }
+            if (remove) {
+                exit.target?.awake?.resourceOff("remove", remove.fn);
+                this.roomExitAwakeCharRemoveListeners.splice(this.roomExitAwakeCharRemoveListeners.indexOf(remove), 1);
+            }
+        }
+    }
+
+    protected _listenInRoom(on: boolean, room: RoomDetails): void {
+        console.log("listenRoom", on, room, room.exits.list);
+        if (on) {
+            room.exits.resourceOn("add", this.onExitAdd);
+            room.exits.resourceOn("remove", this.onExitRemove);
+            console.log("listen exits", room.id);
+            for (const exit of room.exits) {
+                exit.resourceOn("change", this.onExitChange);
+                this._listenExit(on, exit);
+            }
+            room.chars?.resourceOn("add", this.onRoomCharAdd);
+            room.chars?.resourceOn("remove", this.onRoomCharRemove);
+            console.log("listen room chars", this.fullname, room.id, !!room.chars);
+        } else {
+            room.exits.resourceOff("add", this.onExitAdd);
+            room.exits.resourceOff("remove", this.onExitRemove);
+            console.log("unlisten exits", room.id);
+            for (const exit of room.exits) {
+                exit.resourceOff("change", this.onExitChange);
+                this._listenExit(on, exit);
+            }
+            this.roomExitAwakeCharAddListeners = [];
+            this.roomExitAwakeCharRemoveListeners = [];
+            room.chars?.resourceOff("add", this.onRoomCharAdd);
+            room.chars?.resourceOff("remove", this.onRoomCharRemove);
+            console.log("unlisten room chars", this.fullname, room.id, !!room.chars);
+        }
+    }
+
+    protected async _listenLookedAt(on: boolean): Promise<void> {
+        const m = on ? "resourceOn" : "resourceOff";
+        this.lookedAt[m]("change", this.onLookedAtChange);
     }
 
     get avatarURL(): string | null {
@@ -168,6 +306,15 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      */
     async acceptControl(charId: string): Promise<null> {
         return this.call<null>("controlRequestAccept", { charId });
+    }
+
+    /**
+     * Add a tag to this character.
+     * @param tagID The ID of the tag to add.
+     * @param pref The preference for the tag.
+     */
+    async addTag(tagId: string, pref: "like" | "dislike"): Promise<null> {
+        return this.tags.add(tagId, pref);
     }
 
     /**
@@ -420,8 +567,25 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         return this.call<null>("follow", { charId });
     }
 
+    /**
+     * Get the character for this controlled character.
+     * @returns The character.
+     */
     async getChar(): Promise<Character> {
         return this.api.get<Character>(ResourceIDs.CHARACTER({ id: this.id }));
+    }
+
+    /**
+     * Get an exit in the current room.
+     * @param options The options for getting the exit.
+     * @returns The exit.
+     */
+    async getExit(options: Commands.ControlledCharacter.GetExitOptions): Promise<Exit> {
+        return this.call<Exit>("getExit", options);
+    }
+
+    async getLogEvents(startTime?: number): Promise<Commands.LogEvents> {
+        return this.api.call<Commands.LogEvents>(ResourceIDs.LOG_EVENTS, "get", { charId: this.id, startTime });
     }
 
     /**
@@ -429,7 +593,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @returns The owned character.
      */
     async getOwnedChar(): Promise<OwnedCharacter> {
-        return this.api.get<OwnedCharacter>(ResourceIDs.CHARACTER_OWNED({ id: this.id }));
+        return this.api.get<OwnedCharacter>(ResourceIDs.OWNED_CHARACTER({ id: this.id }));
     }
 
     /**
@@ -439,6 +603,14 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
     async getPuppet(): Promise<Puppet> {
         const { char, puppet } = ResourceIDs.CONTROLLED_PUPPET.parts(this.rid);
         return this.api.get<Puppet>(ResourceIDs.PUPPET({ char, puppet }));
+    }
+
+    /**
+     * Get the room character for this controlled character.
+     * @returns The room character.
+     */
+    async getRoomChar(): Promise<RoomCharacter> {
+        return this.api.get<RoomCharacter>(ResourceIDs.ROOM_CHARACTER({ id: this.id }));
     }
 
     /**
@@ -520,6 +692,11 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         return this.call<null>("ooc", options);
     }
 
+    /** Send a ping to avoid being released for inactivity. */
+    async ping(): Promise<null> {
+        return this.call<null>("ping");
+    }
+
     /**
      * Send a pose message.
      * @param msg The message to send.
@@ -556,9 +733,10 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
 
     /**
      * Release control of this character.
+     * @param msg A release message to show.
      */
-    async release(): Promise<null> {
-        return this.call<null>("release");
+    async release(msg?: string): Promise<null> {
+        return this.call<null>("release", { msg });
     }
 
     /**
@@ -568,6 +746,14 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      */
     async removeLocation(locationId: string, type: "area" | "room"): Promise<null> {
         return this.call<null>("removeLocation", { locationId, type });
+    }
+
+    /**
+     * Remove a tag from this character.
+     * @param tagID The ID of the tag to remove.
+     */
+    async removeTag(tagId: string): Promise<null> {
+        return this.tags.remove(tagId);
     }
 
     /**
@@ -648,7 +834,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         return this.api.call<null>(ResourceIDs.ROLLER({ id: this.id }), "roll", { roll, quiet })
             .then(() => observer.get(500).catch(async() => {
                 observer.end();
-                const logs = await this.client.getLogEvents(this.id, now);
+                const logs = await this.getLogEvents(now);
                 return logs.events.find(l => l.type === "roll" && l.char.id === this.id) as Messages.Roll;
             }));
     }
@@ -822,6 +1008,14 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
     }
 
     /**
+     * Set the status message this character.
+     * @param status The status message.
+     */
+    async setStatus(status: string): Promise<null> {
+        return this.call<null>("set", { status });
+    }
+
+    /**
      * Set a teleport node key.
      * @param nodeId The ID of the node.
      * @param options The options for the teleport node.
@@ -832,10 +1026,11 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
 
     /**
      * Put this character to sleep.
+     * @param msg A sleep message to show.
      * @note Alias of {@link release}
      */
-    async sleep(): Promise<null> {
-        return this.release();
+    async sleep(msg?: string): Promise<null> {
+        return this.release(msg);
     }
 
     /**

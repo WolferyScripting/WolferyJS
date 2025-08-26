@@ -1,9 +1,8 @@
 import BaseCollection from "./BaseCollection.js";
 import type ControlledCharacter from "../models/ControlledCharacter.js";
-import type { CollectionAddRemove } from "../util/types.js";
 import type WolferyJS from "../WolferyJS.js";
 import { toID } from "../util/Util.js";
-import type ResClient from "resclient-ts";
+import type { ResClient, CollectionAddRemove } from "resclient-ts";
 
 export default class ControlledCharacters extends BaseCollection<ControlledCharacter> {
     private onAdd = this._onAdd.bind(this);
@@ -13,16 +12,16 @@ export default class ControlledCharacters extends BaseCollection<ControlledChara
     }
 
     private _onAdd(data: CollectionAddRemove<ControlledCharacter>): void {
-        this.client.emit("controlledCharacterAdd", data.item);
+        this.client.emit("controlledCharacters.add", data.item);
     }
 
     private _onRemove(data: CollectionAddRemove<ControlledCharacter>): void {
-        this.client.emit("controlledCharacterRemove", data.item);
+        this.client.emit("controlledCharacters.remove", data.item);
     }
 
     protected override async _listen(on: boolean): Promise<void> {
         await super._listen(on);
-        const m = on ? "on" : "off";
+        const m = on ? "resourceOn" : "resourceOff";
         this[m]("add", this.onAdd);
         this[m]("remove", this.onRemove);
     }

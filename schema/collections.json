@@ -30,6 +30,18 @@
     "model": "PlayerMailMessage"
   },
   {
+    "description": "The incoming requests for the player.",
+    "id": ["INCOMING_REQUESTS(core.player.{id}.incoming.requests)"],
+    "name": "IncomingRequests",
+    "model": "Request"
+  },
+  {
+    "description": "The outgoing requests for the player.",
+    "id": ["OUTGOING_REQUESTS(core.player.{id}.outgoing.requests)"],
+    "name": "OutgoingRequests",
+    "model": "Request"
+  },
+  {
     "description": "The areas owned by a character.",
     "id": ["OWNED_AREAS(core.char.{id}.areas)"],
     "name": "OwnedAreas",
@@ -60,12 +72,6 @@
     "model": "Puppet"
   },
   {
-    "description": "The requests for the player.",
-    "id": ["OUTGOING_REQUESTS(core.player.{id}.outgoing.requests)", "INCOMING_REQUESTS(core.player.{id}.incoming.requests)"],
-    "name": "Requests",
-    "model": "Request"
-  },
-  {
     "description": "The characters in a room.",
     "id": ["ROOM_CHARACTERS(core.room.{id}.chars)", "ROOM_INSTANCE_CHARACTERS(core.instance.{instance}.room.{room}.chars)"],
     "name": "RoomCharacters",
@@ -84,6 +90,12 @@
     "model": "Profile"
   },
   {
+    "description": "The scripts in a room.",
+    "id": ["ROOM_SCRIPTS(core.room.{id}.scripts)"],
+    "name": "RoomScripts",
+    "model": "RoomScript"
+  },
+  {
     "description": "The logs for a room script.",
     "id": ["SCRIPT_LOGS(core.script.{id}.logs)"],
     "name": "ScriptLogs",
@@ -100,5 +112,11 @@
     "object": {
       "key": { "type": "string", "description": "The key for the trigger." }
     }
+  },
+  {
+    "description": "The notices for the logged in user.",
+    "id": ["AUTH_NOTICES(auth.user.{id}.notices)", "IDENTITY_NOTICES(identity.user.{id}.notices)"],
+    "name": "Notices",
+    "model": "Notice"
   }
 ]

@@ -25,7 +25,7 @@ export default abstract class BaseModel extends ResModel {
             }
 
             if (missing.length !== 0) {
-                this.client.emit("missingProperties", this, missing);
+                this.client.emit("missingProperties", this, missing, props);
             }
         }
 

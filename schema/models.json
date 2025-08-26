@@ -10,7 +10,7 @@
       },
       "name": { "type": "string", "description": "The name of the room." },
       "awake": {
-        "collection": "RoomCharactersAwake",
+        "collection": "?RoomCharactersAwake",
         "description": "The characters in the room that are awake."
       }
     }
@@ -466,7 +466,7 @@
         "description": "The navigation direction of the exit."
       },
       "name": { "type": "string", "description": "The name of the exit." },
-      "target": { "model": "AfarRoom", "description": "The target room of the exit." },
+      "target": { "model": "?AfarRoom", "description": "The target room of the exit." },
       "targetId": { "type": "string", "description": "The ID of the target room." }
     }
   },
@@ -700,7 +700,7 @@
     "name": "Note",
     "props": {
       "char": {
-        "model": "Character",
+        "ref": "Character",
         "description": "The character this note is about."
       },
       "text": { "type": "string", "description": "The content of the note." }
@@ -711,11 +711,11 @@
     "description": "All notes.",
     "id": ["NOTES(note.player.{id}.notes)"],
     "name": "Notes",
-    "model": "ResRef"
+    "ref": "Note"
   },
   {
     "description": "An owned character.",
-    "id": ["CHARACTER_OWNED(core.char.{id}.owned)"],
+    "id": ["OWNED_CHARACTER(core.char.{id}.owned)"],
     "name": "OwnedCharacter",
     "props": {
       "avatar": {
@@ -936,7 +936,7 @@
     "name": "Request",
     "props": {
       "answered": {
-        "type": "number",
+        "type": "?number",
         "description": "The timestamp when the request was answered."
       },
       "created": {
@@ -944,7 +944,8 @@
         "description": "The timestamp when the request was created."
       },
       "error": {
-        "type": "any",
+        "type": "?object",
+        "literal": "Record<\"code\" | \"message\", string>",
         "description": "Any error associated with the request."
       },
       "expires": {
@@ -965,6 +966,7 @@
       },
       "state": {
         "type": "string",
+        "oneOf": ["pending", "rejected", "failed", "accepted", "expired", "revoked"],
         "description": "The current state of the request."
       },
       "to": {
@@ -981,10 +983,16 @@
     "props": {
       "area": {
         "model": "?Area",
+        "error": true,
         "description": "The area related to the request."
+      },
+      "owner": {
+        "model": "Character",
+        "description": "The character that owns the request."
       },
       "room": {
         "model": "?Room",
+        "error": true,
         "description": "The room related to the request."
       }
     }
@@ -1130,7 +1138,7 @@
         "description": "The delay for autosweep in seconds."
       },
       "chars": {
-        "collection": "RoomCharacters",
+        "collection": "?RoomCharacters",
         "description": "The characters present in the room."
       },
       "cmds": {
@@ -1215,7 +1223,7 @@
         "description": "The delay for autosweep in seconds."
       },
       "chars": {
-        "collection": "RoomCharacters",
+        "collection": "?RoomCharacters",
         "description": "The characters present in the room."
       },
       "cmds": {
@@ -1518,7 +1526,7 @@
     "description": "Unread mail.",
     "id": ["UNREAD_MAIL(mail.player.{id}.unread)"],
     "name": "UnreadMail",
-    "model": "ResRef"
+    "ref": "PlayerMailMessage"
   },
   {
     "description": "The user when logging in with username/password.",
@@ -1571,6 +1579,138 @@
     "description": "Watched characters.",
     "id": ["WATCHES(note.player.{id}.watches)"],
     "name": "Watches",
-    "model": "ResRef"
+    "ref": "Watch"
+  },
+  {
+    "collection": true,
+    "description": "The globally available tags.",
+    "id": ["TAGS(tag.tags)"],
+    "name": "Tags",
+    "model": "Tag"
+  },
+  {
+    "description": "A tag group.",
+    "id": ["TAG_GROUP(tag.groups.{id})"],
+    "name": "TagGroup",
+    "props": {
+      "key": { "type": "string", "description": "The key of the tag group." },
+      "name": { "type": "string", "description": "The name of the tag group." },
+      "order": { "type": "number", "description": "The order of the tag group." }
+    }
+  },
+  {
+    "collection": true,
+    "description": "The tag groups.",
+    "id": ["TAG_GROUPS(tag.groups)"],
+    "name": "TagGroups",
+    "model": "TagGroup"
+  },
+  {
+    "description": "The core info about the realm.",
+    "id": ["CORE_INFO(core.info)"],
+    "name": "CoreInfo",
+    "props": {
+      "about": { "type": "string", "description": "Information about the core realm." },
+      "adminMaxCharProfiles": { "type": "number", "description": "The maximum number of character profiles an admin can have." },
+      "adminMaxOwnedChars": { "type": "number", "description": "The maximum number of characters an admin can own." },
+      "adminMaxRoomProfiles": { "type": "number", "description": "The maximum number of room profiles an admin can have." },
+      "adminMaxRoomScripts": { "type": "number", "description": "The maximum number of room scripts an admin can have." },
+      "builderMaxOwnedAreas": { "type": "number", "description": "The maximum number of areas a builder can own." },
+      "builderMaxOwnedRooms": { "type": "number", "description": "The maximum number of rooms a builder can own." },
+      "communicationMaxLength": { "type": "number", "description": "The maximum length of communication." },
+      "descriptionMaxLength": { "type": "number", "description": "The maximum length of a description." },
+      "genre": { "type": "string", "description": "The genre of the realm." },
+      "greeting": { "type": "string", "description": "The greeting message of the realm." },
+      "itemNameMaxLength": { "type": "number", "description": "The maximum length of an item name." },
+      "keyMaxLength": { "type": "number", "description": "The maximum length of keys." },
+      "maxCharProfiles": { "type": "number", "description": "The maximum number of profiles a character can have." },
+      "maxFollows": { "type": "number", "description": "The maximum number of characters that can be following a single character." },
+      "maxImageSize": { "type": "number", "description": "The maximum allowed file size for uploaded images, in bytes." },
+      "maxListItems": { "type": "number", "description": "The maximum number of items allowed in a list." },
+      "maxOwnedAreas": { "type": "number", "description": "The maximum number of areas a player can own." },
+      "maxOwnedChars": { "type": "number", "description": "The maximum number of characters a player can own." },
+      "maxOwnedRooms": { "type": "number", "description": "The maximum number of rooms a player can own." },
+      "maxRoomExits": { "type": "number", "description": "The maximum number of exits a room can have." },
+      "maxRoomProfiles": { "type": "number", "description": "The maximum number of profiles a room can have." },
+      "maxRoomScripts": { "type": "number", "description": "The maximum number of scripts a room can have." },
+      "maxScheduledPosts": { "type": "number", "description": "The maximum number of scheduled posts a user can have pending at once." },
+      "propertyMaxLength": { "type": "number", "description": "The maximum length for properties." },
+      "rules": { "type": "string", "description": "The rules for the realm." },
+      "scriptMaxLength": { "type": "number", "description": "The maximum length a script can be." },
+      "shortDescriptionMaxLength": { "type": "number", "description": "The maximum length a short description field can be." },
+      "subgenre": { "type": "string", "description": "The specific subgenre of the realm." },
+      "supporterMaxCharProfiles": { "type": "number", "description": "The maximum number of character profiles a supporter player can have." },
+      "supporterMaxImageSize": {
+        "type": "number",
+        "description": "The maximum allowed file size for uploaded images by supporter players, in bytes."
+      },
+      "supporterMaxOwnedChars": { "type": "number", "description": "The maximum number of characters supporter players can own." },
+      "supporterMaxRoomProfiles": { "type": "number", "description": "The maximum number of room profiles supporter players can have." },
+      "supporterMaxRoomScripts": { "type": "number", "description": "The maximum number of room scripts supporter players can have." },
+      "title": { "type": "string", "description": "The realm name." },
+      "vapidPublicKey": { "type": "string", "description": "The VAPID public key used for push notifications via Web Push protocol." },
+      "version": { "type": "string", "description": "The current version of the realm." }
+    }
+  },
+  {
+    "description": "The tag info.",
+    "id": ["TAG_INFO(tag.info)"],
+    "name": "TagInfo",
+    "props": {
+      "charTagsLimit": { "type": "number", "description": "The maximum number of tags a character can have." },
+      "groupKeyMaxLength": { "type": "number", "description": "The maximum length of a tag group's key." },
+      "groupNameMaxLength": { "type": "number", "description": "The maximum length of a tag group's name." },
+      "tagDescMaxLength": { "type": "number", "description": "The maximum length of a tag's description." },
+      "tagKeyMaxLength": { "type": "number", "description": "The maximum length of a tag's key." }
+    }
+  },
+  {
+    "description": "The mail info.",
+    "id": ["MAIL_INFO(mail.info)"],
+    "name": "MailInfo",
+    "props": {
+      "mailMaxLength": { "type": "number", "description": "The maximum length of a mail." }
+    }
+  },
+  {
+    "description": "The note info.",
+    "id": ["NOTE_INFO(note.info)"],
+    "name": "NoteInfo",
+    "props": {
+      "noteMaxLength": { "type": "number", "description": "The maximum length of a note." }
+    }
+  },
+  {
+    "description": "The report info.",
+    "id": ["REPORT_INFO(report.info)"],
+    "name": "ReportInfo",
+    "props": {
+      "reportMsgMaxLength": { "type": "number", "description": "The maximum length of a report." }
+    }
+  },
+  {
+    "description": "The support info.",
+    "id": ["SUPPORT_INFO(support.info)"],
+    "name": "SupportInfo",
+    "props": {
+      "ticketMsgMaxLength": { "type": "number", "description": "The maximum length of a ticket." }
+    }
+  },
+  {
+    "description": "The web client info.",
+    "id": ["WEB_CLIENT_INFO(web.client.info)"],
+    "name": "WebClientInfo",
+    "props": {
+      "version": { "type": "string", "description": "The version of the web client." }
+    }
+  },
+  {
+    "description": "A notice. @TODO Have not been able to inspect a notice, so the rid and full properties are not known",
+    "id": ["NOTICE(notice)"],
+    "name": "Notice",
+    "props": {
+      "id": { "type": "string", "description": "The ID of the notice." },
+      "type": { "type": "string", "description": "The type of the notice." }
+    }
   }
 ]

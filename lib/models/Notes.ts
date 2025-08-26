@@ -1,25 +1,25 @@
 import type Note from "./Note.js";
 import BaseCollectionModel from "./BaseCollectionModel.js";
 import type WolferyJS from "../WolferyJS.js";
-import type { NotesProperties } from "../generated/models/types.js";
-import { NotesDefinition } from "../generated/models/definitions.js";
-import { type ResClient, ResRef } from "resclient-ts";
+import { type CollectionModelAddRemove, type ResClient, ResRef } from "resclient-ts";
 
-interface Notes extends BaseCollectionModel<ResRef<Note>>, NotesProperties {}
-class Notes extends BaseCollectionModel<ResRef<Note>> implements NotesProperties {
+class Notes extends BaseCollectionModel<ResRef<Note>> {
     private onAdd = this._onAdd.bind(this);
     private onRemove = this._onRemove.bind(this);
     constructor(client: WolferyJS, api: ResClient, rid: string) {
-        super(client, api, rid, ResRef, { definition: NotesDefinition });
+        super(client, api, rid, ResRef);
     }
 
-    private async _onAdd(ref: ResRef<Note>): Promise<void> {
-        console.log("add notes", ref);
+    private async _onAdd(ref: CollectionModelAddRemove<ResRef<Note>>): Promise<void> {
+        const note = await ref.item.get();
+        const char = await note.char.get();
+        this.client.emit("notes.add", note, char);
     }
 
-    private async _onRemove(ref: ResRef<Note>): Promise<void> {
-        console.log("remove notes", ref);
-        void ref.get().then(console.log);
+    private async _onRemove(ref: CollectionModelAddRemove<ResRef<Note>>): Promise<void> {
+        const note = await ref.item.get();
+        const char = await note.char.get();
+        this.client.emit("notes.remove", note, char);
     }
 
     protected override async _listen(on: boolean): Promise<void> {

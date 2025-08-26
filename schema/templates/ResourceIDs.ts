@@ -68,7 +68,7 @@ namespace ResourceIDs {
     /* =ids */
 
     export const ROLLER = f`roller.char.${id}`;
-    export const TAGS = "tag.tags";
+    export const LOG_EVENTS = "log.events";
 }
 /* eslint-enable @typescript-eslint/no-namespace, @typescript-eslint/explicit-function-return-type*/
 

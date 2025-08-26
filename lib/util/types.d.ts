@@ -48,11 +48,6 @@ export type BasicResponse<K extends string> = {
     [key in K]: string;
 } & { id: string; };
 
-export interface CollectionAddRemove<T = unknown> {
-    idx: number;
-    item: T;
-}
-
 export interface LookupCharacter {
     awake: boolean;
     gender: string;
@@ -188,23 +183,24 @@ export type NavIcons = NavDirections | "up" | "down" | "in" | "out";
 export type Roles = "builder" | "helper" | "moderator" | "admin";
 export type IDRoles = "supporter" | "pioneer";
 
-type WakeupMessageEvent = [type: "wakeup", sent: boolean, to: ControlledCharacter, from: Character, msg: string, method: string];
-type SleepMessageEvent = [type: "sleep", sent: boolean, to: ControlledCharacter, from: Character, msg: string, method: string];
-type TravelMessageEvent = [type: "travel", sent: boolean, to: ControlledCharacter, from: Character, msg: string, targetRoom: Messages.Travel["targetRoom"], method: string];
-type SayMessageEvent = [type: "say", sent: boolean, to: ControlledCharacter, from: Character, msg: string];
-type PoseMessageEvent = [type: "pose", sent: boolean, to: ControlledCharacter, from: Character, msg: string];
-type OOCMessageEvent = [type: "ooc", sent: boolean, to: ControlledCharacter, from: Character, msg: string, pose: boolean];
-type AddressMessageEvent = [type: "address", sent: boolean, to: ControlledCharacter, from: Character, msg: string, target: Character, pose: boolean, ooc: boolean];
-type WhisperMessageEvent = [type: "whisper", sent: boolean, to: ControlledCharacter, from: Character, msg: string, target: Character, pose: boolean, ooc: boolean];
-type MailMessageEvent = [type: "mail", sent: boolean, to: ControlledCharacter, from: Character, msg: string, target: Character, pose: boolean, ooc: boolean];
-type MessageMessageEvent = [type: "message", sent: boolean, to: ControlledCharacter, from: Character, msg: string, target: Character, pose: boolean, ooc: boolean];
-type ActionMessageEvent = [type: "action", sent: boolean, to: ControlledCharacter, from: Character, msg: string];
-type DescribeMessageEvent = [type: "describe", sent: boolean, to: ControlledCharacter, from: Character, msg: string];
-type PrivateDescribeMessageEvent = [type: "privateDescribe", sent: boolean, to: ControlledCharacter, msg: string, target: Character, script: string];
-type InfoMessageEvent = [type: "info", sent: boolean, to: ControlledCharacter, msg: string];
-type RollMessageEvent = [type: "roll", sent: boolean, to: ControlledCharacter, from: Character, total: number, result: Messages.Roll["result"], quiet: boolean];
-type LeaveMessageEvent = [type: "leave", sent: boolean, to: ControlledCharacter, from: Character, msg: string, method: string];
-type ArriveMessageEvent = [type: "arrive", sent: boolean, to: ControlledCharacter, from: Character, msg: string, method: string];
+type BaseMessageEvent<T extends Messages.MessageTypes> = [type: T, sent: boolean, to: ControlledCharacter];
+type WakeupMessageEvent = [...BaseMessageEvent<"wakeup">, from: Character, msg: string, method: string];
+type SleepMessageEvent = [...BaseMessageEvent<"sleep">, from: Character, msg: string, method: string];
+type TravelMessageEvent = [...BaseMessageEvent<"travel">, from: Character, msg: string, targetRoom: Messages.Travel["targetRoom"], method: string];
+type SayMessageEvent = [...BaseMessageEvent<"say">, from: Character, msg: string];
+type PoseMessageEvent = [...BaseMessageEvent<"pose">, from: Character, msg: string];
+type OOCMessageEvent = [...BaseMessageEvent<"ooc">, from: Character, msg: string, pose: boolean];
+type AddressMessageEvent = [...BaseMessageEvent<"address">, from: Character, msg: string, target: Character, pose: boolean, ooc: boolean];
+type WhisperMessageEvent = [...BaseMessageEvent<"whisper">, from: Character, msg: string, target: Character, pose: boolean, ooc: boolean];
+type MailMessageEvent = [...BaseMessageEvent<"mail">, from: Character, msg: string, target: Character, pose: boolean, ooc: boolean];
+type MessageMessageEvent = [...BaseMessageEvent<"message">, from: Character, msg: string, target: Character, pose: boolean, ooc: boolean];
+type ActionMessageEvent = [...BaseMessageEvent<"action">, from: Character, msg: string];
+type DescribeMessageEvent = [...BaseMessageEvent<"describe">, from: Character, msg: string];
+type PrivateDescribeMessageEvent = [...BaseMessageEvent<"privateDescribe">, msg: string, target: Character, script: string];
+type InfoMessageEvent = [...BaseMessageEvent<"info">, msg: string];
+type RollMessageEvent = [...BaseMessageEvent<"roll">, from: Character, total: number, result: Messages.Roll["result"], quiet: boolean];
+type LeaveMessageEvent = [...BaseMessageEvent<"leave">, from: Character, msg: string, method: string];
+type ArriveMessageEvent = [...BaseMessageEvent<"arrive">, from: Character, msg: string, method: string];
 type AnyMessageEvent = WakeupMessageEvent | SleepMessageEvent | TravelMessageEvent | SayMessageEvent | PoseMessageEvent | OOCMessageEvent | AddressMessageEvent | WhisperMessageEvent | MailMessageEvent | MessageMessageEvent | ActionMessageEvent | DescribeMessageEvent | PrivateDescribeMessageEvent | InfoMessageEvent | RollMessageEvent | LeaveMessageEvent | ArriveMessageEvent;
 export interface ClientEvents {
     /** Emitted when a character is added to the awake characters list. */
@@ -216,6 +212,7 @@ export interface ClientEvents {
     controlledCharacterAdd: [ctrl: ControlledCharacter];
     /** Emitted when a character is released. */
     controlledCharacterRemove: [ctrl: ControlledCharacter];
+    disconnected: [];
     error: [error: unknown];
     /** Emitted when a character's idle status changes. */
     idleStatusChange: [char: Character, status: IdleStatus, oldStatus: IdleStatus];

@@ -1,5 +1,12 @@
 /* eslint-disable unused-imports/no-unused-imports, @typescript-eslint/no-empty-interface, @typescript-eslint/no-explicit-any, @typescript-eslint/member-ordering, key-spacing, import/order, @typescript-eslint/no-unused-vars */
-import { modelProperty, collectionProperty, type PropertyDefinition } from "resclient-ts";
+import {
+    modelProperty,
+    collectionProperty,
+    refProperty,
+    ResError,
+    ResRef,
+    type PropertyDefinition
+} from "resclient-ts";
 import RoomCharactersAwake from "../../collections/RoomCharactersAwake.js";
 import AreaChildren from "../../models/AreaChildren.js";
 import Image from "../../models/Image.js";
@@ -38,7 +45,7 @@ import Identity from "../../models/Identity.js";
 export const AfarRoomDefinition: Record<string, PropertyDefinition> = {
     id: { type: "string" },
     name: { type: "string" },
-    awake: collectionProperty("awake", RoomCharactersAwake, false)
+    awake: collectionProperty("awake", RoomCharactersAwake, true, false)
 };
 
 export const AreaDefinition: Record<string, PropertyDefinition> = {
@@ -60,14 +67,14 @@ export const AreaChildrenDefinition: Record<string, PropertyDefinition> = {};
 
 export const AreaDetailsDefinition: Record<string, PropertyDefinition> = {
     about: { type: "string" },
-    children: modelProperty("children", AreaChildren, false),
+    children: modelProperty("children", AreaChildren, false, false),
     id: { type: "string" },
-    image: modelProperty("image", Image, true),
+    image: modelProperty("image", Image, true, false),
     mapX: { type: "number" },
     mapY: { type: "number" },
     name: { type: "string" },
-    owner: modelProperty("owner", Character, false),
-    parent: modelProperty("parent", AreaDetails, true),
+    owner: modelProperty("owner", Character, false, false),
+    parent: modelProperty("parent", AreaDetails, true, false),
     pop: { type: "number" },
     private: { type: "boolean" },
     prv: { type: "number" },
@@ -78,8 +85,8 @@ export const AreaDetailsDefinition: Record<string, PropertyDefinition> = {
 export const AwakeCharactersDefinition: Record<string, PropertyDefinition> = {};
 
 export const BotDefinition: Record<string, PropertyDefinition> = {
-    char: modelProperty("char", OwnedCharacter, false),
-    controlled: modelProperty("controlled", ControlledCharacter, true)
+    char: modelProperty("char", OwnedCharacter, false, false),
+    controlled: modelProperty("controlled", ControlledCharacter, true, false)
 };
 
 export const CharacterDefinition: Record<string, PropertyDefinition> = {
@@ -91,13 +98,13 @@ export const CharacterDefinition: Record<string, PropertyDefinition> = {
     idle: { type: "number" },
     lastAwake: { type: "number" },
     name: { type: "string" },
-    puppeteer: modelProperty("puppeteer", Character, true),
+    puppeteer: modelProperty("puppeteer", Character, true, false),
     rp: { type: "string" },
     species: { type: "string" },
     state: { type: "string" },
     status: { type: "string" },
     surname: { type: "string" },
-    tags: modelProperty("tags", CharacterTags, false),
+    tags: modelProperty("tags", CharacterTags, false, false),
     type: { type: "string" }
 };
 
@@ -113,8 +120,8 @@ export const CharacterDetailsDefinition: Record<string, PropertyDefinition> = {
     state: { type: "string" },
     status: { type: "string" },
     surname: { type: "string" },
-    tags: modelProperty("tags", CharacterTags, false),
-    image: modelProperty("image", Image, true),
+    tags: modelProperty("tags", CharacterTags, false, false),
+    image: modelProperty("image", Image, true, false),
     type: { type: "string" }
 };
 
@@ -139,28 +146,28 @@ export const ControlledCharacterDefinition: Record<string, PropertyDefinition> =
     customTeleportMsgs: { type: "boolean" },
     desc: { type: "string" },
     gender: { type: "string" },
-    home: modelProperty("home", Room, false),
+    home: modelProperty("home", Room, false, false),
     id: { type: "string" },
     idle: { type: "number" },
-    image: modelProperty("image", Image, true),
-    inRoom: modelProperty("inRoom", RoomDetails, false),
+    image: modelProperty("image", Image, true, false),
+    inRoom: modelProperty("inRoom", RoomDetails, false, false),
     lfrpDesc: { type: "?string" },
-    lookedAt: modelProperty("lookedAt", LookedAt, false),
-    lookingAt: modelProperty("lookingAt", LookAt, true),
+    lookedAt: modelProperty("lookedAt", LookedAt, false, false),
+    lookingAt: modelProperty("lookingAt", LookAt, true, false),
     name: { type: "string" },
-    nodes: collectionProperty("nodes", CharacterNodes, false),
-    ownedAreas: collectionProperty("ownedAreas", OwnedAreas, false),
-    ownedRooms: collectionProperty("ownedRooms", OwnedRooms, false),
-    profiles: collectionProperty("profiles", Profiles, false),
-    puppeteer: modelProperty("puppeteer", Character, true),
-    puppetInfo: modelProperty("puppetInfo", PuppetInfo, true),
+    nodes: collectionProperty("nodes", CharacterNodes, false, false),
+    ownedAreas: collectionProperty("ownedAreas", OwnedAreas, false, false),
+    ownedRooms: collectionProperty("ownedRooms", OwnedRooms, false, false),
+    profiles: collectionProperty("profiles", Profiles, false, false),
+    puppeteer: modelProperty("puppeteer", Character, true, false),
+    puppetInfo: modelProperty("puppetInfo", PuppetInfo, true, false),
     rp: { type: "string" },
-    settings: modelProperty("settings", Settings, false),
+    settings: modelProperty("settings", Settings, false, false),
     species: { type: "string" },
     state: { type: "string" },
     status: { type: "string" },
     surname: { type: "string" },
-    tags: modelProperty("tags", CharacterTags, false),
+    tags: modelProperty("tags", CharacterTags, false, false),
     teleportArriveMsg: { type: "string" },
     teleportLeaveMsg: { type: "string" },
     teleportTravelMsg: { type: "string" },
@@ -173,7 +180,7 @@ export const ExitDefinition: Record<string, PropertyDefinition> = {
     icon: { type: "string" },
     nav: { type: "string" },
     name: { type: "string" },
-    target: modelProperty("target", AfarRoom, false),
+    target: modelProperty("target", AfarRoom, true, false),
     targetId: { type: "string" }
 };
 
@@ -188,7 +195,7 @@ export const ExitDetailsDefinition: Record<string, PropertyDefinition> = {
     leaveMsg: { type: "string" },
     name: { type: "string" },
     nav: { type: "string" },
-    targetRoom: modelProperty("targetRoom", Room, false),
+    targetRoom: modelProperty("targetRoom", Room, false, false),
     transparent: { type: "boolean" },
     travelMsg: { type: "string" }
 };
@@ -223,8 +230,8 @@ export const ImageDefinition: Record<string, PropertyDefinition> = {
 
 export const LookAtDefinition: Record<string, PropertyDefinition> = {
     charId: { type: "string" },
-    char: modelProperty("char", CharacterDetails, true),
-    unseen: modelProperty("unseen", Character, true)
+    char: modelProperty("char", CharacterDetails, true, false),
+    unseen: modelProperty("unseen", Character, true, false)
 };
 
 export const LookedAtDefinition: Record<string, PropertyDefinition> = {};
@@ -240,11 +247,11 @@ export const MutedCharactersDefinition: Record<string, PropertyDefinition> = {};
 export const NodeDefinition: Record<string, PropertyDefinition> = {
     id: { type: "string" },
     key: { type: "string" },
-    room: modelProperty("room", Room, false)
+    room: modelProperty("room", Room, false, false)
 };
 
 export const NoteDefinition: Record<string, PropertyDefinition> = {
-    char: modelProperty("char", Character, false),
+    char: refProperty("char", false, false), // Character
     text: { type: "string" }
 };
 
@@ -257,11 +264,11 @@ export const OwnedCharacterDefinition: Record<string, PropertyDefinition> = {
     gender: { type: "string" },
     id: { type: "string" },
     idle: { type: "number" },
-    image: modelProperty("image", Image, true),
-    inRoom: modelProperty("inRoom", Room, false),
+    image: modelProperty("image", Image, true, false),
+    inRoom: modelProperty("inRoom", Room, false, false),
     lastAwake: { type: "number" },
     name: { type: "string" },
-    settings: modelProperty("settings", Settings, false),
+    settings: modelProperty("settings", Settings, false, false),
     species: { type: "string" },
     state: { type: "string" },
     status: { type: "string" },
@@ -270,17 +277,17 @@ export const OwnedCharacterDefinition: Record<string, PropertyDefinition> = {
 };
 
 export const PlayerDefinition: Record<string, PropertyDefinition> = {
-    chars: collectionProperty("chars", OwnedCharacters, false),
-    controlled: collectionProperty("controlled", ControlledCharacters, false),
+    chars: collectionProperty("chars", OwnedCharacters, false, false),
+    controlled: collectionProperty("controlled", ControlledCharacters, false, false),
     id: { type: "string" },
-    mutedChars: modelProperty("mutedChars", MutedCharacters, false),
+    mutedChars: modelProperty("mutedChars", MutedCharacters, false, false),
     notifyOnEvent: { type: "boolean" },
     notifyOnMatched: { type: "boolean" },
     notifyOnMention: { type: "boolean" },
     notifyOnRequests: { type: "boolean" },
     notifyOnWakeup: { type: "boolean" },
     notifyOnWatched: { type: "boolean" },
-    puppets: collectionProperty("puppets", Puppets, false)
+    puppets: collectionProperty("puppets", Puppets, false, false)
 };
 
 export const PlayerMailMessageDefinition: Record<string, PropertyDefinition> = {
@@ -304,9 +311,9 @@ export const ProfileDefinition: Record<string, PropertyDefinition> = {
 export const PuppetDefinition: Record<string, PropertyDefinition> = {
     lastUsed: { type: "number" },
     registered: { type: "number" },
-    char: modelProperty("char", OwnedCharacter, false),
-    puppet: modelProperty("puppet", Character, false),
-    settings: modelProperty("settings", Settings, false)
+    char: modelProperty("char", OwnedCharacter, false, false),
+    puppet: modelProperty("puppet", Character, false, false),
+    settings: modelProperty("settings", Settings, false, false)
 };
 
 export const PuppetInfoDefinition: Record<string, PropertyDefinition> = {
@@ -315,21 +322,22 @@ export const PuppetInfoDefinition: Record<string, PropertyDefinition> = {
 };
 
 export const RequestDefinition: Record<string, PropertyDefinition> = {
-    answered: { type: "number" },
+    answered: { type: "?number" },
     created: { type: "number" },
-    error: { type: "any" },
+    error: { type: "?object" },
     expires: { type: "number" },
-    from: modelProperty("from", Character, false),
+    from: modelProperty("from", Character, false, false),
     id: { type: "string" },
-    params: modelProperty("params", RequestParams, false),
+    params: modelProperty("params", RequestParams, false, false),
     state: { type: "string" },
-    to: modelProperty("to", Character, false),
+    to: modelProperty("to", Character, false, false),
     type: { type: "string" }
 };
 
 export const RequestParamsDefinition: Record<string, PropertyDefinition> = {
-    area: modelProperty("area", Area, true),
-    room: modelProperty("room", Room, true)
+    area: modelProperty("area", Area, true, true),
+    owner: modelProperty("owner", Character, false, false),
+    room: modelProperty("room", Room, true, true)
 };
 
 export const RoomDefinition: Record<string, PropertyDefinition> = {
@@ -369,15 +377,15 @@ export const RoomCommandDefinition: Record<string, PropertyDefinition> = {
 export const RoomCommandsDefinition: Record<string, PropertyDefinition> = {};
 
 export const RoomDetailsDefinition: Record<string, PropertyDefinition> = {
-    area: modelProperty("area", AreaDetails, true),
+    area: modelProperty("area", AreaDetails, true, false),
     autosweep: { type: "boolean" },
     autosweepDelay: { type: "number" },
-    chars: collectionProperty("chars", RoomCharacters, false),
-    cmds: modelProperty("cmds", RoomCommands, false),
+    chars: collectionProperty("chars", RoomCharacters, true, false),
+    cmds: modelProperty("cmds", RoomCommands, false, false),
     desc: { type: "string" },
-    exits: collectionProperty("exits", Exits, false),
+    exits: collectionProperty("exits", Exits, false, false),
     id: { type: "string" },
-    image: modelProperty("image", Image, true),
+    image: modelProperty("image", Image, true, false),
     isDark: { type: "boolean" },
     isHome: { type: "boolean" },
     isInstance: { type: "boolean" },
@@ -387,21 +395,21 @@ export const RoomDetailsDefinition: Record<string, PropertyDefinition> = {
     mapX: { type: "number" },
     mapY: { type: "number" },
     name: { type: "string" },
-    owner: modelProperty("owner", Character, false),
+    owner: modelProperty("owner", Character, false, false),
     pop: { type: "number" },
     private: { type: "boolean" }
 };
 
 export const RoomInstanceDetailsDefinition: Record<string, PropertyDefinition> = {
-    area: modelProperty("area", AreaDetails, true),
+    area: modelProperty("area", AreaDetails, true, false),
     autosweep: { type: "boolean" },
     autosweepDelay: { type: "number" },
-    chars: collectionProperty("chars", RoomCharacters, false),
-    cmds: modelProperty("cmds", RoomCommands, false),
+    chars: collectionProperty("chars", RoomCharacters, true, false),
+    cmds: modelProperty("cmds", RoomCommands, false, false),
     desc: { type: "string" },
-    exits: collectionProperty("exits", Exits, false),
+    exits: collectionProperty("exits", Exits, false, false),
     id: { type: "string" },
-    image: modelProperty("image", Image, true),
+    image: modelProperty("image", Image, true, false),
     instanceId: { type: "string" },
     isDark: { type: "boolean" },
     isHome: { type: "boolean" },
@@ -412,7 +420,7 @@ export const RoomInstanceDetailsDefinition: Record<string, PropertyDefinition> =
     mapX: { type: "number" },
     mapY: { type: "number" },
     name: { type: "string" },
-    owner: modelProperty("owner", Character, false),
+    owner: modelProperty("owner", Character, false, false),
     pop: { type: "number" },
     private: { type: "boolean" }
 };
@@ -437,12 +445,12 @@ export const RoomScriptDefinition: Record<string, PropertyDefinition> = {
 export const RoomScriptDetailsDefinition: Record<string, PropertyDefinition> = {
     active: { type: "boolean" },
     address: { type: "string" },
-    binary: modelProperty("binary", ScriptBinary, true),
+    binary: modelProperty("binary", ScriptBinary, true, false),
     created: { type: "number" },
     id: { type: "string" },
     key: { type: "string" },
-    logs: collectionProperty("logs", ScriptLogs, false),
-    room: modelProperty("room", Room, false),
+    logs: collectionProperty("logs", ScriptLogs, false, false),
+    room: modelProperty("room", Room, false, false),
     target: { type: "string" },
     updated: { type: "number" },
     version: { type: "string" }
@@ -473,13 +481,13 @@ export const ScriptLogDefinition: Record<string, PropertyDefinition> = {
 export const SettingsDefinition: Record<string, PropertyDefinition> = {
     dnd: { type: "boolean" },
     dndMsg: { type: "string" },
-    focus: modelProperty("focus", Focus, false),
+    focus: modelProperty("focus", Focus, false, false),
     muteMessage: { type: "boolean" },
     muteOoc: { type: "boolean" },
     muteTravel: { type: "boolean" },
     notifyOnAll: { type: "boolean" },
     lfrpDesc: { type: "string" },
-    triggers: collectionProperty("triggers", Triggers, false)
+    triggers: collectionProperty("triggers", Triggers, false, false)
 };
 
 export const TagDefinition: Record<string, PropertyDefinition> = {
@@ -501,13 +509,96 @@ export const UserDefinition: Record<string, PropertyDefinition> = {
     id: { type: "string" },
     roles: { type: "any" },
     trust: { type: "string" },
-    identity: modelProperty("identity", Identity, false)
+    identity: modelProperty("identity", Identity, false, false)
 };
 
 export const WatchDefinition: Record<string, PropertyDefinition> = {
-    char: modelProperty("char", Character, false),
+    char: modelProperty("char", Character, false, false),
     created: { type: "number" },
     watchers: { type: "array[string]" }
 };
 
 export const WatchesDefinition: Record<string, PropertyDefinition> = {};
+
+export const TagsDefinition: Record<string, PropertyDefinition> = {};
+
+export const TagGroupDefinition: Record<string, PropertyDefinition> = {
+    key: { type: "string" },
+    name: { type: "string" },
+    order: { type: "number" }
+};
+
+export const TagGroupsDefinition: Record<string, PropertyDefinition> = {};
+
+export const CoreInfoDefinition: Record<string, PropertyDefinition> = {
+    about: { type: "string" },
+    adminMaxCharProfiles: { type: "number" },
+    adminMaxOwnedChars: { type: "number" },
+    adminMaxRoomProfiles: { type: "number" },
+    adminMaxRoomScripts: { type: "number" },
+    builderMaxOwnedAreas: { type: "number" },
+    builderMaxOwnedRooms: { type: "number" },
+    communicationMaxLength: { type: "number" },
+    descriptionMaxLength: { type: "number" },
+    genre: { type: "string" },
+    greeting: { type: "string" },
+    itemNameMaxLength: { type: "number" },
+    keyMaxLength: { type: "number" },
+    maxCharProfiles: { type: "number" },
+    maxFollows: { type: "number" },
+    maxImageSize: { type: "number" },
+    maxListItems: { type: "number" },
+    maxOwnedAreas: { type: "number" },
+    maxOwnedChars: { type: "number" },
+    maxOwnedRooms: { type: "number" },
+    maxRoomExits: { type: "number" },
+    maxRoomProfiles: { type: "number" },
+    maxRoomScripts: { type: "number" },
+    maxScheduledPosts: { type: "number" },
+    propertyMaxLength: { type: "number" },
+    rules: { type: "string" },
+    scriptMaxLength: { type: "number" },
+    shortDescriptionMaxLength: { type: "number" },
+    subgenre: { type: "string" },
+    supporterMaxCharProfiles: { type: "number" },
+    supporterMaxImageSize: { type: "number" },
+    supporterMaxOwnedChars: { type: "number" },
+    supporterMaxRoomProfiles: { type: "number" },
+    supporterMaxRoomScripts: { type: "number" },
+    title: { type: "string" },
+    vapidPublicKey: { type: "string" },
+    version: { type: "string" }
+};
+
+export const TagInfoDefinition: Record<string, PropertyDefinition> = {
+    charTagsLimit: { type: "number" },
+    groupKeyMaxLength: { type: "number" },
+    groupNameMaxLength: { type: "number" },
+    tagDescMaxLength: { type: "number" },
+    tagKeyMaxLength: { type: "number" }
+};
+
+export const MailInfoDefinition: Record<string, PropertyDefinition> = {
+    mailMaxLength: { type: "number" }
+};
+
+export const NoteInfoDefinition: Record<string, PropertyDefinition> = {
+    noteMaxLength: { type: "number" }
+};
+
+export const ReportInfoDefinition: Record<string, PropertyDefinition> = {
+    reportMsgMaxLength: { type: "number" }
+};
+
+export const SupportInfoDefinition: Record<string, PropertyDefinition> = {
+    ticketMsgMaxLength: { type: "number" }
+};
+
+export const WebClientInfoDefinition: Record<string, PropertyDefinition> = {
+    version: { type: "string" }
+};
+
+export const NoticeDefinition: Record<string, PropertyDefinition> = {
+    id: { type: "string" },
+    type: { type: "string" }
+};

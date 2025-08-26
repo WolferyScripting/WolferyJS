@@ -104,7 +104,7 @@ namespace ResourceIDs {
     export const NODE = f`core.node.${id}`;
     export const NOTE = f`note.player.${player}.note.${char}`;
     export const NOTES = f`note.player.${id}.notes`;
-    export const CHARACTER_OWNED = f`core.char.${id}.owned`;
+    export const OWNED_CHARACTER = f`core.char.${id}.owned`;
     export const PLAYER = f`core.player.${id}`;
     export const PLAYER_MAIL_MESSAGE = f`mail.player.${player}.message.${message}`;
     export const PROFILE = f`core.profile.${id}`;
@@ -133,29 +133,43 @@ namespace ResourceIDs {
     export const USER = f`auth.user.${id}`;
     export const WATCH = f`note.player.${player}.watch.${char}`;
     export const WATCHES = f`note.player.${id}.watches`;
+    export const TAGS = "tag.tags";
+    export const TAG_GROUP = f`tag.groups.${id}`;
+    export const TAG_GROUPS = "tag.groups";
+    export const CORE_INFO = "core.info";
+    export const TAG_INFO = "tag.info";
+    export const MAIL_INFO = "mail.info";
+    export const NOTE_INFO = "note.info";
+    export const REPORT_INFO = "report.info";
+    export const SUPPORT_INFO = "support.info";
+    export const WEB_CLIENT_INFO = "web.client.info";
+    export const NOTICE = "notice";
     export const CHARACTER_NODES = f`core.char.${id}.nodes`;
     export const CONTROLLED_CHARACTERS = f`core.player.${id}.ctrls`;
     export const EXITS = f`core.room.${id}.exits`;
     export const NODES = "core.nodes";
     export const INBOX = f`mail.player.${id}.inbox`;
+    export const INCOMING_REQUESTS = f`core.player.${id}.incoming.requests`;
+    export const OUTGOING_REQUESTS = f`core.player.${id}.outgoing.requests`;
     export const OWNED_AREAS = f`core.char.${id}.areas`;
     export const OWNED_CHARACTERS = f`core.player.${id}.chars`;
     export const OWNED_ROOMS = f`core.char.${id}.rooms`;
     export const PROFILES = f`core.char.${id}.profiles`;
     export const PUPPETS = f`core.player.${id}.puppets`;
-    export const OUTGOING_REQUESTS = f`core.player.${id}.outgoing.requests`;
-    export const INCOMING_REQUESTS = f`core.player.${id}.incoming.requests`;
     export const ROOM_CHARACTERS = f`core.room.${id}.chars`;
     export const ROOM_INSTANCE_CHARACTERS = f`core.instance.${instance}.room.${room}.chars`;
     export const ROOM_CHARACTERS_AWAKE = f`core.room.${id}.chars.awake`;
     export const ROOM_INSTANCE_CHARACTERS_AWAKE = f`core.instance.${instance}.room.${room}.chars.awake`;
     export const ROOM_PROFILES = f`core.room.${id}.profiles`;
+    export const ROOM_SCRIPTS = f`core.room.${id}.scripts`;
     export const SCRIPT_LOGS = f`core.script.${id}.logs`;
     export const CHARACTER_SETTINGS_TRIGGERS = f`core.char.${id}.settings.triggers`;
     export const PUPPET_SETTINGS_TRIGGERS = f`core.char.${ctrl}.puppet.${puppet}.settings.triggers`;
+    export const AUTH_NOTICES = f`auth.user.${id}.notices`;
+    export const IDENTITY_NOTICES = f`identity.user.${id}.notices`;
 
     export const ROLLER = f`roller.char.${id}`;
-    export const TAGS = "tag.tags";
+    export const LOG_EVENTS = "log.events";
 }
 /* eslint-enable @typescript-eslint/no-namespace, @typescript-eslint/explicit-function-return-type*/
 

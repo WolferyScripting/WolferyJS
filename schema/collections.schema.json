@@ -29,99 +29,237 @@
         "type": "object",
         "patternProperties": {
           "^(.*)$": {
-            "type": "object",
-            "properties": {
-              "description": {
-                "type": "string"
-              },
-              "model": {
-                "type": "string"
-              },
-              "collection": {
-                "type": "string"
-              },
-              "literal": {
-                "type": "string"
-              },
-              "oneOf": {
-                "type": "array",
-                "items": {}
-              },
-              "type": {
-                "anyOf": [
-                  {
-                    "const": "any",
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "description": {
                     "type": "string"
                   },
-                  {
-                    "const": "string",
-                    "type": "string"
+                  "type": {
+                    "anyOf": [
+                      {
+                        "const": "any",
+                        "type": "string"
+                      },
+                      {
+                        "const": "string",
+                        "type": "string"
+                      },
+                      {
+                        "const": "?string",
+                        "type": "string"
+                      },
+                      {
+                        "const": "number",
+                        "type": "string"
+                      },
+                      {
+                        "const": "?number",
+                        "type": "string"
+                      },
+                      {
+                        "const": "boolean",
+                        "type": "string"
+                      },
+                      {
+                        "const": "?boolean",
+                        "type": "string"
+                      },
+                      {
+                        "const": "object",
+                        "type": "string"
+                      },
+                      {
+                        "const": "?object",
+                        "type": "string"
+                      },
+                      {
+                        "const": "array",
+                        "type": "string"
+                      },
+                      {
+                        "const": "?array",
+                        "type": "string"
+                      },
+                      {
+                        "const": "array[string]",
+                        "type": "string"
+                      },
+                      {
+                        "const": "?array[string]",
+                        "type": "string"
+                      },
+                      {
+                        "const": "array[number]",
+                        "type": "string"
+                      },
+                      {
+                        "const": "?array[number]",
+                        "type": "string"
+                      },
+                      {
+                        "const": "function",
+                        "type": "string"
+                      },
+                      {
+                        "const": "?function",
+                        "type": "string"
+                      }
+                    ]
                   },
-                  {
-                    "const": "?string",
-                    "type": "string"
-                  },
-                  {
-                    "const": "number",
-                    "type": "string"
-                  },
-                  {
-                    "const": "?number",
-                    "type": "string"
-                  },
-                  {
-                    "const": "boolean",
-                    "type": "string"
-                  },
-                  {
-                    "const": "?boolean",
-                    "type": "string"
-                  },
-                  {
-                    "const": "object",
-                    "type": "string"
-                  },
-                  {
-                    "const": "?object",
-                    "type": "string"
-                  },
-                  {
-                    "const": "array",
-                    "type": "string"
-                  },
-                  {
-                    "const": "?array",
-                    "type": "string"
-                  },
-                  {
-                    "const": "array[string]",
-                    "type": "string"
-                  },
-                  {
-                    "const": "?array[string]",
-                    "type": "string"
-                  },
-                  {
-                    "const": "array[number]",
-                    "type": "string"
-                  },
-                  {
-                    "const": "?array[number]",
-                    "type": "string"
-                  },
-                  {
-                    "const": "function",
-                    "type": "string"
-                  },
-                  {
-                    "const": "?function",
-                    "type": "string"
+                  "oneOf": {
+                    "type": "array",
+                    "items": {}
                   }
+                },
+                "required": [
+                  "description",
+                  "type",
+                  "oneOf"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "ref": {
+                    "type": "string"
+                  },
+                  "error": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "description",
+                  "ref"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "model": {
+                    "type": "string"
+                  },
+                  "error": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "description",
+                  "model"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "collection": {
+                    "type": "string"
+                  },
+                  "error": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "description",
+                  "collection"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "literal": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "anyOf": [
+                      {
+                        "const": "any",
+                        "type": "string"
+                      },
+                      {
+                        "const": "string",
+                        "type": "string"
+                      },
+                      {
+                        "const": "?string",
+                        "type": "string"
+                      },
+                      {
+                        "const": "number",
+                        "type": "string"
+                      },
+                      {
+                        "const": "?number",
+                        "type": "string"
+                      },
+                      {
+                        "const": "boolean",
+                        "type": "string"
+                      },
+                      {
+                        "const": "?boolean",
+                        "type": "string"
+                      },
+                      {
+                        "const": "object",
+                        "type": "string"
+                      },
+                      {
+                        "const": "?object",
+                        "type": "string"
+                      },
+                      {
+                        "const": "array",
+                        "type": "string"
+                      },
+                      {
+                        "const": "?array",
+                        "type": "string"
+                      },
+                      {
+                        "const": "array[string]",
+                        "type": "string"
+                      },
+                      {
+                        "const": "?array[string]",
+                        "type": "string"
+                      },
+                      {
+                        "const": "array[number]",
+                        "type": "string"
+                      },
+                      {
+                        "const": "?array[number]",
+                        "type": "string"
+                      },
+                      {
+                        "const": "function",
+                        "type": "string"
+                      },
+                      {
+                        "const": "?function",
+                        "type": "string"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "description",
+                  "type"
                 ]
               }
-            },
-            "required": [
-              "description"
             ]
           }
         }

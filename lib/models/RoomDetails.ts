@@ -1,8 +1,8 @@
 import BaseModel from "./BaseModel.js";
 import type WolferyJS from "../WolferyJS.js";
-import type { RoomDetailsProperties } from "../generated/models/types.js";
 import { RoomDetailsDefinition } from "../generated/models/definitions.js";
-import type {  ResClient, ResModelOptions } from "resclient-ts";
+import type { RoomDetailsProperties } from "../generated/models/types.js";
+import type { ResClient, ResModelOptions } from "resclient-ts";
 
 declare interface RoomDetails extends BaseModel, RoomDetailsProperties {}
 class RoomDetails extends BaseModel implements RoomDetailsProperties {

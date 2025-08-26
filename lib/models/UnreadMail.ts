@@ -1,24 +1,22 @@
 import type PlayerMailMessage from "./PlayerMailMessage.js";
 import BaseCollectionModel from "./BaseCollectionModel.js";
 import type WolferyJS from "../WolferyJS.js";
-import type { UnreadMailProperties } from "../generated/models/types.js";
-import { UnreadMailDefinition } from "../generated/models/definitions.js";
-import { type ResClient, ResRef } from "resclient-ts";
+import { type CollectionModelAddRemove, type ResClient, ResRef } from "resclient-ts";
 
-declare interface UnreadMail extends BaseCollectionModel<ResRef<PlayerMailMessage>>, UnreadMailProperties {}
-class UnreadMail extends BaseCollectionModel<ResRef<PlayerMailMessage>> implements UnreadMailProperties {
+// @TODO
+class UnreadMail extends BaseCollectionModel<ResRef<PlayerMailMessage>> {
     private onAdd = this._onAdd.bind(this);
     private onRemove = this._onRemove.bind(this);
     constructor(client: WolferyJS, api: ResClient, rid: string) {
-        super(client, api, rid, ResRef, { definition: UnreadMailDefinition });
+        super(client, api, rid, ResRef);
     }
 
-    private async _onAdd(ref: ResRef<PlayerMailMessage>): Promise<void> {
-        console.log("add unread mail", ref);
+    private async _onAdd(data: CollectionModelAddRemove<ResRef<PlayerMailMessage>>): Promise<void> {
+        console.log("add unread mail", data);
     }
 
-    private async _onRemove(ref: ResRef<PlayerMailMessage>): Promise<void> {
-        console.log("remove unread mail", ref);
+    private async _onRemove(data: CollectionModelAddRemove<ResRef<PlayerMailMessage>>): Promise<void> {
+        console.log("remove unread mail", data);
     }
 
     protected override async _listen(on: boolean): Promise<void> {

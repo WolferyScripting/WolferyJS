@@ -1,11 +1,10 @@
 import BaseCollection from "./BaseCollection.js";
-import type { CollectionAddRemove } from "../util/types.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
 import type Area from "../models/Area.js";
-import type ControlledCharacter from "../models/ControlledCharacter.js";
 import type WolferyJS from "../WolferyJS.js";
 import { toID } from "../util/Util.js";
-import type ResClient from "resclient-ts";
+import type OwnedCharacter from "../models/OwnedCharacter.js";
+import type { ResClient, CollectionAddRemove } from "resclient-ts";
 
 export default class OwnedAreas extends BaseCollection<Area> {
     private onAdd = this._onAdd.bind(this);
@@ -14,12 +13,14 @@ export default class OwnedAreas extends BaseCollection<Area> {
         super(client, api, rid, { idCallback: toID });
     }
 
-    private _onAdd(data: CollectionAddRemove<Area>): void {
-        this.client.emit("ownedAreaAdd", this.ctrl, data.item);
+    private async _onAdd(data: CollectionAddRemove<Area>): Promise<void> {
+        const char = await this.getChar();
+        this.client.emit("ownedAreas.add", char, data.item);
     }
 
-    private _onRemove(data: CollectionAddRemove<Area>): void {
-        this.client.emit("ownedAreaRemove", this.ctrl, data.item);
+    private async _onRemove(data: CollectionAddRemove<Area>): Promise<void> {
+        const char = await this.getChar();
+        this.client.emit("ownedAreas.remove", char, data.item);
     }
 
     protected override async _listen(on: boolean): Promise<void> {
@@ -29,7 +30,8 @@ export default class OwnedAreas extends BaseCollection<Area> {
         this[m]("remove", this.onRemove);
     }
 
-    get ctrl(): ControlledCharacter {
-        return this.client.playerOrThrow().controlled.getOrThrow(ResourceIDs.OWNED_AREAS.parts(this.rid).id);
+    async getChar(): Promise<OwnedCharacter> {
+        const charId = ResourceIDs.OWNED_AREAS.parts(this.rid).id;
+        return this.api.get<OwnedCharacter>(ResourceIDs.OWNED_CHARACTER({ id: charId }));
     }
 }

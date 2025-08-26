@@ -11,11 +11,13 @@ class OwnedCharacter extends BaseModel implements OwnedCharacterProperties {
     private onChange = this._onChange.bind(this);
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: OwnedCharacterDefinition });
+        this.p.writable("inRoomWas");
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    private _onChange(_data: Partial<OwnedCharacterProperties>): void {
-        // empty
+    private _onChange(data: Partial<OwnedCharacterProperties>): void {
+        if (data.inRoom !== undefined) {
+            this.client.emit("roomChange", this, this.inRoom, data.inRoom);
+        }
     }
 
     protected override async _listen(on: boolean): Promise<void> {

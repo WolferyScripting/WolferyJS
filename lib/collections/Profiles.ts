@@ -1,11 +1,10 @@
 import BaseCollection from "./BaseCollection.js";
-import type { CollectionAddRemove } from "../util/types.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
-import type ControlledCharacter from "../models/ControlledCharacter.js";
 import type Profile from "../models/Profile.js";
 import { toID } from "../util/Util.js";
 import type WolferyJS from "../WolferyJS.js";
-import type ResClient from "resclient-ts";
+import type OwnedCharacter from "../models/OwnedCharacter.js";
+import type { ResClient, CollectionAddRemove } from "resclient-ts";
 
 export default class Profiles extends BaseCollection<Profile> {
     private onAdd = this._onAdd.bind(this);
@@ -14,12 +13,14 @@ export default class Profiles extends BaseCollection<Profile> {
         super(client, api, rid, { idCallback: toID });
     }
 
-    private _onAdd(data: CollectionAddRemove<Profile>): void {
-        this.client.emit("profileAdd", this.ctrl, data.item);
+    private async _onAdd(data: CollectionAddRemove<Profile>): Promise<void> {
+        const char = await this.getChar();
+        this.client.emit("profiles.add", char, data.item);
     }
 
-    private _onRemove(data: CollectionAddRemove<Profile>): void {
-        this.client.emit("profileRemove", this.ctrl, data.item);
+    private async _onRemove(data: CollectionAddRemove<Profile>): Promise<void> {
+        const char = await this.getChar();
+        this.client.emit("profiles.remove", char, data.item);
     }
 
     protected override async _listen(on: boolean): Promise<void> {
@@ -29,7 +30,8 @@ export default class Profiles extends BaseCollection<Profile> {
         this[m]("remove", this.onRemove);
     }
 
-    get ctrl(): ControlledCharacter {
-        return this.client.playerOrThrow().controlled.getOrThrow(ResourceIDs.PROFILES.parts(this.rid).id);
+    async getChar(): Promise<OwnedCharacter> {
+        const charId = ResourceIDs.PROFILES.parts(this.rid).id;
+        return this.api.get<OwnedCharacter>(ResourceIDs.OWNED_CHARACTER({ id: charId }));
     }
 }

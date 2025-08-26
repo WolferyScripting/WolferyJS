@@ -1,4 +1,5 @@
-/* eslint-disable @typescript-eslint/no-empty-interface, @typescript-eslint/no-explicit-any, @typescript-eslint/member-ordering, key-spacing */
+/* eslint-disable @typescript-eslint/no-empty-interface, @typescript-eslint/no-explicit-any, @typescript-eslint/member-ordering, key-spacing, unused-imports/no-unused-imports, @typescript-eslint/no-unused-vars, import/order */
+import type { ResError, ResRef } from "resclient-ts";
 import type RoomCharactersAwake from "../../collections/RoomCharactersAwake.js";
 import type AreaChildren from "../../models/AreaChildren.js";
 import type Image from "../../models/Image.js";
@@ -37,7 +38,7 @@ import type Identity from "../../models/Identity.js";
 /** A partial room seen as an exit target. */
 export interface AfarRoomProperties {
     /** The characters in the room that are awake. */
-    awake: RoomCharactersAwake;
+    awake: RoomCharactersAwake | null;
     /** The unique identifier of the room. */
     id: string;
     /** The name of the room. */
@@ -289,7 +290,7 @@ export interface ExitProperties {
     /** The navigation direction of the exit. */
     nav: "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw" | "up" | "down" | "in" | "out" | "";
     /** The target room of the exit. */
-    target: AfarRoom;
+    target: AfarRoom | null;
     /** The ID of the target room. */
     targetId: string;
 }
@@ -413,7 +414,7 @@ export interface NodeProperties {
 /** A note on a character. */
 export interface NoteProperties {
     /** The character this note is about. */
-    char: Character;
+    char: ResRef<Character>;
     /** The content of the note. */
     text: string;
 }
@@ -540,11 +541,11 @@ export interface PuppetInfoProperties {
 /** A request for changing ownership of areas and rooms, creating exits, etc. */
 export interface RequestProperties {
     /** The timestamp when the request was answered. */
-    answered: number;
+    answered: number | null;
     /** The timestamp when the request was created. */
     created: number;
     /** Any error associated with the request. */
-    error: any;
+    error: Record<"code" | "message", string> | null;
     /** The timestamp when the request expires. */
     expires: number;
     /** The character who made the request. */
@@ -554,7 +555,7 @@ export interface RequestProperties {
     /** The parameters for the request. */
     params: RequestParams;
     /** The current state of the request. */
-    state: string;
+    state: "pending" | "rejected" | "failed" | "accepted" | "expired" | "revoked";
     /** The character to whom the request is directed. */
     to: Character;
     /** The type of the request. */
@@ -564,9 +565,11 @@ export interface RequestProperties {
 /** The parameters for a request. */
 export interface RequestParamsProperties {
     /** The area related to the request. */
-    area: Area | null;
+    area: Area | ResError | null;
+    /** The character that owns the request. */
+    owner: Character;
     /** The room related to the request. */
-    room: Room | null;
+    room: Room | ResError | null;
 }
 
 /** A room. */
@@ -641,7 +644,7 @@ export interface RoomDetailsProperties {
     /** The delay for autosweep in seconds. */
     autosweepDelay: number;
     /** The characters present in the room. */
-    chars: RoomCharacters;
+    chars: RoomCharacters | null;
     /** The commands available in the room. */
     cmds: RoomCommands;
     /** The description of the room. */
@@ -687,7 +690,7 @@ export interface RoomInstanceDetailsProperties {
     /** The delay for autosweep in seconds. */
     autosweepDelay: number;
     /** The characters present in the room. */
-    chars: RoomCharacters;
+    chars: RoomCharacters | null;
     /** The commands available in the room. */
     cmds: RoomCommands;
     /** The description of the room. */
@@ -892,3 +895,149 @@ export interface WatchProperties {
 
 /** Watched characters. */
 export interface WatchesProperties {}
+
+/** The globally available tags. */
+export interface TagsProperties {}
+
+/** A tag group. */
+export interface TagGroupProperties {
+    /** The key of the tag group. */
+    key: string;
+    /** The name of the tag group. */
+    name: string;
+    /** The order of the tag group. */
+    order: number;
+}
+
+/** The tag groups. */
+export interface TagGroupsProperties {}
+
+/** The core info about the realm. */
+export interface CoreInfoProperties {
+    /** Information about the core realm. */
+    about: string;
+    /** The maximum number of character profiles an admin can have. */
+    adminMaxCharProfiles: number;
+    /** The maximum number of characters an admin can own. */
+    adminMaxOwnedChars: number;
+    /** The maximum number of room profiles an admin can have. */
+    adminMaxRoomProfiles: number;
+    /** The maximum number of room scripts an admin can have. */
+    adminMaxRoomScripts: number;
+    /** The maximum number of areas a builder can own. */
+    builderMaxOwnedAreas: number;
+    /** The maximum number of rooms a builder can own. */
+    builderMaxOwnedRooms: number;
+    /** The maximum length of communication. */
+    communicationMaxLength: number;
+    /** The maximum length of a description. */
+    descriptionMaxLength: number;
+    /** The genre of the realm. */
+    genre: string;
+    /** The greeting message of the realm. */
+    greeting: string;
+    /** The maximum length of an item name. */
+    itemNameMaxLength: number;
+    /** The maximum length of keys. */
+    keyMaxLength: number;
+    /** The maximum number of profiles a character can have. */
+    maxCharProfiles: number;
+    /** The maximum number of characters that can be following a single character. */
+    maxFollows: number;
+    /** The maximum allowed file size for uploaded images, in bytes. */
+    maxImageSize: number;
+    /** The maximum number of items allowed in a list. */
+    maxListItems: number;
+    /** The maximum number of areas a player can own. */
+    maxOwnedAreas: number;
+    /** The maximum number of characters a player can own. */
+    maxOwnedChars: number;
+    /** The maximum number of rooms a player can own. */
+    maxOwnedRooms: number;
+    /** The maximum number of exits a room can have. */
+    maxRoomExits: number;
+    /** The maximum number of profiles a room can have. */
+    maxRoomProfiles: number;
+    /** The maximum number of scripts a room can have. */
+    maxRoomScripts: number;
+    /** The maximum number of scheduled posts a user can have pending at once. */
+    maxScheduledPosts: number;
+    /** The maximum length for properties. */
+    propertyMaxLength: number;
+    /** The rules for the realm. */
+    rules: string;
+    /** The maximum length a script can be. */
+    scriptMaxLength: number;
+    /** The maximum length a short description field can be. */
+    shortDescriptionMaxLength: number;
+    /** The specific subgenre of the realm. */
+    subgenre: string;
+    /** The maximum number of character profiles a supporter player can have. */
+    supporterMaxCharProfiles: number;
+    /** The maximum allowed file size for uploaded images by supporter players, in bytes. */
+    supporterMaxImageSize: number;
+    /** The maximum number of characters supporter players can own. */
+    supporterMaxOwnedChars: number;
+    /** The maximum number of room profiles supporter players can have. */
+    supporterMaxRoomProfiles: number;
+    /** The maximum number of room scripts supporter players can have. */
+    supporterMaxRoomScripts: number;
+    /** The realm name. */
+    title: string;
+    /** The VAPID public key used for push notifications via Web Push protocol. */
+    vapidPublicKey: string;
+    /** The current version of the realm. */
+    version: string;
+}
+
+/** The tag info. */
+export interface TagInfoProperties {
+    /** The maximum number of tags a character can have. */
+    charTagsLimit: number;
+    /** The maximum length of a tag group's key. */
+    groupKeyMaxLength: number;
+    /** The maximum length of a tag group's name. */
+    groupNameMaxLength: number;
+    /** The maximum length of a tag's description. */
+    tagDescMaxLength: number;
+    /** The maximum length of a tag's key. */
+    tagKeyMaxLength: number;
+}
+
+/** The mail info. */
+export interface MailInfoProperties {
+    /** The maximum length of a mail. */
+    mailMaxLength: number;
+}
+
+/** The note info. */
+export interface NoteInfoProperties {
+    /** The maximum length of a note. */
+    noteMaxLength: number;
+}
+
+/** The report info. */
+export interface ReportInfoProperties {
+    /** The maximum length of a report. */
+    reportMsgMaxLength: number;
+}
+
+/** The support info. */
+export interface SupportInfoProperties {
+    /** The maximum length of a ticket. */
+    ticketMsgMaxLength: number;
+}
+
+/** The web client info. */
+export interface WebClientInfoProperties {
+    /** The version of the web client. */
+    version: string;
+}
+
+/** A notice. @TODO Have not been able to inspect a notice, so the rid and full properties are not known */
+export interface NoticeProperties {
+    /** The ID of the notice. */
+    id: string;
+    /** The type of the notice. */
+    type: string;
+}

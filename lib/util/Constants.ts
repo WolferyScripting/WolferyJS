@@ -50,3 +50,5 @@ export enum ErrorCodes {
     // Identity
     UNKNOWN_USER = "identity.unknownUser",
 }
+
+export const PING_DURATION = 1000 * 60 * 15;

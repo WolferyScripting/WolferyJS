@@ -1,24 +1,21 @@
 import Character from "./Character.js";
 import BaseCollectionModel from "./BaseCollectionModel.js";
 import type WolferyJS from "../WolferyJS.js";
-import type { AwakeCharactersProperties } from "../generated/models/types.js";
-import { AwakeCharactersDefinition } from "../generated/models/definitions.js";
-import type { ResClient } from "resclient-ts";
+import type { CollectionModelAddRemove, ResClient } from "resclient-ts";
 
-declare interface AwakeCharacters extends BaseCollectionModel<Character>, AwakeCharactersProperties {}
-class AwakeCharacters extends BaseCollectionModel<Character> implements AwakeCharactersProperties {
+class AwakeCharacters extends BaseCollectionModel<Character> {
     private onAdd = this._onAdd.bind(this);
     private onRemove = this._onRemove.bind(this);
     constructor(client: WolferyJS, api: ResClient, rid: string) {
-        super(client, api, rid, Character, { definition: AwakeCharactersDefinition });
+        super(client, api, rid, Character);
     }
 
-    private _onAdd(char: Character): void {
-        this.client.emit("awakeCharactersAdd", char);
+    private _onAdd(data: CollectionModelAddRemove<Character>): void {
+        this.client.emit("awakeCharacters.add", data.item);
     }
 
-    private _onRemove(char: Character): void {
-        this.client.emit("awakeCharactersRemove", char);
+    private _onRemove(data: CollectionModelAddRemove<Character>): void {
+        this.client.emit("awakeCharacters.remove", data.item);
     }
 
     protected override async _listen(on: boolean): Promise<void> {

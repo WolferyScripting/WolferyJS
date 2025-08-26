@@ -1,4 +1,4 @@
-/* eslint-disable unused-imports/no-unused-imports, import/order */
+/* eslint-disable @typescript-eslint/no-unused-vars, unused-imports/no-unused-imports, import/order */
 import ResourceIDs from "../ResourceIDs.js";
 import type WolferyJS from "../../WolferyJS.js";
 import type { ResClient } from "resclient-ts";
@@ -56,6 +56,17 @@ import UnreadMail from "../../models/UnreadMail.js";
 import User from "../../models/User.js";
 import Watch from "../../models/Watch.js";
 import Watches from "../../models/Watches.js";
+import Tags from "../../models/Tags.js";
+import TagGroup from "../../models/TagGroup.js";
+import TagGroups from "../../models/TagGroups.js";
+import CoreInfo from "../../models/CoreInfo.js";
+import TagInfo from "../../models/TagInfo.js";
+import MailInfo from "../../models/MailInfo.js";
+import NoteInfo from "../../models/NoteInfo.js";
+import ReportInfo from "../../models/ReportInfo.js";
+import SupportInfo from "../../models/SupportInfo.js";
+import WebClientInfo from "../../models/WebClientInfo.js";
+import Notice from "../../models/Notice.js";
 
 export default function registerModels(client: WolferyJS, res: ResClient): void {
     res.registerModelType(ResourceIDs.AFAR_ROOM({ id: "*" }), (api, rid) => new AfarRoom(client, api, rid));
@@ -89,7 +100,7 @@ export default function registerModels(client: WolferyJS, res: ResClient): void 
     res.registerModelType(ResourceIDs.NODE({ id: "*" }), (api, rid) => new Node(client, api, rid));
     res.registerModelType(ResourceIDs.NOTE({ player: "*", char: "*" }), (api, rid) => new Note(client, api, rid));
     res.registerModelType(ResourceIDs.NOTES({ id: "*" }), (api, rid) => new Notes(client, api, rid));
-    res.registerModelType(ResourceIDs.CHARACTER_OWNED({ id: "*" }), (api, rid) => new OwnedCharacter(client, api, rid));
+    res.registerModelType(ResourceIDs.OWNED_CHARACTER({ id: "*" }), (api, rid) => new OwnedCharacter(client, api, rid));
     res.registerModelType(ResourceIDs.PLAYER({ id: "*" }), (api, rid) => new Player(client, api, rid));
     res.registerModelType(ResourceIDs.PLAYER_MAIL_MESSAGE({ player: "*", message: "*" }), (api, rid) => new PlayerMailMessage(client, api, rid));
     res.registerModelType(ResourceIDs.PROFILE({ id: "*" }), (api, rid) => new Profile(client, api, rid));
@@ -118,4 +129,15 @@ export default function registerModels(client: WolferyJS, res: ResClient): void 
     res.registerModelType(ResourceIDs.USER({ id: "*" }), (api, rid) => new User(client, api, rid));
     res.registerModelType(ResourceIDs.WATCH({ player: "*", char: "*" }), (api, rid) => new Watch(client, api, rid));
     res.registerModelType(ResourceIDs.WATCHES({ id: "*" }), (api, rid) => new Watches(client, api, rid));
+    res.registerModelType(ResourceIDs.TAGS, (api, rid) => new Tags(client, api, rid));
+    res.registerModelType(ResourceIDs.TAG_GROUP({ id: "*" }), (api, rid) => new TagGroup(client, api, rid));
+    res.registerModelType(ResourceIDs.TAG_GROUPS, (api, rid) => new TagGroups(client, api, rid));
+    res.registerModelType(ResourceIDs.CORE_INFO, (api, rid) => new CoreInfo(client, api, rid));
+    res.registerModelType(ResourceIDs.TAG_INFO, (api, rid) => new TagInfo(client, api, rid));
+    res.registerModelType(ResourceIDs.MAIL_INFO, (api, rid) => new MailInfo(client, api, rid));
+    res.registerModelType(ResourceIDs.NOTE_INFO, (api, rid) => new NoteInfo(client, api, rid));
+    res.registerModelType(ResourceIDs.REPORT_INFO, (api, rid) => new ReportInfo(client, api, rid));
+    res.registerModelType(ResourceIDs.SUPPORT_INFO, (api, rid) => new SupportInfo(client, api, rid));
+    res.registerModelType(ResourceIDs.WEB_CLIENT_INFO, (api, rid) => new WebClientInfo(client, api, rid));
+    res.registerModelType(ResourceIDs.NOTICE, (api, rid) => new Notice(client, api, rid));
 }

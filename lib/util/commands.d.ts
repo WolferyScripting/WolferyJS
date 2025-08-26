@@ -148,6 +148,12 @@ declare namespace Commands {
             species?: string;
             /** The surname of the character. */
             surname?: string;
+            /** Message seen by the target room. */
+            teleportArriveMsg?: string;
+            /** Message seen by the origin room. */
+            teleportLeaveMsg?: string;
+            /** Message seen by you. */
+            teleportTravelMsg?: string;
         }
 
         export interface SetProfileOptions {
@@ -191,6 +197,16 @@ declare namespace Commands {
             isteleport?: boolean;
             /** The name of the room. */
             name?: string;
+            /** If character-specific teleport messages should be overridden. */
+            overrideCharTeleportMsgs?: boolean;
+            teleportArriveMsg?: string;
+            teleportLeaveMsg?: string;
+            teleportTravelMsg?: string;
+        }
+
+        export interface GetExitOptions {
+            exitId?: string;
+            exitKey?: string;
         }
     }
 

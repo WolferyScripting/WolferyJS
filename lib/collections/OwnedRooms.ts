@@ -1,11 +1,10 @@
 import BaseCollection from "./BaseCollection.js";
-import type { CollectionAddRemove } from "../util/types.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
-import type ControlledCharacter from "../models/ControlledCharacter.js";
 import type Room from "../models/Room.js";
 import type WolferyJS from "../WolferyJS.js";
 import { toID } from "../util/Util.js";
-import type ResClient from "resclient-ts";
+import type OwnedCharacter from "../models/OwnedCharacter.js";
+import type { ResClient, CollectionAddRemove } from "resclient-ts";
 
 export default class OwnedRooms extends BaseCollection<Room> {
     private onAdd = this._onAdd.bind(this);
@@ -14,12 +13,14 @@ export default class OwnedRooms extends BaseCollection<Room> {
         super(client, api, rid, { idCallback: toID });
     }
 
-    private _onAdd(data: CollectionAddRemove<Room>): void {
-        this.client.emit("ownedRoomAdd", this.ctrl, data.item);
+    private async _onAdd(data: CollectionAddRemove<Room>): Promise<void> {
+        const char = await this.getChar();
+        this.client.emit("ownedRooms.add", char, data.item);
     }
 
-    private _onRemove(data: CollectionAddRemove<Room>): void {
-        this.client.emit("ownedRoomRemove", this.ctrl, data.item);
+    private async _onRemove(data: CollectionAddRemove<Room>): Promise<void> {
+        const char = await this.getChar();
+        this.client.emit("ownedRooms.remove", char, data.item);
     }
 
     protected override async _listen(on: boolean): Promise<void> {
@@ -29,7 +30,8 @@ export default class OwnedRooms extends BaseCollection<Room> {
         this[m]("remove", this.onRemove);
     }
 
-    get ctrl(): ControlledCharacter {
-        return this.client.playerOrThrow().controlled.getOrThrow(ResourceIDs.OWNED_ROOMS.parts(this.rid).id);
+    async getChar(): Promise<OwnedCharacter> {
+        const charId = ResourceIDs.OWNED_ROOMS.parts(this.rid).id;
+        return this.api.get<OwnedCharacter>(ResourceIDs.OWNED_CHARACTER({ id: charId }));
     }
 }

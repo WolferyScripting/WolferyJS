@@ -1,4 +1,4 @@
-/* eslint-disable unused-imports/no-unused-imports, import/order */
+/* eslint-disable @typescript-eslint/no-unused-vars, unused-imports/no-unused-imports, import/order */
 import ResourceIDs from "@generated/ResourceIDs.js";
 import type WolferyJS from "@root/WolferyJS.js";
 import type { ResClient } from "resclient-ts";

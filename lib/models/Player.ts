@@ -11,6 +11,8 @@ import type Commands from "../util/commands.js";
 import type Inbox from "../collections/Inbox.js";
 import type { PlayerProperties } from "../generated/models/types.js";
 import { PlayerDefinition } from "../generated/models/definitions.js";
+import type IncomingRequests from "../collections/IncomingRequests.js";
+import type OutgoingRequests from "../collections/OutgoingRequests.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface Player extends BaseModel, PlayerProperties {}
@@ -124,6 +126,13 @@ class Player extends BaseModel implements PlayerProperties {
     }
 
     /**
+     * Get the incoming requests.
+     */
+    async getIncomingRequests(): Promise<IncomingRequests> {
+        return this.api.get<IncomingRequests>(ResourceIDs.INCOMING_REQUESTS({ id: this.id }));
+    }
+
+    /**
      * Get the note for a character.
      * @param charId The ID of the character to get the note for.
      * @returns The note for the character.
@@ -137,6 +146,13 @@ class Player extends BaseModel implements PlayerProperties {
      */
     async getNotes(): Promise<Notes> {
         return this.api.get<Notes>(ResourceIDs.NOTES({ id: this.id }));
+    }
+
+    /**
+     * Get the outgoing requests.
+     */
+    async getOutgoingRequests(): Promise<OutgoingRequests> {
+        return this.api.get<OutgoingRequests>(ResourceIDs.OUTGOING_REQUESTS({ id: this.id }));
     }
 
     /**

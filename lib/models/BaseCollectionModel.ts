@@ -10,7 +10,7 @@ import {
 
 export default abstract class BaseCollectionModel<T extends ResModel | ResRef = ResModel | ResRef> extends ResCollectionModel<T> {
     protected client!: WolferyJS;
-    constructor(client: WolferyJS, api: ResClient, rid: string, modelType: ModelTypeUnion<T> | Array<ModelTypeUnion<T>>, options?: ResModelOptions) {
+    constructor(client: WolferyJS, api: ResClient, rid: string, modelType: ModelTypeUnion<T> | Array<ModelTypeUnion<T>>, options?: Omit<ResModelOptions, "definition">) {
         super(api, rid, modelType, options);
         Object.defineProperty(this, "client", {
             enumerable: false,

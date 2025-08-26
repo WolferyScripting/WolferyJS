@@ -90,22 +90,29 @@ class Builder<T extends BuilderType = BuilderType> {
                 definitions.push(`export const ${resource.name}Definition: Record<string, PropertyDefinition> = {`);
                 if ("props" in resource && resource.props) {
                     for (const [propName, prop] of Object.entries(resource.props)) {
-                        if (prop.literal && prop.type) {
+                        if ("literal" in prop && prop.literal && prop.type) {
                             definitions.push(`${propName}: { type: "${prop.type}" },`);
-                        } else if (prop.oneOf && prop.type) {
+                        } else if ("oneOf" in prop && prop.oneOf && prop.type) {
                             definitions.push(`${propName}: { type: "${prop.type}" },`);
-                        } else if (prop.model) {
+                        } else if ("ref" in prop && prop.ref) {
+                            const optional = prop.ref.startsWith("?");
+                            const name = optional ? prop.ref.slice(1) : prop.ref;
+                            definitions.push(`${propName}: refProperty("${propName}", ${optional}, ${!!prop.error}), // ${name}`);
+                            imports.add(`model:${name}`);
+                        } else if ("model" in prop && prop.model) {
                             const optional = prop.model.startsWith("?");
                             const name = optional ? prop.model.slice(1) : prop.model;
-                            definitions.push(`${propName}: modelProperty("${propName}", ${name}, ${optional}),`);
+                            definitions.push(`${propName}: modelProperty("${propName}", ${name}, ${optional}, ${!!prop.error}),`);
                             imports.add(`model:${name}`);
-                        } else if (prop.collection) {
+                        } else if ("collection" in prop && prop.collection) {
                             const optional = prop.collection.startsWith("?");
                             const name = optional ? prop.collection.slice(1) : prop.collection;
-                            definitions.push(`${propName}: collectionProperty("${propName}", ${name}, ${optional}),`);
+                            definitions.push(`${propName}: collectionProperty("${propName}", ${name}, ${optional}, ${!!prop.error}),`);
                             imports.add(`collection:${name}`);
-                        } else if (prop.type) {
+                        } else if ("type" in prop && prop.type) {
                             definitions.push(`${propName}: { type: "${prop.type}" },`);
+                        } else {
+                            throw new Error(`not sure how to handle definition for ${propName} for ${resource.name} in ${this.type}`);
                         }
                     }
                 }
@@ -190,24 +197,31 @@ class Builder<T extends BuilderType = BuilderType> {
                     const properties: Array<string> = [], comments: Record<string, string> = {};
                     let formatted: string;
                     for (const [propName, prop] of Object.entries(resource.props)) {
-                        if (prop.literal && prop.type) {
+                        if ("literal" in prop && prop.literal && prop.type) {
                             const optional = prop.type.startsWith("?");
                             formatted = `${propName}: ${prop.literal}${optional ? " | null" : ""};`;
-                        } else if (prop.oneOf && prop.type) {
+                        } else if ("oneOf" in prop && prop.oneOf && prop.type) {
                             const optional = prop.type.startsWith("?");
                             formatted = `${propName}: ${prop.oneOf.map((v: unknown) => typeof v === "string" ? `"${v}"` : v).join(" | ")}${optional ? " | null" : ""};`;
-                        } else if (prop.model) {
+                        } else if ("ref" in prop && prop.ref) {
+                            const optional = prop.ref.startsWith("?");
+                            const name = optional ? prop.ref.slice(1) : prop.ref;
+                            formatted = `${propName}: ResRef<${name}>${prop.error ? " | ResError" : ""}${optional ? " | null" : ""};`;
+                            imports.add(`model:${name}`);
+                        } else if ("model" in prop && prop.model) {
                             const optional = prop.model.startsWith("?");
                             const name = optional ? prop.model.slice(1) : prop.model;
-                            formatted = `${propName}: ${name}${optional ? " | null" : ""};`;
+                            formatted = `${propName}: ${name}${prop.error ? " | ResError" : ""}${optional ? " | null" : ""};`;
                             imports.add(`model:${name}`);
-                        } else if (prop.collection) {
+                        } else if ("collection" in prop && prop.collection) {
                             const optional = prop.collection.startsWith("?");
                             const name = optional ? prop.collection.slice(1) : prop.collection;
-                            formatted = `${propName}: ${name}${optional ? " | null" : ""};`;
+                            formatted = `${propName}: ${name}${prop.error ? " | ResError" : ""}${optional ? " | null" : ""};`;
                             imports.add(`collection:${name}`);
-                        } else if (prop.type) {
+                        } else if ("type" in prop && prop.type) {
                             formatted = `${propName}: ${DefToType[prop.type]};`;
+                        } else {
+                            throw new Error(`not sure how to handle types for ${propName} for ${resource.name} in ${this.type}`);
                         }
                         properties.push(formatted!);
                         comments[formatted!] = prop.description;
