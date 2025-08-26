@@ -113,7 +113,7 @@ export interface AreaDetailsProperties {
 export interface AwakeCharactersProperties {}
 
 /** The user when logged in with a bot token. */
-export interface BotProperties {
+export interface BotUserProperties {
     /** The owned character of the bot. */
     char: OwnedCharacter;
     /** The controlled character of the bot. */
@@ -793,7 +793,7 @@ export interface RoomScriptDetailsProperties {
 }
 
 /** The user when logged in with a management token. */
-export interface SafeUserProperties {
+export interface TokenUserProperties {
     /** The time the user was created. */
     created: number;
     /** The unique identifier of the user. */

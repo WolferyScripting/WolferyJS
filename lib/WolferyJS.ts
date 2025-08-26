@@ -1,10 +1,10 @@
 import type { BotAuthentication, PasswordAuthentication, TokenAuthentication } from "./util/types.js";
 import TypedEmitter from "./util/TypedEmitter.js";
 import User from "./models/User.js";
-import Bot from "./models/Bot.js";
+import BotUser from "./models/BotUser.js";
 import type Player from "./models/Player.js";
 import { ErrorCodes } from "./util/Constants.js";
-import SafeUser from "./models/SafeUser.js";
+import TokenUser from "./models/TokenUser.js";
 import { waitForCached, waitForEvent, type WaitForEventOptions, type WaitForCachedOptions } from "./util/Util.js";
 import type OwnedCharacter from "./models/OwnedCharacter.js";
 import ControlledCharacter from "./models/ControlledCharacter.js";
@@ -102,7 +102,7 @@ export interface InstanceOptions {
     wsFactory(this: void, client: WolferyJS): WebSocket;
 }
 
-type AnyUser = User | SafeUser | Bot;
+type AnyUser = User | TokenUser | BotUser;
 export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter<Events> {
     private _player!: Player | null;
     private _res!: ResClient | null;
@@ -220,7 +220,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         await Promise.all(promises);
     }
 
-    private async _authenticateBot(): Promise<{ user: Bot; }> {
+    private async _authenticateBot(): Promise<{ user: BotUser; }> {
         if (this.options.authentication.type !== "bot") {
             throw new Error("Invalid authentication type");
         }
@@ -229,7 +229,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             token: this.options.authentication.token
         })
             .then(async() => {
-                const user = await this.core.getBot();
+                const user = await this.core.getBotUser();
                 await this._afterAuthenticate("bot");
                 return { user };
             })
@@ -255,7 +255,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             .catch(this._handleError.bind(this));
     }
 
-    private async _authenticateToken(): Promise<{ user: SafeUser; }> {
+    private async _authenticateToken(): Promise<{ user: TokenUser; }> {
         if (this.options.authentication.type !== "token") {
             throw new Error("Invalid authentication type");
         }
@@ -449,9 +449,9 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         return null;
     }
 
-    /** If the authentication used was for a {@link Bot}. */
-    isBot(): this is WolferyJS<Bot> {
-        return (this._user && this._user instanceof Bot) ?? false;
+    /** If the authentication used was for a {@link BotUser}. */
+    isBot(): this is WolferyJS<BotUser> {
+        return (this._user && this._user instanceof BotUser) ?? false;
     }
 
     /** If the authentication used was for a {@link User} and {@link Player}. */
@@ -459,9 +459,9 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         return this.isUser() && this._player !== null;
     }
 
-    /** If the authentication used was for a {@link SafeUser}. */
-    isToken(): this is WolferyJS<SafeUser> {
-        return (this._user && this._user instanceof SafeUser) ?? false;
+    /** If the authentication used was for a {@link TokenUser}. */
+    isToken(): this is WolferyJS<TokenUser> {
+        return (this._user && this._user instanceof TokenUser) ?? false;
     }
 
     /** If the authentication used was for a {@link User}. */

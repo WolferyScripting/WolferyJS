@@ -1,13 +1,13 @@
 import type GlobalTeleports from "../collections/GlobalTeleports.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
 import type AwakeCharacters from "../models/AwakeCharacters.js";
-import type Bot from "../models/Bot.js";
+import type BotUser from "../models/BotUser.js";
 import type CoreInfo from "../models/CoreInfo.js";
 import type MailInfo from "../models/MailInfo.js";
 import type NoteInfo from "../models/NoteInfo.js";
 import type Player from "../models/Player.js";
 import type ReportInfo from "../models/ReportInfo.js";
-import SafeUser from "../models/SafeUser.js";
+import TokenUser from "../models/TokenUser.js";
 import type SupportInfo from "../models/SupportInfo.js";
 import type TagGroups from "../models/TagGroups.js";
 import type TagInfo from "../models/TagInfo.js";
@@ -38,8 +38,8 @@ export default class Core {
         return this.client.api.get<AwakeCharacters>(ResourceIDs.AWAKE_CHARACTERS);
     }
 
-    async getBot(): Promise<Bot> {
-        return this.client.api.call<Bot>("core", "getBot");
+    async getBotUser(): Promise<BotUser> {
+        return this.client.api.call<BotUser>("core", "getBot");
     }
 
     async getCoreInfo(): Promise<CoreInfo> {
@@ -53,7 +53,7 @@ export default class Core {
      */
     async getFullUser(): Promise<User> {
         const user = await this.getUser();
-        if (!(user instanceof SafeUser)) return user;
+        if (!(user instanceof TokenUser)) return user;
         throw new Error(`Expected to get User, got ${user.constructor.name}`);
     }
 
@@ -112,20 +112,20 @@ export default class Core {
     /**
      * Get the authenticated user.
      * @returns The authenticated user.
-     * @note This is an alias for {@link getUser} which throws if the result is not an instance of `SafeUser`.
+     * @note This is an alias for {@link getUser} which throws if the result is not an instance of `TokenUser`.
      */
-    async getTokenUser(): Promise<SafeUser> {
+    async getTokenUser(): Promise<TokenUser> {
         const user = await this.getUser();
-        if (user instanceof SafeUser) return user;
-        throw new Error(`Expected to get SafeUser, got ${user.constructor.name}`);
+        if (user instanceof TokenUser) return user;
+        throw new Error(`Expected to get TokenUser, got ${user.constructor.name}`);
     }
 
     /**
-     * Get the authenticated user. For password authentication this will return {@link User}, for token authentication this will return {@link SafeUser}.
+     * Get the authenticated user. For password authentication this will return {@link User}, for token authentication this will return {@link TokenUser}.
      * @returns The authenticated user.
      */
-    async getUser(): Promise<User | SafeUser> {
-        return this.client.api.call<User | SafeUser>("auth", "getUser");
+    async getUser(): Promise<User | TokenUser> {
+        return this.client.api.call<User | TokenUser>("auth", "getUser");
     }
 
     async getWebClientInfo(): Promise<WebClientInfo> {

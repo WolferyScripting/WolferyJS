@@ -2,19 +2,19 @@ import type OwnedCharacter from "./OwnedCharacter.js";
 import BaseModel from "./BaseModel.js";
 import type ControlledCharacter from "./ControlledCharacter.js";
 import type WolferyJS from "../WolferyJS.js";
-import type { BotProperties } from "../generated/models/types.js";
-import { BotDefinition } from "../generated/models/definitions.js";
+import type { BotUserProperties } from "../generated/models/types.js";
+import { BotUserDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
-declare interface Bot extends BaseModel, BotProperties {}
+declare interface BotUser extends BaseModel, BotUserProperties {}
 // do not edit the first line of the class comment
 /**
  * The user when logged in with a bot token.
- * @resourceID BOT(core.bot.{id})
+ * @resourceID BOT_USER(core.bot.{id})
  */
-class Bot extends BaseModel {
+class BotUser extends BaseModel {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
-        super(client, api, rid, { definition: BotDefinition });
+        super(client, api, rid, { definition: BotUserDefinition });
     }
 
     protected override async _listen(on: boolean): Promise<void> {
@@ -28,8 +28,8 @@ class Bot extends BaseModel {
     }
 
     /**
-     * Control the character associated with this bot.
-     * @returns The owned character instance associated with this bot.
+     * Control the character associated with this BotUser.
+     * @returns The owned character instance associated with this BotUser.
      */
     async controlChar(): Promise<OwnedCharacter> {
         return this.call<OwnedCharacter>("controlChar");
@@ -41,7 +41,7 @@ class Bot extends BaseModel {
     }
 
     /**
-     * Wake up the character associated with this bot.
+     * Wake up the character associated with this BotUser.
      * @param hidden If the character should be hidden from the awake list.
      */
     async wakeup(hidden?: boolean): Promise<ControlledCharacter> {
@@ -57,4 +57,4 @@ class Bot extends BaseModel {
     }
 }
 
-export default Bot;
+export default BotUser;

@@ -79,7 +79,7 @@ namespace ResourceIDs {
     export const AREA_CHILDREN = f`core.area.${id}.children`;
     export const AREA_DETAILS = f`core.area.${id}.details`;
     export const AWAKE_CHARACTERS = "core.chars.awake";
-    export const BOT = f`core.bot.${id}`;
+    export const BOT_USER = f`core.bot.${id}`;
     export const CHARACTER = f`core.char.${id}`;
     export const CHARACTER_DETAILS = f`core.char.${id}.details`;
     export const CHARACTER_INFO = f`core.char.${id}.info`;
@@ -122,7 +122,7 @@ namespace ResourceIDs {
     export const ROOM_PROFILE = f`core.roomprofile.${id}`;
     export const ROOMSCRIPT = f`core.roomscript.${id}`;
     export const ROOMSCRIPT_DETAILS = f`core.roomscript.${id}.details`;
-    export const SAFE_USER = f`auth.user.${id}.safe`;
+    export const TOKEN_USER = f`auth.user.${id}.safe`;
     export const SCRIPT_BINARY = f`core.script.${script}.binary.${binary}`;
     export const SCRIPT_LOG = f`core.script.log.${id}`;
     export const CHARACTER_SETTINGS = f`core.char.${id}.settings`;

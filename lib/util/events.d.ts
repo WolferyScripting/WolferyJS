@@ -1,6 +1,6 @@
 import type { IdleState } from "./Constants.js";
 import type { Messages } from "./types.js";
-import type Bot from "../models/Bot.js";
+import type Bot from "../models/BotUser.ts";
 import type ControlledCharacter from "../models/ControlledCharacter.js";
 import type Player from "../models/Player.js";
 import type User from "../models/User.js";
@@ -9,7 +9,7 @@ import type OwnedCharacter from "../models/OwnedCharacter.js";
 import type Puppet from "../models/Puppet.js";
 import type Room from "../models/Room.js";
 import type Character from "../models/Character.js";
-import type SafeUser from "../models/SafeUser.js";
+import type SafeUser from "../models/TokenUser.ts";
 import type Area from "../models/Area.ts";
 import type Profile from "../models/Profile.ts";
 import type RoomCharacter from "../models/RoomCharacter.ts";

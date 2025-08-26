@@ -6,7 +6,7 @@ export { default as AreaChild } from "../../models/AreaChild.js";
 export { default as AreaChildren } from "../../models/AreaChildren.js";
 export { default as AreaDetails } from "../../models/AreaDetails.js";
 export { default as AwakeCharacters } from "../../models/AwakeCharacters.js";
-export { default as Bot } from "../../models/Bot.js";
+export { default as BotUser } from "../../models/BotUser.js";
 export { default as Character } from "../../models/Character.js";
 export { default as CharacterDetails } from "../../models/CharacterDetails.js";
 export { default as CharacterInfo } from "../../models/CharacterInfo.js";
@@ -43,7 +43,7 @@ export { default as RoomInstanceDetails } from "../../models/RoomInstanceDetails
 export { default as RoomProfile } from "../../models/RoomProfile.js";
 export { default as RoomScript } from "../../models/RoomScript.js";
 export { default as RoomScriptDetails } from "../../models/RoomScriptDetails.js";
-export { default as SafeUser } from "../../models/SafeUser.js";
+export { default as TokenUser } from "../../models/TokenUser.js";
 export { default as ScriptBinary } from "../../models/ScriptBinary.js";
 export { default as ScriptLog } from "../../models/ScriptLog.js";
 export { default as Settings } from "../../models/Settings.js";

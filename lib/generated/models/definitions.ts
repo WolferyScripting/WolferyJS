@@ -85,7 +85,7 @@ export const AreaDetailsDefinition: Record<string, PropertyDefinition> = {
 
 export const AwakeCharactersDefinition: Record<string, PropertyDefinition> = {};
 
-export const BotDefinition: Record<string, PropertyDefinition> = {
+export const BotUserDefinition: Record<string, PropertyDefinition> = {
     char: modelProperty("char", OwnedCharacter, false, false),
     controlled: modelProperty("controlled", ControlledCharacter, true, false)
 };
@@ -459,7 +459,7 @@ export const RoomScriptDetailsDefinition: Record<string, PropertyDefinition> = {
     version: { type: "string" }
 };
 
-export const SafeUserDefinition: Record<string, PropertyDefinition> = {
+export const TokenUserDefinition: Record<string, PropertyDefinition> = {
     created: { type: "number" },
     id: { type: "string" },
     roles: { type: "any" },

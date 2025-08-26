@@ -124,8 +124,8 @@
   },
   {
     "description": "The user when logged in with a bot token.",
-    "id": ["BOT(core.bot.{id})"],
-    "name": "Bot",
+    "id": ["BOT_USER(core.bot.{id})"],
+    "name": "BotUser",
     "props": {
       "char": {
         "model": "OwnedCharacter",
@@ -1414,8 +1414,9 @@
   },
   {
     "description": "The user when logged in with a management token.",
-    "id": ["SAFE_USER(auth.user.{id}.safe)"],
-    "name": "SafeUser",
+    "id": ["TOKEN_USER(auth.user.{id}.safe)"],
+    "name": "TokenUser",
+    "name": "TokenUser",
     "props": {
       "created": {
         "type": "number",
