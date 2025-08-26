@@ -8,6 +8,7 @@ declare interface Profile extends BaseModel, ProfileProperties {}
 // do not edit the first line of the class comment
 /**
  * A character profile.
+ * @resourceID PROFILE(core.profile.{id})
  */
 class Profile extends BaseModel implements ProfileProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

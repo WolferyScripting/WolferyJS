@@ -8,6 +8,7 @@ declare interface ExitDetails extends BaseModel, ExitDetailsProperties {}
 // do not edit the first line of the class comment
 /**
  * A detailed exit.
+ * @resourceID EXIT_DETAILS(core.exit.{id}.details)
  */
 class ExitDetails extends BaseModel implements ExitDetailsProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

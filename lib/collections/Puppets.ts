@@ -7,6 +7,7 @@ import type { ResClient, CollectionAddRemove } from "resclient-ts";
 // do not edit the first line of the class comment
 /**
  * The puppets that the player can control.
+ * @resourceID PUPPETS(core.player.{id}.puppets)
  */
 export default class Puppets extends BaseCollection<Puppet> {
     private onAdd = this._onAdd.bind(this);

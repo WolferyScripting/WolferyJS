@@ -6,6 +6,7 @@ import type { CollectionModelAddRemove, ResClient } from "resclient-ts";
 // do not edit the first line of the class comment
 /**
  * The tag groups.
+ * @resourceID TAG_GROUPS(tag.groups)
  */
 class TagGroups extends BaseCollectionModel<TagGroup> {
     private onAdd = this._onAdd.bind(this);

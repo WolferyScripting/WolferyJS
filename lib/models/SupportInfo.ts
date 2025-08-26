@@ -8,6 +8,7 @@ declare interface SupportInfo extends BaseModel, SupportInfoProperties {}
 // do not edit the first line of the class comment
 /**
  * The support info.
+ * @resourceID SUPPORT_INFO(support.info)
  */
 class SupportInfo extends BaseModel implements SupportInfoProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

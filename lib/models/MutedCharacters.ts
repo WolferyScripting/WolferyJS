@@ -1,3 +1,4 @@
+/* eslint-disable jsdoc/tag-lines */
 import BaseCollectionModel from "./BaseCollectionModel.js";
 import CharacterMin from "./CharacterMin.js";
 import type WolferyJS from "../WolferyJS.js";
@@ -6,6 +7,7 @@ import type { CollectionModelAddRemove, ResClient } from "resclient-ts";
 // do not edit the first line of the class comment
 /**
  * The characters that are muted.
+ * @resourceID MUTED_CHARACTERS(core.player.{id}.mutedchars)
  */
 class MutedCharacters extends BaseCollectionModel<CharacterMin>  {
     private onAdd = this._onAdd.bind(this);

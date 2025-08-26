@@ -8,6 +8,7 @@ declare interface CoreInfo extends BaseModel, CoreInfoProperties {}
 // do not edit the first line of the class comment
 /**
  * The core info about the realm.
+ * @resourceID CORE_INFO(core.info)
  */
 class CoreInfo extends BaseModel implements CoreInfoProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

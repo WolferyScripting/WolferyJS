@@ -7,6 +7,7 @@ import type { ResClient } from "resclient-ts";
 // do not edit the first line of the class comment
 /**
  * The exits in a room.
+ * @resourceID EXITS(core.room.{id}.exits)
  */
 export default class Exits extends BaseCollection<Exit> {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

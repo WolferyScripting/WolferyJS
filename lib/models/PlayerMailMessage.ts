@@ -9,6 +9,7 @@ declare interface PlayerMailMessage extends BaseModel, PlayerMailMessageProperti
 // do not edit the first line of the class comment
 /**
  * A mail message.
+ * @resourceID PLAYER_MAIL_MESSAGE(mail.player.{player}.message.{message})
  */
 class PlayerMailMessage extends BaseModel implements PlayerMailMessageProperties {
     from!: MailUser;

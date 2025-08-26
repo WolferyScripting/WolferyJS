@@ -9,6 +9,7 @@ declare interface Node extends BaseModel, NodeProperties {}
 // do not edit the first line of the class comment
 /**
  * A teleportation node.
+ * @resourceID NODE(core.node.{id})
  */
 class Node extends BaseModel implements NodeProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

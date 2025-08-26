@@ -8,6 +8,7 @@ declare interface TagGroup extends BaseModel, TagGroupProperties {}
 // do not edit the first line of the class comment
 /**
  * A tag group.
+ * @resourceID TAG_GROUP(tag.groups.{id})
  */
 class TagGroup extends BaseModel implements TagGroupProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

@@ -6,6 +6,7 @@ import { type CollectionModelAddRemove, type ResClient, ResRef } from "resclient
 // do not edit the first line of the class comment
 /**
  * All notes.
+ * @resourceID NOTES(note.player.{id}.notes)
  */
 class Notes extends BaseCollectionModel<ResRef<Note>> {
     private onAdd = this._onAdd.bind(this);

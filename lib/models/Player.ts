@@ -19,6 +19,7 @@ declare interface Player extends BaseModel, PlayerProperties {}
 // do not edit the first line of the class comment
 /**
  * The logged in player.
+ * @resourceID PLAYER(core.player.{id})
  */
 class Player extends BaseModel implements PlayerProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

@@ -6,6 +6,7 @@ import type { CollectionModelAddRemove, ResClient } from "resclient-ts";
 // do not edit the first line of the class comment
 /**
  * The awake characters in the realm.
+ * @resourceID AWAKE_CHARACTERS(core.chars.awake)
  */
 class AwakeCharacters extends BaseCollectionModel<Character> {
     private onAdd = this._onAdd.bind(this);

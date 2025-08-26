@@ -32,6 +32,8 @@ declare interface ControlledCharacter extends BaseModel, ControlledCharacterProp
 // do not edit the first line of the class comment
 /**
  * A controlled character.
+ * @resourceID CONTROLLED_CHARACTER(core.char.{id}.ctrl)
+ * @resourceID CONTROLLED_PUPPET(core.char.{char}.puppet.{puppet}.ctrl)
  */
 class ControlledCharacter extends BaseModel implements ControlledCharacterProperties {
     private _pingTimeout!: NodeJS.Timeout | null;

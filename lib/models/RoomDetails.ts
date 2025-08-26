@@ -8,6 +8,7 @@ declare interface RoomDetails extends BaseModel, RoomDetailsProperties {}
 // do not edit the first line of the class comment
 /**
  * A detailed view of a room.
+ * @resourceID ROOM_DETAILS(core.room.{id}.details)
  */
 class RoomDetails extends BaseModel implements RoomDetailsProperties {
     // eslint-disable-next-line unicorn/no-object-as-default-parameter

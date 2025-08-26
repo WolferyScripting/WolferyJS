@@ -8,6 +8,7 @@ declare interface RequestParams extends BaseModel, RequestParamsProperties {}
 // do not edit the first line of the class comment
 /**
  * The parameters for a request.
+ * @resourceID REQUEST_PARAMS(core.request.{id}.params)
  */
 class RequestParams extends BaseModel implements RequestParamsProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

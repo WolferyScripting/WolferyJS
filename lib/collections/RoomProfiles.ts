@@ -11,6 +11,7 @@ import assert from "node:assert";
 // do not edit the first line of the class comment
 /**
  * The profiles in a room.
+ * @resourceID ROOM_PROFILES(core.room.{id}.profiles)
  */
 export default class RoomProfiles extends BaseCollection<RoomProfile> {
     private onAdd = this._onAdd.bind(this);

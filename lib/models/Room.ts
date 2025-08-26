@@ -10,6 +10,7 @@ declare interface Room extends BaseModel, RoomProperties {}
 // do not edit the first line of the class comment
 /**
  * A room.
+ * @resourceID ROOM(core.room.{id})
  */
 class Room extends BaseModel implements RoomProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

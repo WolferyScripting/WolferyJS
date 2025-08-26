@@ -6,6 +6,7 @@ import type { CollectionModelAddRemove, ResClient } from "resclient-ts";
 // do not edit the first line of the class comment
 /**
  * The globally available tags.
+ * @resourceID TAGS(tag.tags)
  */
 class Tags extends BaseCollectionModel<Tag> {
     private onAdd = this._onAdd.bind(this);

@@ -8,6 +8,7 @@ declare interface User extends BaseModel, UserProperties {}
 // do not edit the first line of the class comment
 /**
  * The user when logging in with username/password.
+ * @resourceID USER(auth.user.{id})
  */
 class User extends BaseModel implements UserProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

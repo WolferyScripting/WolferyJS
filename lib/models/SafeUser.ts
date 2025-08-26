@@ -8,6 +8,7 @@ declare interface SafeUser extends BaseModel, SafeUserProperties {}
 // do not edit the first line of the class comment
 /**
  * The user when logged in with a management token.
+ * @resourceID SAFE_USER(auth.user.{id}.safe)
  */
 class SafeUser extends BaseModel implements SafeUserProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

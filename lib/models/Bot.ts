@@ -10,6 +10,7 @@ declare interface Bot extends BaseModel, BotProperties {}
 // do not edit the first line of the class comment
 /**
  * The user when logged in with a bot token.
+ * @resourceID BOT(core.bot.{id})
  */
 class Bot extends BaseModel {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

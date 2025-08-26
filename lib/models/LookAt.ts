@@ -8,6 +8,7 @@ declare interface LookAt extends BaseModel, LookAtProperties {}
 // do not edit the first line of the class comment
 /**
  * The character being looked at.
+ * @resourceID LOOK_AT(core.lookat.char.{char}.inroom.{room})
  */
 class LookAt extends BaseModel implements LookAtProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

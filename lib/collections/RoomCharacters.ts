@@ -7,6 +7,8 @@ import type { ResClient } from "resclient-ts";
 // do not edit the first line of the class comment
 /**
  * The characters in a room.
+ * @resourceID ROOM_CHARACTERS(core.room.{id}.chars)
+ * @resourceID ROOM_INSTANCE_CHARACTERS(core.instance.{instance}.room.{room}.chars)
  */
 export default class RoomCharacters extends BaseCollection<RoomCharacter> {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

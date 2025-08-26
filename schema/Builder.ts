@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/consistent-function-scoping */
 import {
     formatImports,
     getCollections,
@@ -22,6 +23,7 @@ const writeFileWithAliases = async(path: string, data: string): Promise<void> =>
     }
     await writeFile(path, data);
 };
+
 const defaultSpacing = 4;
 const baseDir = fileURLToPath(new URL("../lib/generated", import.meta.url));
 type BuilderType = "collections" | "models";
@@ -271,23 +273,43 @@ class Builder<T extends BuilderType = BuilderType> {
             const originalContents = Array.from(contents);
             const classStart = contents.findIndex(line => line.includes(`class ${resource.name}`));
             const commentStart = contents.findIndex((line, index) => index < classStart && line.match(/^\s*\/\*\*/));
+            const docLine = (str: string): string => ` * ${(str.trim().startsWith("*") ? str.trim().slice(1) : str).trim()}`;
+            const formatRIDs = (): Array<string> => resource.id.map(id => docLine(`@resourceID ${id}`));
             if (commentStart === -1) {
                 // no comment, create a multi-line comment
                 contents.splice(classStart, 0, "/**", ` * ${resource.description}`, " */");
             } else {
                 const commentEnd = contents.findIndex((line, index) => index >= commentStart && line.endsWith("*/"));
-                const docLine = (str: string): string => ` * ${(str.trim().startsWith("*") ? str.trim().slice(1) : str).trim()}`;
                 if (commentEnd === commentStart) {
                     // a comment exists, but only spans a single line. Assume it's a third party comment and keep it below our comment
                     const currentComment = contents[commentStart]!;
-                    contents.splice(commentStart, 1, "/**", docLine(resource.description), docLine(currentComment.slice(currentComment.indexOf("*") + 3, currentComment.lastIndexOf("*") - 1)), " */");
+                    contents.splice(commentStart, 1, "/**", docLine(resource.description), ...formatRIDs(), docLine(currentComment.slice(currentComment.indexOf("*") + 3, currentComment.lastIndexOf("*") - 1)), " */");
                 } else {
                     // a comment exists, and spans multiple lines. Assume the first line is our comment and replace it
                     const currentCommentLines = contents.slice(commentStart, commentEnd + 1);
+                    let emptyTop = 0, emptyBottom = 0;
+                    for (let i = 2; i < currentCommentLines.length - 1; i++) {
+                        if (currentCommentLines[i]!.trim() === "*") emptyTop++;
+                        else break;
+                    }
+                    for (let i = currentCommentLines.length - 2; i > 1; i--) {
+                        if (currentCommentLines[i]!.trim() === "*") emptyBottom++;
+                        else break;
+                    }
+                    if (emptyTop === 1 && emptyBottom === 1 && currentCommentLines.length === 4) emptyTop = 0;
+                    let ridCount = 0;
+                    for (let i = emptyTop + 2; i < currentCommentLines.length; i++) {
+                        const line = currentCommentLines[i]!;
+                        if (line.trim().startsWith("* @resourceID")) ridCount++;
+                        else break;
+                    }
+                    const removeCount = 2 + emptyTop + ridCount;
+
                     const newCommentLines = [
                         "/**",
                         docLine(resource.description),
-                        ...currentCommentLines.slice(2, -1).map(docLine),
+                        ...formatRIDs(),
+                        ...currentCommentLines.slice(removeCount, -(emptyBottom + 1)).map(docLine),
                         " */"
                     ];
                     contents.splice(commentStart, commentEnd - commentStart + 1, ...newCommentLines);

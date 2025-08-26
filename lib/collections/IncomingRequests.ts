@@ -7,6 +7,7 @@ import type { ResClient, CollectionAddRemove } from "resclient-ts";
 // do not edit the first line of the class comment
 /**
  * The incoming requests for the player.
+ * @resourceID INCOMING_REQUESTS(core.player.{id}.incoming.requests)
  */
 export default class IncomingRequests extends BaseCollection<Request> {
     private onAdd = this._onAdd.bind(this);

@@ -11,6 +11,8 @@ interface LookedAt extends BaseModel, LookedAtProperties {}
 // do not edit the first line of the class comment
 /**
  * The characters looking at an owned character.
+ * @resourceID LOOKED_AT(core.lookedat.char.{char}.inroom.{room})
+ * @resourceID LOOKED_AT_INSTANCE(core.instance.{instance}.lookedat.char.{char}.inroom.{room})
  */
 class LookedAt extends BaseModel implements LookedAtProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

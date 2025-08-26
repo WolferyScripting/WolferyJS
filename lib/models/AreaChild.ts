@@ -8,6 +8,7 @@ declare interface AreaChild extends BaseModel, AreaChildProperties {}
 // do not edit the first line of the class comment
 /**
  * A child of an area.
+ * @resourceID AREA_CHILD(core.area.{id}.child)
  */
 class AreaChild extends BaseModel implements AreaChildProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

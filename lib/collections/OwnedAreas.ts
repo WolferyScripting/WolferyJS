@@ -9,6 +9,7 @@ import type { ResClient, CollectionAddRemove } from "resclient-ts";
 // do not edit the first line of the class comment
 /**
  * The areas owned by a character.
+ * @resourceID OWNED_AREAS(core.char.{id}.areas)
  */
 export default class OwnedAreas extends BaseCollection<Area> {
     private onAdd = this._onAdd.bind(this);

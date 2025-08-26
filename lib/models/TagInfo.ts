@@ -8,6 +8,7 @@ declare interface TagInfo extends BaseModel, TagInfoProperties {}
 // do not edit the first line of the class comment
 /**
  * The tag info.
+ * @resourceID TAG_INFO(tag.info)
  */
 class TagInfo extends BaseModel implements TagInfoProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

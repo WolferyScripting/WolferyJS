@@ -9,6 +9,7 @@ declare interface Watches extends BaseCollectionModel<ResRef<Watch>>, WatchesPro
 // do not edit the first line of the class comment
 /**
  * Watched characters.
+ * @resourceID WATCHES(note.player.{id}.watches)
  */
 class Watches extends BaseCollectionModel<ResRef<Watch>> {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

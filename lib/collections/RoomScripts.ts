@@ -11,6 +11,7 @@ import assert from "node:assert";
 // do not edit the first line of the class comment
 /**
  * The scripts in a room.
+ * @resourceID ROOM_SCRIPTS(core.room.{id}.scripts)
  */
 export default class RoomScripts extends BaseCollection<RoomScript> {
     private onAdd = this._onAdd.bind(this);

@@ -10,6 +10,7 @@ export type TagPref = "like" | "dislike";
 // do not edit the first line of the class comment
 /**
  * The tags of a character.
+ * @resourceID CHARACTER_TAGS(tag.char.{id}.tags)
  */
 class CharacterTags extends BaseCollectionModel<Tag> {
     private onAdd = this._onAdd.bind(this);

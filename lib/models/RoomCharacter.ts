@@ -8,6 +8,7 @@ declare interface RoomCharacter extends BaseModel, RoomCharacterProperties {}
 // do not edit the first line of the class comment
 /**
  * A character in the current room.
+ * @resourceID ROOM_CHARACTER(core.char.{id}.inroom)
  */
 class RoomCharacter extends BaseModel implements RoomCharacterProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

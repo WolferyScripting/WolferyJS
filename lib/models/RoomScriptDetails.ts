@@ -8,6 +8,7 @@ declare interface RoomScriptDetails extends BaseModel, RoomScriptDetailsProperti
 // do not edit the first line of the class comment
 /**
  * A detailed room script.
+ * @resourceID ROOMSCRIPT_DETAILS(core.roomscript.{id}.details)
  */
 class RoomScriptDetails extends BaseModel implements RoomScriptDetailsProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

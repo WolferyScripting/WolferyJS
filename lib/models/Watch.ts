@@ -9,6 +9,7 @@ declare interface Watch extends BaseModel, WatchProperties {}
 // do not edit the first line of the class comment
 /**
  * A watched character.
+ * @resourceID WATCH(note.player.{player}.watch.{char})
  */
 class Watch extends BaseModel implements WatchProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

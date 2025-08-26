@@ -8,6 +8,7 @@ declare interface MailMessage extends BaseModel, MailMessageProperties {}
 // do not edit the first line of the class comment
 /**
  * A mail message.
+ * @resourceID MAIL_MESSAGE(mail.message.{id})
  */
 class MailMessage extends BaseModel implements MailMessageProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

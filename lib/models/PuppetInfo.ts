@@ -8,6 +8,7 @@ declare interface PuppetInfo extends BaseModel, PuppetInfoProperties {}
 // do not edit the first line of the class comment
 /**
  * The info for a puppet.
+ * @resourceID PUPPET_INFO(core.puppet.{id}.info)
  */
 class PuppetInfo extends BaseModel implements PuppetInfoProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

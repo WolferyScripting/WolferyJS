@@ -8,6 +8,7 @@ declare interface RoomCommand extends BaseModel, RoomCommandProperties {}
 // do not edit the first line of the class comment
 /**
  * A command in a room.
+ * @resourceID ROOM_COMMAND(core.roomcmd.{id})
  */
 class RoomCommand extends BaseModel implements RoomCommandProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

@@ -9,6 +9,8 @@ declare interface FocusChars extends BaseCollectionModel<CharacterMin>, FocusCha
 // do not edit the first line of the class comment
 /**
  * The characters being focused on.
+ * @resourceID CHARACTER_FOCUS_CHARS(core.char.{id}.focus.chars)
+ * @resourceID PUPPET_FOCUS_CHARS(core.char.{char}.puppet.{puppet}.focus.chars)
  */
 class FocusChars extends BaseCollectionModel<CharacterMin> implements FocusCharsProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
