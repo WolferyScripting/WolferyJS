@@ -245,6 +245,24 @@ class Player extends BaseModel implements PlayerProperties {
     async unmuteChar(charId: string): Promise<null> {
         return this.muteChars({ [charId]: false });
     }
+
+    /**
+     * Remove a character from your watch list.
+     * @param charId The ID of the character to unwatch.
+     */
+    async unwatchChar(charId: string): Promise<Character> {
+        return this.api.call<BasicCharacterResponse<"char">>(ResourceIDs.WATCH({ player: this.id, char: charId }), "delete")
+            .then(r => this.basicChar(r, "char"));
+    }
+
+    /**
+     * Add a character to your watch list.
+     * @param charId The ID of the character to watch.
+     */
+    async watchChar(charId: string): Promise<Character> {
+        return this.api.call<BasicCharacterResponse<"char">>(ResourceIDs.WATCH({ player: this.id, char: charId }), "addWatcher", { charId })
+            .then(r => this.basicChar(r, "char"));
+    }
 }
 
 export default Player;

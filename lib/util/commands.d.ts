@@ -208,6 +208,11 @@ declare namespace Commands {
             exitId?: string;
             exitKey?: string;
         }
+
+        export interface TeleportOptions {
+            nodeId?: string;
+            roomId?: string;
+        }
     }
 
     export namespace Player {

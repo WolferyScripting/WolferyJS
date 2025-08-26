@@ -687,7 +687,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param nodeId The ID of the node to teleport to.
      */
     async nodeTeleport(nodeId: string): Promise<null> {
-        return this.call<null>("teleport", { nodeId });
+        return this.teleport({ nodeId });
     }
 
     /**
@@ -850,7 +850,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param roomId The ID of the room to teleport to.
      */
     async roomTeleport(roomId: string): Promise<null> {
-        return this.call<null>("teleport", { roomId });
+        return this.teleport({ roomId });
     }
 
     /**
@@ -1054,12 +1054,25 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         return this.call<null>("stopLead", { charID });
     }
 
+    /** Stop LFRP status. */
+    async stopLfrp(): Promise<null> {
+        return this.call<null>("set", { rp: "" });
+    }
+
     /**
      * Request to summon a character.
      * @param charId The ID of the character to summon.
      */
     async summon(charId: string): Promise<null> {
         return this.call<null>("summon", { charId });
+    }
+
+    /**
+     * Sweep characters out of the room. If no character id is provided, sleeping characters are swept.
+     * @param charId The ID of a specific character to sweep. You must own the room.
+     */
+    async sweep(charId?: string): Promise<null> {
+        return this.call<null>("sweep", { charId });
     }
 
     /**
@@ -1078,6 +1091,14 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      */
     async syncRoomProfile(profileId: string): Promise<null> {
         return this.updateRoomProfile(profileId);
+    }
+
+    /**
+     * Teleport.
+     * @param options The options for teleporting.
+     */
+    async teleport(options: Commands.ControlledCharacter.TeleportOptions): Promise<null> {
+        return this.call<null>("teleport", options);
     }
 
     /**

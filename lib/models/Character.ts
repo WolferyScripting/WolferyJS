@@ -158,6 +158,16 @@ class Character extends BaseModel implements CharacterProperties {
         return this.client.core.getPlayer().then(player => player.unmuteChar(this.id));
     }
 
+    /** Remove this character from your watch list. */
+    async unwatch(): Promise<Character> {
+        return this.client.core.getPlayer().then(player => player.unwatchChar(this.id));
+    }
+
+    /** Add this character to your watch list. */
+    async watch(): Promise<Character> {
+        return this.client.core.getPlayer().then(player => player.watchChar(this.id));
+    }
+
     /**
      * Send a whisper to this character. You must be in the same room.
      * @param ctrl The controlled character to send the whisper.
