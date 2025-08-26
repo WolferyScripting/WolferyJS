@@ -1,20 +1,33 @@
 import type GlobalTeleports from "../collections/GlobalTeleports.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
 import type AwakeCharacters from "../models/AwakeCharacters.js";
+import type Bot from "../models/Bot.js";
 import type CoreInfo from "../models/CoreInfo.js";
 import type MailInfo from "../models/MailInfo.js";
 import type NoteInfo from "../models/NoteInfo.js";
 import type Player from "../models/Player.js";
 import type ReportInfo from "../models/ReportInfo.js";
+import SafeUser from "../models/SafeUser.js";
 import type SupportInfo from "../models/SupportInfo.js";
 import type TagGroups from "../models/TagGroups.js";
 import type TagInfo from "../models/TagInfo.js";
 import type Tags from "../models/Tags.js";
+import type User from "../models/User.js";
 import type WebClientInfo from "../models/WebClientInfo.js";
 import type WolferyJS from "../WolferyJS.js";
 import { Properties } from "resclient-ts";
 
-// Core classes/calls that don't require any id input
+export interface Info {
+    core: CoreInfo;
+    mail: MailInfo;
+    note: NoteInfo;
+    report: ReportInfo;
+    support: SupportInfo;
+    tag: TagInfo;
+    webClient: WebClientInfo;
+}
+
+/** Core classes/calls that don't require any id input */
 export default class Core {
     client!: WolferyJS;
     constructor(client: WolferyJS) {
@@ -25,12 +38,39 @@ export default class Core {
         return this.client.api.get<AwakeCharacters>(ResourceIDs.AWAKE_CHARACTERS);
     }
 
+    async getBot(): Promise<Bot> {
+        return this.client.api.call<Bot>("core", "getBot");
+    }
+
     async getCoreInfo(): Promise<CoreInfo> {
         return this.client.api.get<CoreInfo>(ResourceIDs.CORE_INFO);
     }
 
+    /**
+     * Get the authenticated user.
+     * @returns The authenticated user.
+     * @note This is an alias for {@link getUser} which throws if the result is not an instance of `User`.
+     */
+    async getFullUser(): Promise<User> {
+        const user = await this.getUser();
+        if (!(user instanceof SafeUser)) return user;
+        throw new Error(`Expected to get User, got ${user.constructor.name}`);
+    }
+
     async getGlobalTeleports(): Promise<GlobalTeleports> {
         return this.client.api.get<GlobalTeleports>(ResourceIDs.NODES);
+    }
+
+    async getInfo(): Promise<Info> {
+        return {
+            core:      await this.getCoreInfo(),
+            mail:      await this.getMailInfo(),
+            note:      await this.getNoteInfo(),
+            report:    await this.getReportInfo(),
+            support:   await this.getSupportInfo(),
+            tag:       await this.getTagInfo(),
+            webClient: await this.getWebClientInfo()
+        };
     }
 
     async getMailInfo(): Promise<MailInfo> {
@@ -67,6 +107,25 @@ export default class Core {
 
     async getTags(): Promise<Tags> {
         return this.client.api.get<Tags>(ResourceIDs.TAGS);
+    }
+
+    /**
+     * Get the authenticated user.
+     * @returns The authenticated user.
+     * @note This is an alias for {@link getUser} which throws if the result is not an instance of `SafeUser`.
+     */
+    async getTokenUser(): Promise<SafeUser> {
+        const user = await this.getUser();
+        if (user instanceof SafeUser) return user;
+        throw new Error(`Expected to get SafeUser, got ${user.constructor.name}`);
+    }
+
+    /**
+     * Get the authenticated user. For password authentication this will return {@link User}, for token authentication this will return {@link SafeUser}.
+     * @returns The authenticated user.
+     */
+    async getUser(): Promise<User | SafeUser> {
+        return this.client.api.call<User | SafeUser>("auth", "getUser");
     }
 
     async getWebClientInfo(): Promise<WebClientInfo> {

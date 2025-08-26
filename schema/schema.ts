@@ -22,6 +22,8 @@ export const Types = Type.Union([
 const OneOfPropertySchema = Type.Object({
     description: Type.String(),
     type:        Types,
+    ts:          Type.Optional(Type.String()),
+    const:       Type.Optional(Type.String()),
     oneOf:       Type.Array(Type.Any())
 });
 const RefPropertySchema = Type.Object({
@@ -42,6 +44,8 @@ const CollectionPropertySchema = Type.Object({
 const BasicPropertySchema = Type.Object({
     description: Type.String(),
     literal:     Type.Optional(Type.String()),
+    ts:          Type.Optional(Type.String()),
+    const:       Type.Optional(Type.String()),
     type:        Types
 });
 export const PropertySchema = Type.Union([

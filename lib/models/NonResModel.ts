@@ -4,37 +4,22 @@ import {
     ResModel,
     update,
     type ResClient,
-    type ResModelOptions
+    type ResModelOptions,
+    Properties
 } from "resclient-ts";
 
 export default abstract class NonResModel<T extends AnyObject = AnyObject> {
-    protected _props = {} as T;
+    protected _props!: T;
     protected client!: WolferyJS;
     api!: ResClient;
-    constructor(client: WolferyJS, api: ResClient, data: T, options?: ResModelOptions) {
-        update(this, options ?? {}, {
+    constructor(client: WolferyJS, api: ResClient, data: T, options: ResModelOptions = {}) {
+        update(this, options, {
             definition: { type: "?object", property: "_definition" }
         });
-        Object.defineProperties(this, {
-            client: {
-                enumerable: false,
-                writable:   false,
-                value:      client
-            },
-            api: {
-                enumerable: false,
-                writable:   false,
-                value:      api
-            },
-            _props: {
-                enumerable: false,
-                writable:   false,
-                value:      {}
-            },
-            _definition: {
-                enumerable: false
-            }
-        });
+        Properties.of(this)
+            .readOnly("client", client)
+            .readOnly("api", api)
+            .readOnly("_props", {});
         ResModel.prototype.update.call(this, data);
     }
 

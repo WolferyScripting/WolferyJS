@@ -165,6 +165,7 @@
       "idle": {
         "type": "number",
         "oneOf": [0, 1, 2, 3],
+        "const": "IdleState",
         "description": "The idle state of the character."
       },
       "lastAwake": {
@@ -188,6 +189,7 @@
       "state": {
         "type": "string",
         "oneOf": ["awake", "asleep"],
+        "ts": "CharacterState",
         "description": "The state of the character."
       },
       "status": {
@@ -205,6 +207,7 @@
       "type": {
         "type": "string",
         "oneOf": ["player", "puppet"],
+        "ts": "CharacterType",
         "description": "The type of the character."
       }
     }
@@ -234,6 +237,7 @@
       "idle": {
         "type": "number",
         "oneOf": [0, 1, 2, 3],
+        "const": "IdleState",
         "description": "The idle state of the character."
       },
       "name": { "type": "string", "description": "The name of the character." },
@@ -244,6 +248,7 @@
       "state": {
         "type": "string",
         "oneOf": ["awake", "asleep"],
+        "ts": "CharacterState",
         "description": "The state of the character."
       },
       "status": {
@@ -265,6 +270,7 @@
       "type": {
         "type": "string",
         "oneOf": ["player", "puppet"],
+        "ts": "CharacterType",
         "description": "The type of the character."
       }
     }
@@ -346,6 +352,7 @@
       "idle": {
         "type": "number",
         "oneOf": [0, 1, 2, 3],
+        "const": "IdleState",
         "description": "The idle state of the character."
       },
       "image": {
@@ -409,6 +416,7 @@
       "state": {
         "type": "string",
         "oneOf": ["awake", "asleep"],
+        "ts": "CharacterState",
         "description": "The state of the character."
       },
       "status": {
@@ -438,6 +446,7 @@
       "type": {
         "type": "string",
         "oneOf": ["player", "puppet"],
+        "ts": "CharacterType",
         "description": "The type of the character."
       }
     }
@@ -457,12 +466,14 @@
       },
       "icon": {
         "type": "string",
-        "oneOf": ["n", "ne", "e", "se", "s", "sw", "w", "nw", ""],
+        "oneOf": ["n", "ne", "e", "se", "s", "sw", "w", "nw", "up", "down", "in", "out", ""],
+        "ts": "NavIcons",
         "description": "The icon representing the exit direction."
       },
       "nav": {
         "type": "string",
-        "oneOf": ["n", "ne", "e", "se", "s", "sw", "w", "nw", "up", "down", "in", "out", ""],
+        "oneOf": ["n", "ne", "e", "se", "s", "sw", "w", "nw", ""],
+        "ts": "NavDirections",
         "description": "The navigation direction of the exit."
       },
       "name": { "type": "string", "description": "The name of the exit." },
@@ -489,7 +500,8 @@
       },
       "icon": {
         "type": "string",
-        "oneOf": ["n", "ne", "e", "se", "s", "sw", "w", "nw", ""],
+        "oneOf": ["n", "ne", "e", "se", "s", "sw", "w", "nw", "up", "down", "in", "out", ""],
+        "ts": "NavIcons",
         "description": "The icon representing the exit direction."
       },
       "id": {
@@ -511,7 +523,8 @@
       "name": { "type": "string", "description": "The name of the exit." },
       "nav": {
         "type": "string",
-        "oneOf": ["n", "ne", "e", "se", "s", "sw", "w", "nw", "up", "down", "in", "out", ""],
+        "oneOf": ["n", "ne", "e", "se", "s", "sw", "w", "nw", ""],
+        "ts": "NavDirections",
         "description": "The navigation direction of the exit."
       },
       "targetRoom": {
@@ -741,6 +754,7 @@
       "idle": {
         "type": "number",
         "oneOf": [0, 1, 2, 3],
+        "const": "IdleState",
         "description": "The idle state of the character."
       },
       "image": {
@@ -767,6 +781,7 @@
       "state": {
         "type": "string",
         "oneOf": ["awake", "asleep"],
+        "ts": "CharacterState",
         "description": "The current state of the character."
       },
       "status": {
@@ -780,6 +795,7 @@
       "type": {
         "type": "string",
         "oneOf": ["player", "puppet"],
+        "ts": "CharacterType",
         "description": "The type of character."
       }
     }
@@ -1029,6 +1045,7 @@
       "idle": {
         "type": "number",
         "oneOf": [0, 1, 2, 3],
+        "const": "IdleState",
         "description": "The idle state of the character."
       },
       "name": { "type": "string", "description": "The name of the character." },
@@ -1044,6 +1061,7 @@
       "state": {
         "type": "string",
         "oneOf": ["awake", "asleep"],
+        "ts": "CharacterState",
         "description": "The current state of the character."
       },
       "status": {
@@ -1057,6 +1075,7 @@
       "type": {
         "type": "string",
         "oneOf": ["player", "puppet"],
+        "ts": "CharacterType",
         "description": "The type of the character."
       }
     }
@@ -1504,12 +1523,14 @@
       "idRole": {
         "type": "?string",
         "oneOf": ["supporter", "pioneer"],
+        "ts": "IDRoles",
         "description": "The id role of the tag."
       },
       "key": { "type": "string", "description": "The key of the tag." },
       "role": {
         "type": "?string",
         "oneOf": ["builder", "helper", "moderator", "admin"],
+        "ts": "Roles",
         "description": "The role associated with the tag."
       }
     }
@@ -1711,6 +1732,18 @@
     "props": {
       "id": { "type": "string", "description": "The ID of the notice." },
       "type": { "type": "string", "description": "The type of the notice." }
+    }
+  },
+  {
+    "description": "A mail user, seen in a {@link PlayerMailMessage}.",
+    "id": [],
+    "name": "MailUser",
+    "props": {
+      "avatar": { "type": "string", "description": "The avatar of the user." },
+      "id": { "type": "string", "description": "The ID of the user." },
+      "name": { "type": "string", "description": "The name of the user." },
+      "surname": { "type": "string", "description": "The surname of the user." },
+      "type": { "type": "string", "oneOf": ["char", "puppet"], "ts": "MailCharacterType", "description": "The type of the user." }
     }
   }
 ]

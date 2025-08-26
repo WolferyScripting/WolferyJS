@@ -210,7 +210,13 @@ class Builder<T extends BuilderType = BuilderType> {
                             formatted = `${propName}: ${prop.literal}${optional ? " | null" : ""};`;
                         } else if ("oneOf" in prop && prop.oneOf && prop.type) {
                             const optional = prop.type.startsWith("?");
-                            formatted = `${propName}: ${prop.oneOf.map((v: unknown) => typeof v === "string" ? `"${v}"` : v).join(" | ")}${optional ? " | null" : ""};`;
+                            if (prop.ts || prop.const) {
+                                formatted = `${propName}: ${prop.ts || prop.const}${optional ? " | null" : ""};`;
+                                if (prop.ts) imports.add(`type:${prop.ts}`);
+                                if (prop.const) imports.add(`const:${prop.const}`);
+                            } else {
+                                formatted = `${propName}: ${prop.oneOf.map((v: unknown) => typeof v === "string" ? `"${v}"` : v).join(" | ")}${optional ? " | null" : ""};`;
+                            }
                         } else if ("ref" in prop && prop.ref) {
                             const optional = prop.ref.startsWith("?");
                             const name = optional ? prop.ref.slice(1) : prop.ref;
@@ -227,7 +233,13 @@ class Builder<T extends BuilderType = BuilderType> {
                             formatted = `${propName}: ${name}${prop.error ? " | ResError" : ""}${optional ? " | null" : ""};`;
                             imports.add(`collection:${name}`);
                         } else if ("type" in prop && prop.type) {
-                            formatted = `${propName}: ${DefToType[prop.type]};`;
+                            if (prop.ts || prop.const) {
+                                formatted = `${propName}: ${prop.ts || prop.const};`;
+                                if (prop.ts) imports.add(`type:${prop.ts}`);
+                                if (prop.const) imports.add(`const:${prop.const}`);
+                            } else {
+                                formatted = `${propName}: ${DefToType[prop.type]};`;
+                            }
                         } else {
                             throw new Error(`not sure how to handle types for ${propName} for ${resource.name} in ${this.type}`);
                         }

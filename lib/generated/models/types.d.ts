@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-empty-interface, @typescript-eslint/no-explicit-any, @typescript-eslint/member-ordering, key-spacing, unused-imports/no-unused-imports, @typescript-eslint/no-unused-vars, import/order */
+/* eslint-disable @typescript-eslint/no-empty-interface, @typescript-eslint/no-explicit-any, @typescript-eslint/member-ordering, key-spacing, unused-imports/no-unused-imports, @typescript-eslint/no-unused-vars, import/order, import-newlines/enforce */
 import type { ResError, ResRef } from "resclient-ts";
 import type RoomCharactersAwake from "../../collections/RoomCharactersAwake.js";
 import type AreaChildren from "../../models/AreaChildren.js";
@@ -34,6 +34,8 @@ import type ScriptLogs from "../../collections/ScriptLogs.js";
 import type Focus from "../../models/Focus.js";
 import type Triggers from "../../collections/Triggers.js";
 import type Identity from "../../models/Identity.js";
+import type { IdleState } from "../../util/Constants.js";
+import type { CharacterState, CharacterType, NavIcons, NavDirections, IDRoles, Roles, MailCharacterType } from "../../util/types.js";
 
 /** A partial room seen as an exit target. */
 export interface AfarRoomProperties {
@@ -130,7 +132,7 @@ export interface CharacterProperties {
     /** The unique identifier of the character. */
     id: string;
     /** The idle state of the character. */
-    idle: 0 | 1 | 2 | 3;
+    idle: IdleState;
     /** The last awake timestamp of the character. */
     lastAwake: number;
     /** The name of the character. */
@@ -142,7 +144,7 @@ export interface CharacterProperties {
     /** The species of the character. */
     species: string;
     /** The state of the character. */
-    state: "awake" | "asleep";
+    state: CharacterState;
     /** The status of the character. */
     status: string;
     /** The surname of the character. */
@@ -150,7 +152,7 @@ export interface CharacterProperties {
     /** The tags associated with the character. */
     tags: CharacterTags;
     /** The type of the character. */
-    type: "player" | "puppet";
+    type: CharacterType;
 }
 
 /** A character with extra details, seen when looking at a character. */
@@ -166,7 +168,7 @@ export interface CharacterDetailsProperties {
     /** The unique identifier of the character. */
     id: string;
     /** The idle state of the character. */
-    idle: 0 | 1 | 2 | 3;
+    idle: IdleState;
     /** The image of the character. */
     image: Image | null;
     /** The name of the character. */
@@ -174,7 +176,7 @@ export interface CharacterDetailsProperties {
     /** The species of the character. */
     species: string;
     /** The state of the character. */
-    state: "awake" | "asleep";
+    state: CharacterState;
     /** The status of the character. */
     status: string;
     /** The surname of the character. */
@@ -182,7 +184,7 @@ export interface CharacterDetailsProperties {
     /** The tags associated with the character. */
     tags: CharacterTags;
     /** The type of the character. */
-    type: "player" | "puppet";
+    type: CharacterType;
 }
 
 /** Extra info about a character. Reliability of lfrpDesc seems patchy at best. */
@@ -228,7 +230,7 @@ export interface ControlledCharacterProperties {
     /** The unique identifier of the character. */
     id: string;
     /** The idle state of the character. */
-    idle: 0 | 1 | 2 | 3;
+    idle: IdleState;
     /** The image of the character. */
     image: Image | null;
     /** The room the character is currently in. */
@@ -260,7 +262,7 @@ export interface ControlledCharacterProperties {
     /** The species of the character. */
     species: string;
     /** The state of the character. */
-    state: "awake" | "asleep";
+    state: CharacterState;
     /** The status of the character. */
     status: string;
     /** The surname of the character. */
@@ -274,13 +276,13 @@ export interface ControlledCharacterProperties {
     /** The message displayed during the character's teleportation travel. */
     teleportTravelMsg: string;
     /** The type of the character. */
-    type: "player" | "puppet";
+    type: CharacterType;
 }
 
 /** An exit. */
 export interface ExitProperties {
     /** The icon representing the exit direction. */
-    icon: "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw" | "";
+    icon: NavIcons;
     /** The unique identifier of the exit. */
     id: string;
     /** The keys associated with the exit. */
@@ -288,7 +290,7 @@ export interface ExitProperties {
     /** The name of the exit. */
     name: string;
     /** The navigation direction of the exit. */
-    nav: "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw" | "up" | "down" | "in" | "out" | "";
+    nav: NavDirections;
     /** The target room of the exit. */
     target: AfarRoom | null;
     /** The ID of the target room. */
@@ -304,7 +306,7 @@ export interface ExitDetailsProperties {
     /** Whether the exit is hidden. */
     hidden: boolean;
     /** The icon representing the exit direction. */
-    icon: "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw" | "";
+    icon: NavIcons;
     /** The unique identifier of the exit. */
     id: string;
     /** Whether the exit is inactive. */
@@ -316,7 +318,7 @@ export interface ExitDetailsProperties {
     /** The name of the exit. */
     name: string;
     /** The navigation direction of the exit. */
-    nav: "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw" | "up" | "down" | "in" | "out" | "";
+    nav: NavDirections;
     /** The target room of the exit. */
     targetRoom: Room;
     /** Whether the exit is transparent. */
@@ -435,7 +437,7 @@ export interface OwnedCharacterProperties {
     /** The unique identifier of the character. */
     id: string;
     /** The idle state of the character. */
-    idle: 0 | 1 | 2 | 3;
+    idle: IdleState;
     /** The image associated with the character. */
     image: Image | null;
     /** The room the character is currently in. */
@@ -449,13 +451,13 @@ export interface OwnedCharacterProperties {
     /** The species of the character. */
     species: string;
     /** The current state of the character. */
-    state: "awake" | "asleep";
+    state: CharacterState;
     /** The status message of the character. */
     status: string;
     /** The surname of the character. */
     surname: string;
     /** The type of character. */
-    type: "player" | "puppet";
+    type: CharacterType;
 }
 
 /** The logged in player. */
@@ -589,7 +591,7 @@ export interface RoomCharacterProperties {
     /** The unique identifier of the character. */
     id: string;
     /** The idle state of the character. */
-    idle: 0 | 1 | 2 | 3;
+    idle: IdleState;
     /** The name of the character. */
     name: string;
     /** The roleplay status of the character. */
@@ -597,13 +599,13 @@ export interface RoomCharacterProperties {
     /** The species of the character. */
     species: string;
     /** The current state of the character. */
-    state: "awake" | "asleep";
+    state: CharacterState;
     /** The status message of the character. */
     status: string;
     /** The surname of the character. */
     surname: string;
     /** The type of the character. */
-    type: "player" | "puppet";
+    type: CharacterType;
 }
 
 /** A child room of an area. */
@@ -856,11 +858,11 @@ export interface TagProperties {
     /** The unique identifier of the tag. */
     id: string;
     /** The id role of the tag. */
-    idRole: "supporter" | "pioneer" | null;
+    idRole: IDRoles | null;
     /** The key of the tag. */
     key: string;
     /** The role associated with the tag. */
-    role: "builder" | "helper" | "moderator" | "admin" | null;
+    role: Roles | null;
 }
 
 /** The tags of a character. */
@@ -1040,4 +1042,18 @@ export interface NoticeProperties {
     id: string;
     /** The type of the notice. */
     type: string;
+}
+
+/** A mail user, seen in a {@link PlayerMailMessage}. */
+export interface MailUserProperties {
+    /** The avatar of the user. */
+    avatar: string;
+    /** The ID of the user. */
+    id: string;
+    /** The name of the user. */
+    name: string;
+    /** The surname of the user. */
+    surname: string;
+    /** The type of the user. */
+    type: MailCharacterType;
 }

@@ -4,8 +4,6 @@ import User from "./models/User.js";
 import Bot from "./models/Bot.js";
 import type Player from "./models/Player.js";
 import { ErrorCodes } from "./util/Constants.js";
-import type GlobalTeleports from "./collections/GlobalTeleports.js";
-import type AwakeCharacters from "./models/AwakeCharacters.js";
 import SafeUser from "./models/SafeUser.js";
 import { waitForCached, waitForEvent, type WaitForEventOptions, type WaitForCachedOptions } from "./util/Util.js";
 import type OwnedCharacter from "./models/OwnedCharacter.js";
@@ -15,16 +13,18 @@ import registerCollections from "./generated/collections/registry.js";
 import registerModels from "./generated/models/registry.js";
 import type { Events } from "./util/events.js";
 import type Notes from "./models/Notes.js";
+import Core from "./util/Core.js";
 import {
-    ResClient,
     type ClientOptions,
     ResError,
     ResModel,
     type AnyRes,
     type AnyObject,
+    ResClient,
     ResCollection,
     type ResourceType,
-    type ItemFactory
+    type ItemFactory,
+    Properties
 } from "resclient-ts";
 import { WebSocket } from "ws";
 import { createHash, createHmac } from "node:crypto";
@@ -107,6 +107,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
     private _player!: Player | null;
     private _res!: ResClient | null;
     private _user!: U | null;
+    core!: Core;
     onUnsubscribe = this._onUnsubscribe.bind(this);
     options!: InstanceOptions;
     constructor(options: Options) {
@@ -116,54 +117,10 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         }
         options.clientOptions ??= {};
         options.clientOptions.retryOnTooActive ??= true;
-        Object.defineProperties(this, {
-            options: {
-                value: {
-                    clientOptions: {
-                        ...options.clientOptions,
-                        defaultCollectionFactory: (api, rid): ResCollection => this._missingRes("collection", api, rid, options.clientOptions?.defaultCollectionFactory),
-                        defaultErrorFactory:      (api, rid): ResError => this._missingRes("error", api, rid, options.clientOptions?.defaultErrorFactory),
-                        defaultModelFactory:      (api, rid): ResModel => this._missingRes("model", api, rid, options.clientOptions?.defaultModelFactory)
-                    },
-                    domain: options.apiDomain ?? "wolfery.com",
-                    fetch:  {
-                        charInfo:              options.fetch?.charInfo ?? false,
-                        charInfoOffline:       options.fetch?.charInfoOffline ?? false,
-                        startup:               options.fetch?.startup ?? true,
-                        trackAwake:            options.fetch?.trackAwake ?? true,
-                        trackIncomingRequests: options.fetch?.trackIncomingRequests ?? true,
-                        trackMail:             options.fetch?.trackMail ?? options.authentication.type === "password",
-                        trackNoteChanges:      options.fetch?.trackNoteChanges ?? false,
-                        trackNotes:            options.fetch?.trackNotes ?? true,
-                        trackOutgoingRequests: options.fetch?.trackOutgoingRequests ?? true,
-                        trackWatched:          options.fetch?.trackWatched ?? options.fetch?.trackAwake ?? true
-                    },
-                    pingCharacters:   options.pingCharacters ?? true,
-                    wsFactory:        options.wsFactory ?? ((client: WolferyJS): WebSocket => new WebSocket(client.wsURL, { handshakeTimeout: 5000 })),
-                    resClientFactory: options.resClientFactory ?? ((client: WolferyJS): ResClient => new ResClient(() => client.options.wsFactory(client), client.options.clientOptions))
-                } satisfies Omit<InstanceOptions, "authentication">,
-                enumerable: false,
-                writable:   true
-            },
-            _player: {
-                value:      null,
-                enumerable: false,
-                writable:   true
-            },
-            _res: {
-                value:      null,
-                enumerable: false,
-                writable:   true
-            },
-            _user: {
-                value:      null,
-                enumerable: false,
-                writable:   true
-            }
-        });
 
+        let authOptions: InstanceOptions["authentication"] | undefined;
         if (typeof options.authentication.token === "string") {
-            this.options.authentication = {
+            authOptions = {
                 type:  options.authentication.type as "bot" | "token",
                 token: options.authentication.token
             };
@@ -172,14 +129,14 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
                 const HMACKey = options.authentication.HMACKey ?? "TheStoryStartsHere";
                 const passwordHash = createHash("sha256").update(options.authentication.password).digest("base64");
                 const passwordHMAC = createHmac("sha256", HMACKey).update(options.authentication.password).digest("base64");
-                this.options.authentication = {
+                authOptions = {
                     type:     "password",
                     hash:     passwordHash,
                     hmac:     passwordHMAC,
                     username: options.authentication.username
                 };
             } else if (typeof options.authentication.passwordHash === "string" && typeof options.authentication.passwordHMAC === "string") {
-                this.options.authentication = {
+                authOptions = {
                     type:     "password",
                     hash:     options.authentication.passwordHash,
                     hmac:     options.authentication.passwordHMAC,
@@ -188,9 +145,42 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             }
         }
 
-        if (this.options.authentication === undefined) {
-            throw new Error("Missing or invalid authentication.");
-        }
+        if (authOptions === undefined) throw new TypeError("Missing or invalid authentication.");
+
+
+        const instanceOptions = {
+            authentication: authOptions,
+            clientOptions:  {
+                ...options.clientOptions,
+                defaultCollectionFactory: (api, rid): ResCollection => this._missingRes("collection", api, rid, options.clientOptions?.defaultCollectionFactory),
+                defaultErrorFactory:      (api, rid): ResError => this._missingRes("error", api, rid, options.clientOptions?.defaultErrorFactory),
+                defaultModelFactory:      (api, rid): ResModel => this._missingRes("model", api, rid, options.clientOptions?.defaultModelFactory)
+            },
+            domain: options.apiDomain ?? "wolfery.com",
+            fetch:  {
+                charInfo:              options.fetch?.charInfo ?? false,
+                charInfoOffline:       options.fetch?.charInfoOffline ?? false,
+                startup:               options.fetch?.startup ?? true,
+                trackAwake:            options.fetch?.trackAwake ?? true,
+                trackIncomingRequests: options.fetch?.trackIncomingRequests ?? true,
+                trackMail:             options.fetch?.trackMail ?? options.authentication.type === "password",
+                trackNoteChanges:      options.fetch?.trackNoteChanges ?? false,
+                trackNotes:            options.fetch?.trackNotes ?? true,
+                trackOutgoingRequests: options.fetch?.trackOutgoingRequests ?? true,
+                trackWatched:          options.fetch?.trackWatched ?? options.fetch?.trackAwake ?? true
+            },
+            pingCharacters:   options.pingCharacters ?? true,
+            wsFactory:        options.wsFactory ?? ((client: WolferyJS): WebSocket => new WebSocket(client.wsURL, { handshakeTimeout: 5000 })),
+            resClientFactory: options.resClientFactory ?? ((client: WolferyJS): ResClient => new ResClient(() => client.options.wsFactory(client), client.options.clientOptions))
+        } satisfies InstanceOptions;
+
+        Properties.of(this)
+            .writable("_res", null)
+            .writable("_player", null)
+            .writable("_user", null)
+            .readOnly("core", new Core(this))
+            .readOnly("onUnsubscribe")
+            .readOnly("options", instanceOptions);
     }
 
     private async _afterAuthenticate(type: "password" | "token" | "bot"): Promise<void> {
@@ -201,7 +191,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             }
 
             if (type === "password") {
-                const player = await this.getPlayer();
+                const player = await this.core.getPlayer();
                 if (this.options.fetch.trackAwake) {
                     promises.push(this.api.subscribe(ResourceIDs.WATCHES({ id: player.id }), true), this.api.subscribe(ResourceIDs.NOTES({ id: player.id }), true));
                 }
@@ -239,7 +229,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             token: this.options.authentication.token
         })
             .then(async() => {
-                const user = await this.api.call<Bot>("core", "getBot");
+                const user = await this.core.getBot();
                 await this._afterAuthenticate("bot");
                 return { user };
             })
@@ -257,15 +247,15 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             hash: this.options.authentication.hmac
         })
             .then(async() => {
-                const user = await this.api.call<User>("auth", "getUser");
-                const player = await this.api.call<Player>("core", "getPlayer");
+                const user = await this.core.getFullUser();
+                const player = await this.core.getPlayer();
                 await this._afterAuthenticate("password");
                 return { user, player };
             })
             .catch(this._handleError.bind(this));
     }
 
-    private async _authenticateToken(): Promise<{ user: User; }> {
+    private async _authenticateToken(): Promise<{ user: SafeUser; }> {
         if (this.options.authentication.type !== "token") {
             throw new Error("Invalid authentication type");
         }
@@ -274,7 +264,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             token: this.options.authentication.token
         })
             .then(async() => {
-                const user = await this.api.call<User>("auth", "getUser");
+                const user = await this.core.getTokenUser();
                 await this._afterAuthenticate("token");
                 return { user };
             })
@@ -438,10 +428,6 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         return results;
     }
 
-    async getAwakeCharacters(): Promise<AwakeCharacters> {
-        return this.api.get<AwakeCharacters>(ResourceIDs.AWAKE_CHARACTERS);
-    }
-
     async getCharacterInRoom(roomId: string): Promise<ControlledCharacter | null> {
         if (this.isBot()) {
             if (this._user?.char.inRoom.id === roomId) return this._user.controlled;
@@ -453,7 +439,6 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
     }
 
     async getCharacterInRoomExit(exitId: string): Promise<ControlledCharacter | null> {
-        console.log(exitId);
         if (this.isBot()) {
             if (this._user?.controlled?.inRoom.exits.find(e => e.id === exitId)) return this._user.controlled;
         } else if (this.isPlayer()) {
@@ -462,25 +447,6 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             if (char) return char;
         }
         return null;
-    }
-
-    async getGlobalTeleports(): Promise<GlobalTeleports> {
-        return this.api.get<GlobalTeleports>(ResourceIDs.NODES);
-    }
-
-    async getPlayer(): Promise<Player> {
-        this._ensureRes(this._res);
-        return (this._player ??= await this.api.call<Player>("core", "getPlayer"));
-    }
-
-    async getRoles(): Promise<Record<"roles" | "idRoles", Array<string> | null>> {
-        this._ensureRes(this._res);
-        return this.api.call<Record<"roles" | "idRoles", Array<string> | null>>("core", "getRoles");
-    }
-
-    async getUser(): Promise<U> {
-        this._ensureRes(this._res);
-        return (this._user ??= await this.api.call<U>("auth", "getUser"));
     }
 
     /** If the authentication used was for a {@link Bot}. */
@@ -537,7 +503,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             throw new Error("don't know how to wakeup a character with a token user");
         }
 
-        return this.getPlayer().then(player => player.controlChar(char.id, true)
+        return this.core.getPlayer().then(player => player.controlChar(char.id, true)
             .then(ctrl => ((ctrl.wakeup(hidden, true), ctrl))));
     }
 }

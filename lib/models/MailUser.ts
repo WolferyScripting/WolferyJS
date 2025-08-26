@@ -1,20 +1,19 @@
 import NonResModel from "./NonResModel.js";
-import Definition from "../util/Definition.js";
 import type WolferyJS from "../WolferyJS.js";
-import type { ResClient } from "resclient-ts";
+import { MailUserDefinition } from "../generated/models/definitions.js";
+import type { MailUserProperties } from "../generated/models/types.js";
+import type { AnyObject, ResClient } from "resclient-ts";
 
-const DEFINITION = Definition.new()
-    .add("avatar", "string")
-    .add("id", "string")
-    .add("name", "string")
-    .add("surname", "string")
-    .add<"type", "string", "char">("type", "string");
-export type MailUserProperties = (typeof DEFINITION)["type"];
 
 declare interface MailUser extends NonResModel, MailUserProperties {}
+// do not edit the first line of the class comment
+/**
+ * A mail user, seen in a {@link PlayerMailMessage}.
+ * This is not a real RES model. It has been made into a model for convinience.
+ */
 class MailUser extends NonResModel implements MailUserProperties {
     constructor(client: WolferyJS, api: ResClient, data: MailUserProperties) {
-        super(client, api, data, { definition: DEFINITION.get() });
+        super(client, api, data as unknown as AnyObject, { definition: MailUserDefinition });
     }
 
     get avatarURL(): string | null {

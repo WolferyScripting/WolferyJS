@@ -33,6 +33,20 @@ class Character extends BaseModel implements CharacterProperties {
         }
     }
 
+    protected override async _listen(on: boolean): Promise<void> {
+        await super._listen(on);
+        const m = on ? "resourceOn" : "resourceOff";
+        this[m]("change", this.onChange);
+        if (on) {
+            if (this.client.options.fetch.charInfo && (this.awake || this.client.options.fetch.charInfoOffline)) {
+                this._info = await this.getInfo();
+                this._info.keep();
+            }
+        } else {
+            this._info?.unkeep();
+        }
+    }
+
     get avatarURL(): string | null {
         return this.avatar === "" ? null : `${this.client.fileURL}/core/char/avatar/${this.avatar}`;
     }
@@ -82,20 +96,6 @@ class Character extends BaseModel implements CharacterProperties {
         return ctrl.lead(this.id);
     }
 
-    protected override async _listen(on: boolean): Promise<void> {
-        await super._listen(on);
-        const m = on ? "resourceOn" : "resourceOff";
-        this[m]("change", this.onChange);
-        if (on) {
-            if (this.client.options.fetch.charInfo && (this.awake || this.client.options.fetch.charInfoOffline)) {
-                this._info = await this.getInfo();
-                this._info.keep();
-            }
-        } else {
-            this._info?.unkeep();
-        }
-    }
-
     /**
      * Look at this character.
      * @param ctrl The controlled character to look at this character.
@@ -124,7 +124,7 @@ class Character extends BaseModel implements CharacterProperties {
 
     /** Mute this character. */
     async mute(): Promise<null> {
-        return this.client.getPlayer().then(player => player.muteChar(this.id));
+        return this.client.core.getPlayer().then(player => player.muteChar(this.id));
     }
 
     /**
@@ -154,7 +154,7 @@ class Character extends BaseModel implements CharacterProperties {
 
     /** Unmute this character. */
     async unmute(): Promise<null> {
-        return this.client.getPlayer().then(player => player.unmuteChar(this.id));
+        return this.client.core.getPlayer().then(player => player.unmuteChar(this.id));
     }
 
     /**

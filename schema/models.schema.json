@@ -104,6 +104,12 @@
                           }
                         ]
                       },
+                      "ts": {
+                        "type": "string"
+                      },
+                      "const": {
+                        "type": "string"
+                      },
                       "oneOf": {
                         "type": "array",
                         "items": {}
@@ -176,6 +182,12 @@
                         "type": "string"
                       },
                       "literal": {
+                        "type": "string"
+                      },
+                      "ts": {
+                        "type": "string"
+                      },
+                      "const": {
                         "type": "string"
                       },
                       "type": {

@@ -602,3 +602,11 @@ export const NoticeDefinition: Record<string, PropertyDefinition> = {
     id: { type: "string" },
     type: { type: "string" }
 };
+
+export const MailUserDefinition: Record<string, PropertyDefinition> = {
+    avatar: { type: "string" },
+    id: { type: "string" },
+    name: { type: "string" },
+    surname: { type: "string" },
+    type: { type: "string" }
+};

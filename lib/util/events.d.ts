@@ -1,5 +1,5 @@
-import type { IdleStatus } from "./Constants.js";
-import { type AnyMessageEvent } from "./types.js";
+import type { IdleState } from "./Constants.js";
+import type { Messages } from "./types.js";
 import type Bot from "../models/Bot.js";
 import type ControlledCharacter from "../models/ControlledCharacter.js";
 import type Player from "../models/Player.js";
@@ -101,7 +101,7 @@ export interface CharacterEvents {
     "characterTags.add": [char: Character, tag: Tag, pref: TagPref];
     "characterTags.remove": [char: Character, tag: Tag, pref: TagPref];
     /** Emitted when a character's idle status changes. */
-    "idleStatusChange": [char: Character, status: IdleStatus, oldStatus: IdleStatus];
+    "idleStatusChange": [char: Character, status: IdleState, oldStatus: IdleState];
 }
 
 export interface PlayerEvents {
@@ -161,3 +161,24 @@ export interface ClientEvents {
 }
 
 export type Events = ClientEvents & MiscEvents & CharacterEvents & OwnedCharacterEvents & ControlledCharacterEvents & PlayerEvents & UserEvents;
+
+
+export type BaseMessageEvent<T extends Messages.MessageTypes> = [type: T, sent: boolean, to: ControlledCharacter];
+export type WakeupMessageEvent = [...BaseMessageEvent<"wakeup">, from: Character, msg: string, method: string];
+export type SleepMessageEvent = [...BaseMessageEvent<"sleep">, from: Character, msg: string, method: string];
+export type TravelMessageEvent = [...BaseMessageEvent<"travel">, from: Character, msg: string, targetRoom: Messages.Travel["targetRoom"], method: string];
+export type SayMessageEvent = [...BaseMessageEvent<"say">, from: Character, msg: string];
+export type PoseMessageEvent = [...BaseMessageEvent<"pose">, from: Character, msg: string];
+export type OOCMessageEvent = [...BaseMessageEvent<"ooc">, from: Character, msg: string, pose: boolean];
+export type AddressMessageEvent = [...BaseMessageEvent<"address">, from: Character, msg: string, target: Character, pose: boolean, ooc: boolean];
+export type WhisperMessageEvent = [...BaseMessageEvent<"whisper">, from: Character, msg: string, target: Character, pose: boolean, ooc: boolean];
+export type MailMessageEvent = [...BaseMessageEvent<"mail">, from: Character, msg: string, target: Character, pose: boolean, ooc: boolean];
+export type MessageMessageEvent = [...BaseMessageEvent<"message">, from: Character, msg: string, target: Character, pose: boolean, ooc: boolean];
+export type ActionMessageEvent = [...BaseMessageEvent<"action">, from: Character, msg: string];
+export type DescribeMessageEvent = [...BaseMessageEvent<"describe">, from: Character, msg: string];
+export type PrivateDescribeMessageEvent = [...BaseMessageEvent<"privateDescribe">, msg: string, target: Character, script: string];
+export type InfoMessageEvent = [...BaseMessageEvent<"info">, msg: string];
+export type RollMessageEvent = [...BaseMessageEvent<"roll">, from: Character, total: number, result: Messages.Roll["result"], quiet: boolean];
+export type LeaveMessageEvent = [...BaseMessageEvent<"leave">, from: Character, msg: string, method: string];
+export type ArriveMessageEvent = [...BaseMessageEvent<"arrive">, from: Character, msg: string, method: string];
+export type AnyMessageEvent = WakeupMessageEvent | SleepMessageEvent | TravelMessageEvent | SayMessageEvent | PoseMessageEvent | OOCMessageEvent | AddressMessageEvent | WhisperMessageEvent | MailMessageEvent | MessageMessageEvent | ActionMessageEvent | DescribeMessageEvent | PrivateDescribeMessageEvent | InfoMessageEvent | RollMessageEvent | LeaveMessageEvent | ArriveMessageEvent;

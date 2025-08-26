@@ -44,7 +44,7 @@ class OwnedCharacter extends BaseModel implements OwnedCharacterProperties {
      * @param options The settings to apply.
      */
     async setSettings(options: Omit<Commands.Player.SetCharSettingsOptions, "puppeteerId">): Promise<null> {
-        return this.client.getPlayer().then(player => player.setCharSettings(this.id, options));
+        return this.client.core.getPlayer().then(player => player.setCharSettings(this.id, options));
     }
 
     /**
@@ -53,7 +53,7 @@ class OwnedCharacter extends BaseModel implements OwnedCharacterProperties {
      * @returns The controlled character.
      */
     async wakeup(hidden?: boolean): Promise<ControlledCharacter> {
-        return this.client.getPlayer().then(player =>
+        return this.client.core.getPlayer().then(player =>
             player.controlChar(this.id, true).then(ctrl => ((ctrl.wakeup(hidden, true), ctrl)))
         );
     }

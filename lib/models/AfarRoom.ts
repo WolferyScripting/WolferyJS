@@ -4,7 +4,6 @@ import type { AfarRoomProperties } from "../generated/models/types.js";
 import { AfarRoomDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
-
 declare interface AfarRoom extends BaseModel, AfarRoomProperties {}
 // do not edit the first line of the class comment
 /**

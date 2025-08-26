@@ -1,7 +1,7 @@
 import BaseModel from "./BaseModel.js";
-import MailUser, { type MailUserProperties } from "./MailUser.js";
+import MailUser from "./MailUser.js";
 import type WolferyJS from "../WolferyJS.js";
-import type { PlayerMailMessageProperties } from "../generated/models/types.js";
+import type { MailUserProperties, PlayerMailMessageProperties } from "../generated/models/types.js";
 import { PlayerMailMessageDefinition } from "../generated/models/definitions.js";
 import type { AnyObject, ResClient } from "resclient-ts";
 

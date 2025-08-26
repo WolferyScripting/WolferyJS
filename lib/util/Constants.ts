@@ -1,12 +1,9 @@
-export enum IdleStatus {
+export enum IdleState {
     ASLEEP = 0,
     ACTIVE = 1,
     IDLE = 2,
     AWAY = 3,
 }
-
-export type CharacterState = "asleep" | "awake";
-export type CharacterType = "player" | "puppet";
 
 export enum ErrorCodes {
     // System

@@ -64,3 +64,4 @@ export { default as ReportInfo } from "../../models/ReportInfo.js";
 export { default as SupportInfo } from "../../models/SupportInfo.js";
 export { default as WebClientInfo } from "../../models/WebClientInfo.js";
 export { default as Notice } from "../../models/Notice.js";
+export { default as MailUser } from "../../models/MailUser.js";

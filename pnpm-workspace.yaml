@@ -1,2 +1,5 @@
 onlyBuiltDependencies:
   - '@swc/core'
+
+overrides:
+  resclient-ts: link:../resclient-ts

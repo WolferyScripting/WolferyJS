@@ -76,19 +76,28 @@ function idsToResources<T extends "collection" | "model">(ids: Array<string>, na
     return resources;
 }
 
-export function pathTo(name: string, type: "model" | "collection", ext = "js"): string {
-    if (type === "model") {
-        return `../lib/models/${name}.${ext}`;
-    } else if (type === "collection") {
-        return `../lib/collections/${name}.${ext}`;
+export function pathTo(name: string, type: "model" | "collection" | "type" | "const", ext = "js"): string {
+    switch (type) {
+        case "model": return `../lib/models/${name}.${ext}`;
+        case "collection": return `../lib/collections/${name}.${ext}`;
+        case "type": return `../lib/util/types.${ext}`;
+        case "const": return `../lib/util/Constants.${ext}`;
+        default: {
+            throw new Error(`Unknown import type: ${String(type)}`);
+        }
     }
-    throw new Error(`Unknown import type: ${String(type)}`);
 }
 
 export function formatImports(imports: Array<string>, from: string, types: boolean): string {
-    return imports.map(imp => {
+    const typeImports = imports.filter(imp => imp.startsWith("type:")).map(imp => imp.split(":")[1]).join(", ");
+    const constImports = imports.filter(imp => imp.startsWith("const:")).map(imp => imp.split(":")[1]).join(", ");
+    const otherImports = imports.filter(imp => !imp.startsWith("type:") && !imp.startsWith("const:")).map(imp => {
         const [type, name] = imp.split(":") as ["model" | "collection", string];
         const r = relative(from, resolve(fileURLToPath(new URL(pathTo(name, type), import.meta.url))));
         return `import${types ? " type" : ""} ${name} from "${r}";`;
     }).join("\n");
+    let final = otherImports;
+    if (constImports) final += `\nimport ${types ? "type " : ""}{ ${constImports} } from "${relative(from, resolve(fileURLToPath(new URL(pathTo("", "const"), import.meta.url))))}";`;
+    if (typeImports) final += `\nimport type { ${typeImports} } from "${relative(from, resolve(fileURLToPath(new URL(pathTo("", "type"), import.meta.url))))}";`;
+    return final;
 }
