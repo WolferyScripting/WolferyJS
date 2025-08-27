@@ -3,6 +3,7 @@ import ResourceIDs from "../generated/ResourceIDs.js";
 import type Room from "../models/Room.js";
 import type WolferyJS from "../WolferyJS.js";
 import { toID } from "../util/Util.js";
+import type Character from "../models/Character.js";
 import type OwnedCharacter from "../models/OwnedCharacter.js";
 import type { ResClient, CollectionAddRemove } from "resclient-ts";
 
@@ -20,12 +21,16 @@ export default class OwnedRooms extends BaseCollection<Room> {
 
     private async _onAdd(data: CollectionAddRemove<Room>): Promise<void> {
         const char = await this.getChar();
-        this.client.emit("ownedRooms.add", char, data.item);
+        const ownedChar = await this.getOwnedChar();
+        if (ownedChar) this.client.emit("ownedRooms.add", ownedChar, data.item);
+        this.client.emit("rooms.add", char, data.item);
     }
 
     private async _onRemove(data: CollectionAddRemove<Room>): Promise<void> {
         const char = await this.getChar();
-        this.client.emit("ownedRooms.remove", char, data.item);
+        const ownedChar = await this.getOwnedChar();
+        if (ownedChar) this.client.emit("ownedRooms.remove", ownedChar, data.item);
+        this.client.emit("rooms.remove", char, data.item);
     }
 
     protected override async _listen(on: boolean): Promise<void> {
@@ -35,8 +40,14 @@ export default class OwnedRooms extends BaseCollection<Room> {
         this[m]("remove", this.onRemove);
     }
 
-    async getChar(): Promise<OwnedCharacter> {
+    async getChar(): Promise<Character> {
         const charId = ResourceIDs.OWNED_ROOMS.parts(this.rid).id;
+        return this.api.get<Character>(ResourceIDs.CHARACTER({ id: charId }));
+    }
+
+    async getOwnedChar(): Promise<OwnedCharacter | null> {
+        const charId = ResourceIDs.OWNED_ROOMS.parts(this.rid).id;
+        if (!await this.client.isCharacterOursControlled(charId)) return null;
         return this.api.get<OwnedCharacter>(ResourceIDs.OWNED_CHARACTER({ id: charId }));
     }
 }

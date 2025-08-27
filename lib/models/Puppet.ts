@@ -26,7 +26,7 @@ class Puppet extends BaseModel implements PuppetProperties {
      * @param options The settings to apply.
      */
     async setSettings(options: Omit<Commands.Player.SetCharSettingsOptions, "puppeteerId">): Promise<null> {
-        return this.client.core.getPlayer().then(player => player.setCharSettings(this.id, { puppeteerId: this.char.id, ...options }));
+        return this.client.modules.core.getPlayer().then(player => player.setCharSettings(this.id, { puppeteerId: this.char.id, ...options }));
     }
 
     /**
@@ -35,7 +35,7 @@ class Puppet extends BaseModel implements PuppetProperties {
      * @returns The controlled puppet.
      */
     async wakeup(hidden?: boolean): Promise<ControlledCharacter> {
-        return this.client.core.getPlayer().then(player => player.controlPuppet(this.char.id, this.id, true)).then(ctrl => ((ctrl.wakeup(hidden, true), ctrl)));
+        return this.client.modules.core.getPlayer().then(player => player.controlPuppet(this.char.id, this.id, true)).then(ctrl => ((ctrl.wakeup(hidden, true), ctrl)));
     }
 }
 

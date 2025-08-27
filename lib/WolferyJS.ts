@@ -3,7 +3,7 @@ import TypedEmitter from "./util/TypedEmitter.js";
 import User from "./models/User.js";
 import BotUser from "./models/BotUser.js";
 import type Player from "./models/Player.js";
-import { ErrorCodes } from "./util/Constants.js";
+import { ErrorCodes, PublicPepper } from "./util/Constants.js";
 import TokenUser from "./models/TokenUser.js";
 import { waitForCached, waitForEvent, type WaitForEventOptions, type WaitForCachedOptions } from "./util/Util.js";
 import type OwnedCharacter from "./models/OwnedCharacter.js";
@@ -13,7 +13,7 @@ import registerCollections from "./generated/collections/registry.js";
 import registerModels from "./generated/models/registry.js";
 import type { Events } from "./util/events.js";
 import type Notes from "./models/Notes.js";
-import Core from "./util/Core.js";
+import Modules from "./modules/Modules.js";
 import {
     type ClientOptions,
     ResError,
@@ -113,7 +113,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
     private _player!: Player | null;
     private _res!: ResClient | null;
     private _user!: U | null;
-    core!: Core;
+    modules!: Modules;
     onUnsubscribe = this._onUnsubscribe.bind(this);
     options!: InstanceOptions;
     constructor(options: Options) {
@@ -132,7 +132,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             };
         } else if (typeof options.authentication.username === "string") {
             if (typeof options.authentication.password === "string") {
-                const HMACKey = options.authentication.HMACKey ?? "TheStoryStartsHere";
+                const HMACKey = options.authentication.HMACKey ?? PublicPepper;
                 const passwordHash = createHash("sha256").update(options.authentication.password).digest("base64");
                 const passwordHMAC = createHmac("sha256", HMACKey).update(options.authentication.password).digest("base64");
                 authOptions = {
@@ -186,7 +186,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             .writable("_res", null)
             .writable("_player", null)
             .writable("_user", null)
-            .readOnly("core", new Core(this))
+            .readOnly("modules", new Modules(this))
             .readOnly("onUnsubscribe")
             .readOnly("options", instanceOptions);
     }
@@ -199,7 +199,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             }
 
             if (type === "password") {
-                const player = await this.core.getPlayer();
+                const player = await this.modules.core.getPlayer();
                 if (this.options.fetch.trackAwake) {
                     promises.push(this.api.subscribe(ResourceIDs.WATCHES({ id: player.id }), true));
                 }
@@ -243,7 +243,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             token: this.options.authentication.token
         })
             .then(async() => {
-                const user = await this.core.getBotUser();
+                const user = await this.modules.core.getBotUser();
                 await this._afterAuthenticate("bot");
                 return { user };
             })
@@ -261,8 +261,8 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             hash: this.options.authentication.hmac
         })
             .then(async() => {
-                const user = await this.core.getFullUser();
-                const player = await this.core.getPlayer();
+                const user = await this.modules.core.getFullUser();
+                const player = await this.modules.core.getPlayer();
                 await this._afterAuthenticate("password");
                 return { user, player };
             })
@@ -278,7 +278,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             token: this.options.authentication.token
         })
             .then(async() => {
-                const user = await this.core.getTokenUser();
+                const user = await this.modules.core.getTokenUser();
                 await this._afterAuthenticate("token");
                 return { user };
             })
@@ -457,9 +457,24 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         return (this._user && this._user instanceof BotUser) ?? false;
     }
 
+    async isCharacterOurs(charId: string): Promise<boolean> {
+        const player = await this.modules.core.getPlayer();
+        return player.chars.hasKey(charId);
+    }
+
+    async isCharacterOursControlled(charId: string): Promise<boolean> {
+        const player = await this.modules.core.getPlayer();
+        return player.controlled.hasKey(charId);
+    }
+
     /** If the authentication used was for a {@link User} and {@link Player}. */
     isPlayer(): this is WolferyJS<User> {
         return this.isUser() && this._player !== null;
+    }
+
+    async isPlayerUs(playerId: string): Promise<boolean> {
+        const player = await this.modules.core.getPlayer();
+        return player.id === playerId;
     }
 
     /** If the authentication used was for a {@link TokenUser}. */
@@ -506,7 +521,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             throw new Error("don't know how to wakeup a character with a token user");
         }
 
-        return this.core.getPlayer().then(player => player.controlChar(char.id, true)
+        return this.modules.core.getPlayer().then(player => player.controlChar(char.id, true)
             .then(ctrl => ((ctrl.wakeup(hidden, true), ctrl))));
     }
 }

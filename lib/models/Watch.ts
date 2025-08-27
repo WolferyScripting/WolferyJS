@@ -17,12 +17,12 @@ class Watch extends BaseModel implements WatchProperties {
     }
 
     async getWatchedBy(): Promise<Array<OwnedCharacter>> {
-        return this.client.core.getPlayer().then(player => this.watchers.map(id => player.chars.getOrThrow(id)));
+        return this.client.modules.core.getPlayer().then(player => this.watchers.map(id => player.chars.getOrThrow(id)));
     }
 
     // @TODO
     async unwatch(): Promise<void> {
-        // return this.client.core.getPlayer().then(player => {});
+        // return this.client.modules.core.getPlayer().then(player => {});
     }
 }
 

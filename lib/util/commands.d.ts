@@ -1,4 +1,6 @@
 import type { Messages, NavDirections, NavIcons } from "./types.js";
+import { type RealmConfig } from "../modules/Admin.ts";
+import { type RealmConfigOverseer } from "../modules/Overseer.ts";
 
 declare namespace Commands {
     export interface LogEvents {
@@ -221,6 +223,8 @@ declare namespace Commands {
             dnd?: boolean;
             /** The message shown when DND is enabled. */
             dndMsg?: string;
+            /** Only usable by staff. */
+            ishelping?: boolean;
             /** The description shown when LFRP is enabled. */
             lfrpDesc?: string;
             /** If the character should be notified on all events. This is used for `@all` in `focus` & `unfocus`. */
@@ -291,6 +295,55 @@ declare namespace Commands {
     export namespace Identity {
         export interface SetOptions {
             allowNewsletter?: boolean;
+        }
+    }
+    export namespace Moderator {
+        export interface SetPlayerOptions {
+            trusted?: boolean;
+        }
+    }
+    export namespace Admin {
+        export interface CreateGlobalTagOptions {
+            desc?: string | null;
+            group?: string | null;
+            key: string;
+        }
+        export interface CreateTagGroupOptions {
+            key: string;
+            name?: string;
+            order?: number;
+        }
+        export interface SetCharOptions {
+            about?: string;
+            desc?: string;
+            gender?: string;
+            name?: string;
+            species?: string;
+            surname?: string;
+        }
+        export type SetConfigOptions = Partial<RealmConfig>;
+        export interface SetGlobalTagOptions {
+            desc?: string;
+            group?: string;
+            key?: string;
+            parentId?: string;
+        }
+        export interface SetTagGroupOptions {
+            name?: string;
+            order?: number;
+        }
+    }
+    export namespace Overseer {
+        export interface CreateUserLoginOptions {
+            password: string;
+            username: string;
+        }
+        export type SetConfigOptions = Partial<RealmConfigOverseer>;
+        export interface SetUserOptions {
+            email?: string;
+            emailVerified?: boolean;
+            name?: string;
+            username?: string;
         }
     }
 }

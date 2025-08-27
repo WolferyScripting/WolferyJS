@@ -18,7 +18,7 @@ class Request extends BaseModel implements RequestProperties {
 
     private async _onChange(data: Partial<RequestProperties>): Promise<void> {
         if (data.state !== undefined && this.state !== "pending") {
-            const incoming = await this.client.core.getPlayer().then(p => p.chars.some(c => c.id === this.to.id));
+            const incoming = await this.client.modules.core.getPlayer().then(p => p.chars.some(c => c.id === this.to.id));
             this.client.emit(`requests.${incoming ? "incoming" : "outgoing"}.${this.state}`, this);
         }
     }
@@ -31,17 +31,17 @@ class Request extends BaseModel implements RequestProperties {
 
     /** Accept this request. */
     async accept(): Promise<null> {
-        return this.client.core.getPlayer().then(player => player.acceptRequest(this.id));
+        return this.client.modules.core.getPlayer().then(player => player.acceptRequest(this.id));
     }
 
     /** Reject this request. */
     async reject(): Promise<null> {
-        return this.client.core.getPlayer().then(player => player.rejectRequest(this.id));
+        return this.client.modules.core.getPlayer().then(player => player.rejectRequest(this.id));
     }
 
     /** Revoke this request. */
     async revoke(): Promise<null> {
-        return this.client.core.getPlayer().then(player => player.revokeRequest(this.id));
+        return this.client.modules.core.getPlayer().then(player => player.revokeRequest(this.id));
     }
 }
 

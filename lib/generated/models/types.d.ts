@@ -36,7 +36,7 @@ import type Focus from "../../models/Focus.js";
 import type Triggers from "../../collections/Triggers.js";
 import type Identity from "../../models/Identity.js";
 import type { IdleState } from "../../util/Constants.js";
-import type { CharacterState, CharacterType, NavIcons, NavDirections, IDRoles, Roles, MailCharacterType } from "../../util/types.js";
+import type { CharacterState, CharacterType, NavIcons, NavDirections, Titles, Roles, MailCharacterType } from "../../util/types.js";
 
 /** A partial room seen as an exit target. */
 export interface AfarRoomProperties {
@@ -800,7 +800,7 @@ export interface TokenUserProperties {
     id: string;
     /** The roles assigned to the user. @TODO only seen null */
     roles: any;
-    /** The trust of the user. @TODO never seen a non-empty value */
+    /** The trust of the user. String containing `T`, `V`, `B` (none, one, or multiple) - [source](https://github.com/mucklet/mucklet-client/blob/8a0bc7c8e6b8e56c731ba0229116cfbfc1eae824/src/client/modules/moderator/moderatorCommands/inspect/Inspect.js#L19-L23) */
     trust: string;
 }
 
@@ -863,7 +863,7 @@ export interface TagProperties {
     /** The unique identifier of the tag. */
     id: string;
     /** The id role of the tag. */
-    idRole: IDRoles | null;
+    idRole: Titles | null;
     /** The key of the tag. */
     key: string;
     /** The role associated with the tag. */
@@ -886,7 +886,7 @@ export interface UserProperties {
     identity: Identity;
     /** The roles assigned to the user. @TODO only seen null */
     roles: any;
-    /** The trust of the user. @TODO never seen a non-empty value */
+    /** The trust of the user. String containing `T`, `V`, `B` (none, one, or multiple, no separator) - [source](https://github.com/mucklet/mucklet-client/blob/8a0bc7c8e6b8e56c731ba0229116cfbfc1eae824/src/client/modules/moderator/moderatorCommands/inspect/Inspect.js#L19-L23) */
     trust: string;
 }
 

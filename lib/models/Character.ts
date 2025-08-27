@@ -125,7 +125,7 @@ class Character extends BaseModel implements CharacterProperties {
 
     /** Mute this character. */
     async mute(): Promise<null> {
-        return this.client.core.getPlayer().then(player => player.muteChar(this.id));
+        return this.client.modules.core.getPlayer().then(player => player.muteChar(this.id));
     }
 
     /**
@@ -155,17 +155,17 @@ class Character extends BaseModel implements CharacterProperties {
 
     /** Unmute this character. */
     async unmute(): Promise<null> {
-        return this.client.core.getPlayer().then(player => player.unmuteChar(this.id));
+        return this.client.modules.core.getPlayer().then(player => player.unmuteChar(this.id));
     }
 
     /** Remove this character from your watch list. */
     async unwatch(): Promise<Character> {
-        return this.client.core.getPlayer().then(player => player.unwatchChar(this.id));
+        return this.client.modules.core.getPlayer().then(player => player.unwatchChar(this.id));
     }
 
     /** Add this character to your watch list. */
     async watch(): Promise<Character> {
-        return this.client.core.getPlayer().then(player => player.watchChar(this.id));
+        return this.client.modules.core.getPlayer().then(player => player.watchChar(this.id));
     }
 
     /**

@@ -1,3 +1,4 @@
+import Base from "./Base.js";
 import type GlobalTeleports from "../collections/GlobalTeleports.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
 import type AwakeCharacters from "../models/AwakeCharacters.js";
@@ -14,8 +15,6 @@ import type TagInfo from "../models/TagInfo.js";
 import type Tags from "../models/Tags.js";
 import type User from "../models/User.js";
 import type WebClientInfo from "../models/WebClientInfo.js";
-import type WolferyJS from "../WolferyJS.js";
-import { Properties } from "resclient-ts";
 
 export interface Info {
     core: CoreInfo;
@@ -28,12 +27,7 @@ export interface Info {
 }
 
 /** Core classes/calls that don't require any id input */
-export default class Core {
-    client!: WolferyJS;
-    constructor(client: WolferyJS) {
-        Properties.of(this).readOnly("client", client);
-    }
-
+export default class Core extends Base {
     async getAwakeCharacters(): Promise<AwakeCharacters> {
         return this.client.api.get<AwakeCharacters>(ResourceIDs.AWAKE_CHARACTERS);
     }

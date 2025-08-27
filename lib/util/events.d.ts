@@ -105,6 +105,10 @@ export interface CharacterEvents {
     "characterTags.remove": [char: Character, tag: Tag, pref: TagPref];
     /** Emitted when a character's idle status changes. */
     "idleStatusChange": [char: Character, status: IdleState, oldStatus: IdleState];
+    "areas.add": [char: Character, area: Area];
+    "areas.remove": [char: Character, area: Area];
+    "rooms.add": [char: Character, area: Area];
+    "rooms.remove": [char: Character, area: Area];
 }
 
 export interface PlayerEvents {

@@ -44,7 +44,7 @@ class Inbox extends BaseCollection<PlayerMailMessage> {
      * @param options The options for the mail.
      */
     async send(fromCharId: string, toCharId: string, options: Commands.Inbox.SendOptions): Promise<Character> {
-        return this.client.core.getPlayer().then(player =>
+        return this.client.modules.core.getPlayer().then(player =>
             this.call<BasicCharacterResponse<"toChar">>("send", { toCharId, fromCharId, ...options })
                 .then(r => player.basicChar(r, "toChar"))
         );

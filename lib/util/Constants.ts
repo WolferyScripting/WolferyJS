@@ -49,3 +49,4 @@ export enum ErrorCodes {
 }
 
 export const PING_DURATION = 1000 * 60 * 15;
+export const PublicPepper = "TheStoryStartsHere";

@@ -2,6 +2,7 @@ import BaseCollection from "./BaseCollection.js";
 import type OwnedCharacter from "../models/OwnedCharacter.js";
 import type WolferyJS from "../WolferyJS.js";
 import { toID } from "../util/Util.js";
+import ResourceIDs from "../generated/ResourceIDs.js";
 import type { ResClient, CollectionAddRemove } from "resclient-ts";
 
 // do not edit the first line of the class comment
@@ -26,6 +27,8 @@ export default class OwnedCharacters extends BaseCollection<OwnedCharacter> {
 
     protected override async _listen(on: boolean): Promise<void> {
         await super._listen(on);
+        const playerId = ResourceIDs.OWNED_CHARACTERS.parts(this.rid).id;
+        if (!await this.client.isPlayerUs(playerId)) return;
         const m = on ? "resourceOn" : "resourceOff";
         this[m]("add", this.onAdd);
         this[m]("remove", this.onRemove);

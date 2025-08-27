@@ -41,7 +41,7 @@ class Note extends BaseModel implements NoteProperties {
      * @param text The text to append to the note.
      */
     async appendText(text: string): Promise<Character> {
-        return this.client.core.getPlayer().then(player => player.appendNote(this.id, text));
+        return this.client.modules.core.getPlayer().then(player => player.appendNote(this.id, text));
     }
 
     /**
@@ -65,7 +65,7 @@ class Note extends BaseModel implements NoteProperties {
      * @param text The text to set the note to. Provide an empty string to clear.
      */
     async setText(text: string): Promise<Character| null> {
-        return this.client.core.getPlayer().then(player => player.setNote(this.id, text));
+        return this.client.modules.core.getPlayer().then(player => player.setNote(this.id, text));
     }
 }
 

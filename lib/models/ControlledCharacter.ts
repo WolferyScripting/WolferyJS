@@ -452,7 +452,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param messageId The ID of the message to delete.
      */
     async deleteMail(messageId: string): Promise<null> {
-        return this.client.core.getPlayer().then(player =>
+        return this.client.modules.core.getPlayer().then(player =>
             this.api.call<null>(ResourceIDs.PLAYER_MAIL_MESSAGE({ player: player.id, message: messageId }), "delete")
         );
     }
@@ -560,7 +560,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @returns The focused character.
      */
     async focusChar(targetId: string, options: Omit<Commands.Player.FocusCharOptions, "targetId">): Promise<Character> {
-        return this.client.core.getPlayer().then(player =>
+        return this.client.modules.core.getPlayer().then(player =>
             player.focusChar(this.id, { targetId, ...options })
         );
     }
@@ -649,7 +649,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      */
     async lfrp(msg?: string): Promise<null> {
         if (msg) {
-            await this.client.core.getPlayer().then(player => player.setCharSettings(this.id, { lfrpDesc: msg }));
+            await this.client.modules.core.getPlayer().then(player => player.setCharSettings(this.id, { lfrpDesc: msg }));
         }
 
         return this.call<null>("set", { rp: "lfrp" });
@@ -670,7 +670,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param options The options for the mail.
      */
     async mail(toCharId: string, options: Commands.Inbox.SendOptions): Promise<Character> {
-        return this.client.core.getPlayer().then(player => player.getInbox()).then(inbox => inbox.send(this.id, toCharId, options));
+        return this.client.modules.core.getPlayer().then(player => player.getInbox()).then(inbox => inbox.send(this.id, toCharId, options));
     }
 
     /**
@@ -715,7 +715,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * Mark a mail message as read. You must be using the username/password authentication method to use this.
      */
     async readMail(message: string): Promise<null> {
-        return this.client.core.getPlayer().then(player =>
+        return this.client.modules.core.getPlayer().then(player =>
             this.api.call<null>(ResourceIDs.PLAYER_MAIL_MESSAGE({ player: player.id, message }), "read")
         );
     }

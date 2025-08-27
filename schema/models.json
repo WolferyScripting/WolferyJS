@@ -1432,7 +1432,7 @@
       },
       "trust": {
         "type": "string",
-        "description": "The trust of the user. @TODO never seen a non-empty value"
+        "description": "The trust of the user. String containing `T`, `V`, `B` (none, one, or multiple) - [source](https://github.com/mucklet/mucklet-client/blob/8a0bc7c8e6b8e56c731ba0229116cfbfc1eae824/src/client/modules/moderator/moderatorCommands/inspect/Inspect.js#L19-L23)"
       }
     }
   },
@@ -1526,7 +1526,7 @@
       "idRole": {
         "type": "?string",
         "oneOf": ["supporter", "pioneer"],
-        "ts": "IDRoles",
+        "ts": "Titles",
         "description": "The id role of the tag."
       },
       "key": { "type": "string", "description": "The key of the tag." },
@@ -1571,7 +1571,7 @@
       },
       "trust": {
         "type": "string",
-        "description": "The trust of the user. @TODO never seen a non-empty value"
+        "description": "The trust of the user. String containing `T`, `V`, `B` (none, one, or multiple, no separator) - [source](https://github.com/mucklet/mucklet-client/blob/8a0bc7c8e6b8e56c731ba0229116cfbfc1eae824/src/client/modules/moderator/moderatorCommands/inspect/Inspect.js#L19-L23)"
       },
       "identity": {
         "model": "Identity",

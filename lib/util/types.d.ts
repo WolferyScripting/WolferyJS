@@ -18,9 +18,19 @@ export interface TokenAuthentication {
     type: "token";
 }
 
+export interface KeyNameResponse {
+    key: string;
+    name: string;
+}
 export type BasicCharacterResponse<K extends string> = Record<K, NameBasicResponse & {
     surname: string;
 }>;
+
+export type OptionalBasicCharacterResponse<K extends string> = {
+    [T in K]?: NameBasicResponse & {
+        surname: string;
+    }
+};
 
 export interface DeleteNameResponse extends NameBasicResponse {
     deleted: number;
@@ -164,7 +174,7 @@ export namespace Messages {
 export type NavDirections = "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw" | "";
 export type NavIcons = NavDirections | "up" | "down" | "in" | "out";
 export type Roles = "builder" | "helper" | "moderator" | "admin";
-export type IDRoles = "supporter" | "pioneer";
+export type Titles = "supporter" | "pioneer" | "overseer";
 export type CharacterType = "player" | "puppet";
 export type MailCharacterType = "char" | "puppet";
 export type CharacterState = "awake" | "asleep";

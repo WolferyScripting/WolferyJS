@@ -6,7 +6,7 @@ import type Watches from "./Watches.js";
 import type Notes from "./Notes.js";
 import type UnreadMail from "./UnreadMail.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
-import type { BasicCharacterResponse, LookupCharacter } from "../util/types.js";
+import type { BasicCharacterResponse, LookupCharacter, OptionalBasicCharacterResponse } from "../util/types.js";
 import type WolferyJS from "../WolferyJS.js";
 import type Commands from "../util/commands.js";
 import type Inbox from "../collections/Inbox.js";
@@ -57,9 +57,9 @@ class Player extends BaseModel implements PlayerProperties {
      * @internal
      */
     async basicChar<K extends string>(data: BasicCharacterResponse<K>, key: K): Promise<Character>;
-    async basicChar<K extends string>(data: BasicCharacterResponse<K> | null, key: K): Promise<Character | null>;
-    async basicChar<K extends string>(data: BasicCharacterResponse<K> | null, key: K): Promise<Character | null> {
-        if (!data) return null;
+    async basicChar<K extends string>(data: BasicCharacterResponse<K> | OptionalBasicCharacterResponse<K> | null | undefined, key: K): Promise<Character | null>;
+    async basicChar<K extends string>(data: BasicCharacterResponse<K> | OptionalBasicCharacterResponse<K> | null | undefined, key: K): Promise<Character | null> {
+        if (!data || !data[key]) return null;
         return this.getChar(data[key].id);
     }
 
