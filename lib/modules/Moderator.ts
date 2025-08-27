@@ -1,24 +1,8 @@
 import Base from "./Base.js";
-import type { BasicCharacterResponse, OptionalBasicCharacterResponse } from "../util/types.js";
+import type { BasicCharacterResponse, CharacterInspection, RawCharacterInspection } from "../util/types.js";
 import type Character from "../models/Character.js";
 import type Commands from "../util/commands.js";
 import type ControlledCharacter from "../models/ControlledCharacter.js";
-
-interface RawCharacterInspection extends BasicCharacterResponse<"char"> {
-    banMatches: Array<OptionalBasicCharacterResponse<"char"> & { banReason: string; banned: number; }>;
-    banned: number | null;
-    charCreated: number;
-    playerJoined: number;
-    trust: string;
-}
-export interface CharacterInspection {
-    banMatches: Array<{ banReason: string; banned: number; char: Character | null; }>;
-    banned: number | null;
-    char: Character;
-    charCreated: number;
-    playerJoined: number;
-    trust: Record<"trusted" | "npn" | "bannedIP", boolean>;
-}
 
 export default class Moderator extends Base {
     private _formatTrust(trust: string): Record<"trusted" | "npn" | "bannedIP", boolean> {

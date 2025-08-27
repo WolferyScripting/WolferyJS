@@ -2,31 +2,31 @@ import type { Writeable } from "../util/types.js";
 
 /* eslint-disable @typescript-eslint/no-namespace, @typescript-eslint/explicit-function-return-type*/
 namespace ResourceIDs {
-    function arg<Name extends string>(name: Name): Arg<Name> {
+    export function arg<Name extends string>(name: Name): Arg<Name> {
         return { __arg__: name } as Arg<Name>;
     }
 
-    interface Arg<Name extends string> {
+    export interface Arg<Name extends string> {
         __arg__: Name;
     }
 
-    type ExtractArgs<T extends ReadonlyArray<unknown>> =
+    export type ExtractArgs<T extends ReadonlyArray<unknown>> =
     T[number] extends Arg<infer Name> ? Name : never;
 
-    type ArgObject<T extends ReadonlyArray<unknown>> =
+    export type ArgObject<T extends ReadonlyArray<unknown>> =
     ExtractArgs<T> extends infer U
         ? [U] extends [never]
             ? unknown
             : { [K in U & string]: string }
         : never;
 
-    interface RIDFunction<Parts extends ReadonlyArray<unknown>> {
+    export interface RIDFunction<Parts extends ReadonlyArray<unknown>> {
         (args: ArgObject<Parts>): string;
         get regex(): RegExp;
         parts(value: string): ArgObject<Parts>;
     }
 
-    function f<Parts extends ReadonlyArray<unknown>>(
+    export function f<Parts extends ReadonlyArray<unknown>>(
         strings: TemplateStringsArray,
         ...exprs: Parts
     ): RIDFunction<Parts> {
@@ -63,7 +63,7 @@ namespace ResourceIDs {
         return match.groups as T extends RIDFunction<infer Parts> ? ArgObject<Parts> : never;
     }
 
-    const id = arg("id");
+    export const id = arg("id");
     const char = arg("char");
     const puppet = arg("puppet");
     const room = arg("room");
@@ -175,7 +175,6 @@ namespace ResourceIDs {
     export const TOKENS = f`auth.user.${id}.tokens`;
 
     export const ROLLER = f`roller.char.${id}`;
-    export const LOG_EVENTS = "log.events";
 }
 /* eslint-enable @typescript-eslint/no-namespace, @typescript-eslint/explicit-function-return-type*/
 

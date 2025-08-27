@@ -1,0 +1,27 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "WolferyJS",
+  "entryPoints": ["../lib"],
+  "plugin": [
+    "typedoc-plugin-extras",
+    "typedoc-plugin-mdn-links",
+    "typedoc-plugin-rename-defaults",
+    "@mxssfd/typedoc-theme",
+    "./dark.cjs"
+  ],
+  "tsconfig": "../tsconfig.build.json",
+  "entryPointStrategy": "expand",
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "categorizeByGroup": true,
+  "githubPages": false,
+  "hideGenerator": true,
+  "gitRemote": "origin",
+  "readme": "../README.md",
+  "out": "../docs",
+  "json": "../docs/docs.json",
+  "exclude": [],
+  "favicon": "./favicon.ico",
+  "titleLink": "https://wolferyjs.furry.cool",
+  "kindSortOrder": ["Class", "Namespace"]
+}

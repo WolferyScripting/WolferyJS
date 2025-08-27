@@ -48,7 +48,6 @@ class CharacterTags extends BaseCollectionModel<Tag> {
 
     /**
      * Add a tag to the character.
-     * @command `add tag`
      * @param tag The tag to add.
      * @param type The type, `like` or `dislike`.
      */
@@ -70,7 +69,6 @@ class CharacterTags extends BaseCollectionModel<Tag> {
 
     /**
      * Remove a tag from the character.
-     * @command `remove tag`
      * @param tag The tag to remove.
      */
     async remove(tag: string): Promise<null> {

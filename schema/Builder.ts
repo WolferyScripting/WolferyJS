@@ -15,6 +15,7 @@ import { isDeepStrictEqual } from "node:util";
 import type { PathLike } from "node:fs";
 
 const exists = (path: PathLike): Promise<boolean> => access(path).then(() => true, () => false);
+// const ucwords = (str: string): string => str.replaceAll(/\b\w/g, c => c.toUpperCase());
 const tsconfig = parseTSConfigJSON(JSON.parse(await readFile(new URL("../tsconfig.json", import.meta.url), "utf8")))!;
 const tsconfigBase = resolve(fileURLToPath(new URL("..", import.meta.url)), tsconfig.compilerOptions!.baseUrl!);
 const writeFileWithAliases = async(path: string, data: string): Promise<void> => {
@@ -202,9 +203,9 @@ class Builder<T extends BuilderType = BuilderType> {
 
         for (const resource of this.data.schema) {
             if ("collection" in resource && resource.collection || (!("props" in resource) || Object.keys(resource.props).length === 0)) {
-                types.push(`/** ${resource.description} */`, `export interface ${resource.name}Properties {}`, "");
+                types.push("/**", ` * ${resource.description}`, " */", `export interface ${resource.name}Properties {}`, "");
             } else {
-                types.push(`/** ${resource.description} */`, `export interface ${resource.name}Properties {`);
+                types.push("/**", ` * ${resource.description}`, " */", `export interface ${resource.name}Properties {`);
                 if ("props" in resource && resource.props) {
                     const properties: Array<string> = [], comments: Record<string, string> = {};
                     let formatted: string;

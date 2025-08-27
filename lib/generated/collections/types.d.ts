@@ -1,63 +1,104 @@
+/* =module */
 /* eslint-disable @typescript-eslint/no-empty-interface, @typescript-eslint/no-explicit-any, @typescript-eslint/member-ordering, key-spacing, unused-imports/no-unused-imports, @typescript-eslint/no-unused-vars, import/order, import-newlines/enforce */
 import type { ResError, ResRef } from "resclient-ts";
 
 
-/** The teleport nodes a character has. */
+/**
+ * The teleport nodes a character has.
+ */
 export interface CharacterNodesProperties {}
 
-/** The controlled characters. */
+/**
+ * The controlled characters.
+ */
 export interface ControlledCharactersProperties {}
 
-/** The exits in a room. */
+/**
+ * The exits in a room.
+ */
 export interface ExitsProperties {}
 
-/** The global teleport nodes. */
+/**
+ * The global teleport nodes.
+ */
 export interface GlobalTeleportsProperties {}
 
-/** The player's mail inbox. */
+/**
+ * The player's mail inbox.
+ */
 export interface InboxProperties {}
 
-/** The incoming requests for the player. */
+/**
+ * The incoming requests for the player.
+ */
 export interface IncomingRequestsProperties {}
 
-/** The outgoing requests for the player. */
+/**
+ * The outgoing requests for the player.
+ */
 export interface OutgoingRequestsProperties {}
 
-/** The areas owned by a character. */
+/**
+ * The areas owned by a character.
+ */
 export interface OwnedAreasProperties {}
 
-/** The characters owned by the player. */
+/**
+ * The characters owned by the player.
+ */
 export interface OwnedCharactersProperties {}
 
-/** The rooms owned by a character. */
+/**
+ * The rooms owned by a character.
+ */
 export interface OwnedRoomsProperties {}
 
-/** The profiles for a character. */
+/**
+ * The profiles for a character.
+ */
 export interface ProfilesProperties {}
 
-/** The puppets that the player can control. */
+/**
+ * The puppets that the player can control.
+ */
 export interface PuppetsProperties {}
 
-/** The characters in a room. */
+/**
+ * The characters in a room.
+ */
 export interface RoomCharactersProperties {}
 
-/** The awake characters in a room. */
+/**
+ * The awake characters in a room.
+ */
 export interface RoomCharactersAwakeProperties {}
 
-/** The profiles in a room. */
+/**
+ * The profiles in a room.
+ */
 export interface RoomProfilesProperties {}
 
-/** The scripts in a room. */
+/**
+ * The scripts in a room.
+ */
 export interface RoomScriptsProperties {}
 
-/** The logs for a room script. */
+/**
+ * The logs for a room script.
+ */
 export interface ScriptLogsProperties {}
 
-/** The triggers for a character or puppet. */
+/**
+ * The triggers for a character or puppet.
+ */
 export interface TriggersProperties {}
 
-/** The notices for the logged in user. */
+/**
+ * The notices for the logged in user.
+ */
 export interface NoticesProperties {}
 
-/** The authenticated user's management tokens. */
+/**
+ * The authenticated user's management tokens.
+ */
 export interface TokensProperties {}

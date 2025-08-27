@@ -1,45 +1,20 @@
 import Base from "./Base.js";
-import { type RealmConfigOverseer } from "./Overseer.js";
 import type Commands from "../util/commands.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
 import type Tag from "../models/Tag.js";
 import type TagGroup from "../models/TagGroup.js";
 import type ControlledCharacter from "../models/ControlledCharacter.js";
-import { type BasicCharacterResponse, type Roles, type KeyNameResponse, type NameBasicResponse } from "../util/types.js";
+import {
+    type BasicCharacterResponse,
+    type Roles,
+    type KeyNameResponse,
+    type NameBasicResponse,
+    type RealmConfigOverseer
+} from "../util/types.js";
 import type Room from "../models/Room.js";
 import type OwnedCharacters from "../collections/OwnedCharacters.js";
 import type Character from "../models/Character.js";
 
-export interface MoveMessages {
-    arriveMsg: string;
-    leaveMsg: string;
-    travelMsg: string;
-}
-export interface RealmConfig {
-    about: string;
-    arrivalMsg: string;
-    arrivalRoom: unknown;
-    dazedMsg: string;
-    defaultDoNotDisturbMsg: string;
-    defaultHome: unknown;
-    deleteCharMsg: string;
-    exitTimeoutMsg: string;
-    fallAsleepMsg: string;
-    genre: string;
-    greeting: string;
-    notAPuppetMsg: string;
-    puppetControlledByOtherMsg: string;
-    quietMsg: string;
-    recoverFromDazeMsg: string;
-    rules: string;
-    subgenre: string;
-    summon: MoveMessages;
-    sweepMsg: string;
-    teleport: MoveMessages;
-    teleportHome: MoveMessages;
-    title: string;
-    wakeUpMsg: string;
-}
 export default class Admin extends Base {
     /**
      * Add a role to a player.

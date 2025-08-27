@@ -318,7 +318,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
 
     /**
      * Add a tag to this character.
-     * @param tagID The ID of the tag to add.
+     * @param tagId The ID of the tag to add.
      * @param pref The preference for the tag.
      */
     async addTag(tagId: string, pref: "like" | "dislike"): Promise<null> {
@@ -593,7 +593,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
     }
 
     async getLogEvents(startTime?: number): Promise<Commands.LogEvents> {
-        return this.api.call<Commands.LogEvents>(ResourceIDs.LOG_EVENTS, "get", { charId: this.id, startTime });
+        return this.api.call<Commands.LogEvents>("log.events", "get", { charId: this.id, startTime });
     }
 
     /**
@@ -758,7 +758,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
 
     /**
      * Remove a tag from this character.
-     * @param tagID The ID of the tag to remove.
+     * @param tagId The ID of the tag to remove.
      */
     async removeTag(tagId: string): Promise<null> {
         return this.tags.remove(tagId);

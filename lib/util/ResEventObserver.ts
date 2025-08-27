@@ -2,13 +2,13 @@ import { Debug } from "./Debug.js";
 import type WolferyJS from "../WolferyJS.js";
 import type { AnyObject } from "resclient-ts";
 
-interface ResEventObserverOptions<T = AnyObject> {
+export interface ResEventObserverOptions<T = AnyObject> {
     once?: boolean;
     callback?(this: void, data: T): void;
     filter?(this: void, data: T): boolean;
 }
 
-class ResEventObserver<T = AnyObject> {
+export default class ResEventObserver<T = AnyObject> {
     private callback?: (this: void, data: T) => void;
     private client!: WolferyJS;
     private filter?: (this: void, data: T) => boolean;
@@ -110,5 +110,3 @@ class ResEventObserver<T = AnyObject> {
         return promise;
     }
 }
-
-export default ResEventObserver;

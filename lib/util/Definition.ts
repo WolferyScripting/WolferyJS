@@ -3,7 +3,7 @@ import { type ResModel, type PropertyDefinition, ResCollection, ResRef } from "r
 import assert from "node:assert";
 import { format } from "node:util";
 
-interface DefinitionTypeMap {
+export interface DefinitionTypeMap {
     "?array": Array<unknown> | null;
     "?array[number]": Array<number> | null;
     "?array[string]": Array<string> | null;

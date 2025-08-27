@@ -3,4 +3,5 @@
 /local
 /coverage
 /.vscode
+/docs
 *.tgz

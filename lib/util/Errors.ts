@@ -1,5 +1,3 @@
-/** @module Errors */
-
 /** An error that is thrown when we encounter an error, and no `error` listeners are present. */
 export class UncaughtError extends Error {
     override name = "UncaughtError";

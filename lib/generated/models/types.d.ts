@@ -1,3 +1,4 @@
+/* =module */
 /* eslint-disable @typescript-eslint/no-empty-interface, @typescript-eslint/no-explicit-any, @typescript-eslint/member-ordering, key-spacing, unused-imports/no-unused-imports, @typescript-eslint/no-unused-vars, import/order, import-newlines/enforce */
 import type { ResError, ResRef } from "resclient-ts";
 import type RoomCharactersAwake from "../../collections/RoomCharactersAwake.js";
@@ -38,7 +39,9 @@ import type Identity from "../../models/Identity.js";
 import type { IdleState } from "../../util/Constants.js";
 import type { CharacterState, CharacterType, NavIcons, NavDirections, Titles, Roles, MailCharacterType } from "../../util/types.js";
 
-/** A partial room seen as an exit target. */
+/**
+ * A partial room seen as an exit target.
+ */
 export interface AfarRoomProperties {
     /** The characters in the room that are awake. */
     awake: RoomCharactersAwake | null;
@@ -48,7 +51,9 @@ export interface AfarRoomProperties {
     name: string;
 }
 
-/** An area. */
+/**
+ * An area.
+ */
 export interface AreaProperties {
     /** The unique identifier of the area. */
     id: string;
@@ -56,7 +61,9 @@ export interface AreaProperties {
     name: string;
 }
 
-/** A child of an area. */
+/**
+ * A child of an area.
+ */
 export interface AreaChildProperties {
     /** The unique identifier of the area child. */
     id: string;
@@ -74,10 +81,14 @@ export interface AreaChildProperties {
     type: "area";
 }
 
-/** The child areas of an area. */
+/**
+ * The child areas of an area.
+ */
 export interface AreaChildrenProperties {}
 
-/** A detailed area, seen by a controlled character. */
+/**
+ * A detailed area, seen by a controlled character.
+ */
 export interface AreaDetailsProperties {
     /** The about of the area. */
     about: string;
@@ -109,10 +120,14 @@ export interface AreaDetailsProperties {
     shortDesc: string;
 }
 
-/** The awake characters in the realm. */
+/**
+ * The awake characters in the realm.
+ */
 export interface AwakeCharactersProperties {}
 
-/** The user when logged in with a bot token. */
+/**
+ * The user when logged in with a bot token.
+ */
 export interface BotUserProperties {
     /** The owned character of the bot. */
     char: OwnedCharacter;
@@ -120,7 +135,9 @@ export interface BotUserProperties {
     controlled: ControlledCharacter | null;
 }
 
-/** A character */
+/**
+ * A character
+ */
 export interface CharacterProperties {
     /** The avatar of the character. */
     avatar: string;
@@ -156,7 +173,9 @@ export interface CharacterProperties {
     type: CharacterType;
 }
 
-/** A character with extra details, seen when looking at a character. */
+/**
+ * A character with extra details, seen when looking at a character.
+ */
 export interface CharacterDetailsProperties {
     /** About the character. */
     about: string;
@@ -188,7 +207,9 @@ export interface CharacterDetailsProperties {
     type: CharacterType;
 }
 
-/** Extra info about a character. Reliability of lfrpDesc seems patchy at best. */
+/**
+ * Extra info about a character. Reliability of lfrpDesc seems patchy at best.
+ */
 export interface CharacterInfoProperties {
     /** About the character. */
     about: string;
@@ -196,7 +217,9 @@ export interface CharacterInfoProperties {
     lfrpDesc: string;
 }
 
-/** A minimal character, seen in the list of muted and focused characters. */
+/**
+ * A minimal character, seen in the list of muted and focused characters.
+ */
 export interface CharacterMinProperties {
     /** The avatar of the character. */
     avatar: string;
@@ -212,7 +235,9 @@ export interface CharacterMinProperties {
     surname: string;
 }
 
-/** A controlled character. */
+/**
+ * A controlled character.
+ */
 export interface ControlledCharacterProperties {
     /** About the character. */
     about: string;
@@ -280,7 +305,9 @@ export interface ControlledCharacterProperties {
     type: CharacterType;
 }
 
-/** An exit. */
+/**
+ * An exit.
+ */
 export interface ExitProperties {
     /** The icon representing the exit direction. */
     icon: NavIcons;
@@ -298,7 +325,9 @@ export interface ExitProperties {
     targetId: string;
 }
 
-/** A detailed exit. */
+/**
+ * A detailed exit.
+ */
 export interface ExitDetailsProperties {
     /** The message seen by the target room. */
     arriveMsg: string;
@@ -328,13 +357,19 @@ export interface ExitDetailsProperties {
     travelMsg: string;
 }
 
-/** The focus options for a character. */
+/**
+ * The focus options for a character.
+ */
 export interface FocusProperties {}
 
-/** The characters being focused on. */
+/**
+ * The characters being focused on.
+ */
 export interface FocusCharsProperties {}
 
-/** The logged in player's identity. */
+/**
+ * The logged in player's identity.
+ */
 export interface IdentityProperties {
     /** Whether the user allows newsletters. */
     allowNewsletter: boolean;
@@ -360,7 +395,9 @@ export interface IdentityProperties {
     username: string;
 }
 
-/** An image. */
+/**
+ * An image.
+ */
 export interface ImageProperties {
     /** The filename of the image. */
     filename: string;
@@ -378,7 +415,9 @@ export interface ImageProperties {
     width: number;
 }
 
-/** The character being looked at. */
+/**
+ * The character being looked at.
+ */
 export interface LookAtProperties {
     /** The character being looked at, if they are still in the room. */
     char: CharacterDetails | null;
@@ -388,10 +427,14 @@ export interface LookAtProperties {
     unseen: Character | null;
 }
 
-/** The characters looking at an owned character. */
+/**
+ * The characters looking at an owned character.
+ */
 export interface LookedAtProperties {}
 
-/** A mail message. */
+/**
+ * A mail message.
+ */
 export interface MailMessageProperties {
     /** Out of character message flag. */
     ooc: boolean;
@@ -401,10 +444,14 @@ export interface MailMessageProperties {
     text: string;
 }
 
-/** The characters that are muted. */
+/**
+ * The characters that are muted.
+ */
 export interface MutedCharactersProperties {}
 
-/** A teleportation node. */
+/**
+ * A teleportation node.
+ */
 export interface NodeProperties {
     /** The unique identifier of the node. */
     id: string;
@@ -414,7 +461,9 @@ export interface NodeProperties {
     room: Room;
 }
 
-/** A note on a character. */
+/**
+ * A note on a character.
+ */
 export interface NoteProperties {
     /** The character this note is about. */
     char: ResRef<Character>;
@@ -422,10 +471,14 @@ export interface NoteProperties {
     text: string;
 }
 
-/** All notes. */
+/**
+ * All notes.
+ */
 export interface NotesProperties {}
 
-/** An owned character. */
+/**
+ * An owned character.
+ */
 export interface OwnedCharacterProperties {
     /** The avatar unique identifier. */
     avatar: string;
@@ -461,7 +514,9 @@ export interface OwnedCharacterProperties {
     type: CharacterType;
 }
 
-/** The logged in player. */
+/**
+ * The logged in player.
+ */
 export interface PlayerProperties {
     /** The characters owned by the player. */
     chars: OwnedCharacters;
@@ -487,7 +542,9 @@ export interface PlayerProperties {
     puppets: Puppets;
 }
 
-/** A mail message. */
+/**
+ * A mail message.
+ */
 export interface PlayerMailMessageProperties {
     /** The sender of the mail. */
     from: object;
@@ -501,7 +558,9 @@ export interface PlayerMailMessageProperties {
     to: object;
 }
 
-/** A character profile. */
+/**
+ * A character profile.
+ */
 export interface ProfileProperties {
     /** The unique identifier of the avatar image. */
     avatar: string;
@@ -521,7 +580,9 @@ export interface ProfileProperties {
     species: string;
 }
 
-/** A puppet. */
+/**
+ * A puppet.
+ */
 export interface PuppetProperties {
     /** The character that has registered the puppet. */
     char: OwnedCharacter;
@@ -535,7 +596,9 @@ export interface PuppetProperties {
     settings: Settings;
 }
 
-/** The info for a puppet. */
+/**
+ * The info for a puppet.
+ */
 export interface PuppetInfoProperties {
     /** The bounding area of the puppet. @TODO unknown, only seen null */
     boundingArea: any;
@@ -543,7 +606,9 @@ export interface PuppetInfoProperties {
     howToPlay: string;
 }
 
-/** A request for changing ownership of areas and rooms, creating exits, etc. */
+/**
+ * A request for changing ownership of areas and rooms, creating exits, etc.
+ */
 export interface RequestProperties {
     /** The timestamp when the request was answered. */
     answered: number | null;
@@ -567,7 +632,9 @@ export interface RequestProperties {
     type: string;
 }
 
-/** The parameters for a request. */
+/**
+ * The parameters for a request.
+ */
 export interface RequestParamsProperties {
     /** The area related to the request. */
     area: Area | ResError | null;
@@ -577,7 +644,9 @@ export interface RequestParamsProperties {
     room: Room | ResError | null;
 }
 
-/** A room. */
+/**
+ * A room.
+ */
 export interface RoomProperties {
     /** The unique identifier of the room. */
     id: string;
@@ -585,7 +654,9 @@ export interface RoomProperties {
     name: string;
 }
 
-/** A character in the current room. */
+/**
+ * A character in the current room.
+ */
 export interface RoomCharacterProperties {
     /** The unique identifier of the character's avatar image. */
     avatar: string;
@@ -613,7 +684,9 @@ export interface RoomCharacterProperties {
     type: CharacterType;
 }
 
-/** A child room of an area. */
+/**
+ * A child room of an area.
+ */
 export interface RoomChildProperties {
     /** The unique identifier of the child room. */
     id: string;
@@ -629,7 +702,9 @@ export interface RoomChildProperties {
     type: "room" | "instanceRoom";
 }
 
-/** A command in a room. */
+/**
+ * A command in a room.
+ */
 export interface RoomCommandProperties {
     /** The command object. */
     cmd: Record<"pattern" | "desc", string>;
@@ -639,10 +714,14 @@ export interface RoomCommandProperties {
     priority: number;
 }
 
-/** The commands in a room. */
+/**
+ * The commands in a room.
+ */
 export interface RoomCommandsProperties {}
 
-/** A detailed view of a room. */
+/**
+ * A detailed view of a room.
+ */
 export interface RoomDetailsProperties {
     /** The area this room belongs to. */
     area: AreaDetails | null;
@@ -688,7 +767,9 @@ export interface RoomDetailsProperties {
     private: boolean;
 }
 
-/** A detailed view of a room instance. */
+/**
+ * A detailed view of a room instance.
+ */
 export interface RoomInstanceDetailsProperties {
     /** The area this room belongs to. */
     area: AreaDetails | null;
@@ -736,7 +817,9 @@ export interface RoomInstanceDetailsProperties {
     private: boolean;
 }
 
-/** A profile of a room. */
+/**
+ * A profile of a room.
+ */
 export interface RoomProfileProperties {
     /** The unique identifier of the profile. */
     id: string;
@@ -750,7 +833,9 @@ export interface RoomProfileProperties {
     name: string;
 }
 
-/** A room script. */
+/**
+ * A room script.
+ */
 export interface RoomScriptProperties {
     /** Whether the script is active. */
     active: boolean;
@@ -766,7 +851,9 @@ export interface RoomScriptProperties {
     version: string;
 }
 
-/** A detailed room script. */
+/**
+ * A detailed room script.
+ */
 export interface RoomScriptDetailsProperties {
     /** Whether the script is active. */
     active: boolean;
@@ -792,7 +879,9 @@ export interface RoomScriptDetailsProperties {
     version: string;
 }
 
-/** The user when logged in with a management token. */
+/**
+ * The user when logged in with a management token.
+ */
 export interface TokenUserProperties {
     /** The time the user was created. */
     created: number;
@@ -804,7 +893,9 @@ export interface TokenUserProperties {
     trust: string;
 }
 
-/** The binary for a room script. */
+/**
+ * The binary for a room script.
+ */
 export interface ScriptBinaryProperties {
     /** The name of the file. */
     filename: string;
@@ -818,7 +909,9 @@ export interface ScriptBinaryProperties {
     size: number;
 }
 
-/** A log for a room script. */
+/**
+ * A log for a room script.
+ */
 export interface ScriptLogProperties {
     /** The unique identifier of the log. */
     id: string;
@@ -830,7 +923,9 @@ export interface ScriptLogProperties {
     time: number;
 }
 
-/** The settings for a character or puppet. */
+/**
+ * The settings for a character or puppet.
+ */
 export interface SettingsProperties {
     /** Do Not Disturb status. */
     dnd: boolean;
@@ -852,7 +947,9 @@ export interface SettingsProperties {
     triggers: Triggers;
 }
 
-/** A tag. */
+/**
+ * A tag.
+ */
 export interface TagProperties {
     /** Whether the tag is custom. */
     custom: boolean;
@@ -870,13 +967,19 @@ export interface TagProperties {
     role: Roles | null;
 }
 
-/** The tags of a character. */
+/**
+ * The tags of a character.
+ */
 export interface CharacterTagsProperties {}
 
-/** Unread mail. */
+/**
+ * Unread mail.
+ */
 export interface UnreadMailProperties {}
 
-/** The user when logging in with username/password. */
+/**
+ * The user when logging in with username/password.
+ */
 export interface UserProperties {
     /** The time the user was created. */
     created: number;
@@ -890,7 +993,9 @@ export interface UserProperties {
     trust: string;
 }
 
-/** A watched character. */
+/**
+ * A watched character.
+ */
 export interface WatchProperties {
     /** The character being watched. */
     char: Character;
@@ -900,13 +1005,19 @@ export interface WatchProperties {
     watchers: Array<string>;
 }
 
-/** Watched characters. */
+/**
+ * Watched characters.
+ */
 export interface WatchesProperties {}
 
-/** The globally available tags. */
+/**
+ * The globally available tags.
+ */
 export interface TagsProperties {}
 
-/** A tag group. */
+/**
+ * A tag group.
+ */
 export interface TagGroupProperties {
     /** The key of the tag group. */
     key: string;
@@ -916,10 +1027,14 @@ export interface TagGroupProperties {
     order: number;
 }
 
-/** The tag groups. */
+/**
+ * The tag groups.
+ */
 export interface TagGroupsProperties {}
 
-/** The core info about the realm. */
+/**
+ * The core info about the realm.
+ */
 export interface CoreInfoProperties {
     /** Information about the core realm. */
     about: string;
@@ -997,7 +1112,9 @@ export interface CoreInfoProperties {
     version: string;
 }
 
-/** The tag info. */
+/**
+ * The tag info.
+ */
 export interface TagInfoProperties {
     /** The maximum number of tags a character can have. */
     charTagsLimit: number;
@@ -1011,37 +1128,49 @@ export interface TagInfoProperties {
     tagKeyMaxLength: number;
 }
 
-/** The mail info. */
+/**
+ * The mail info.
+ */
 export interface MailInfoProperties {
     /** The maximum length of a mail. */
     mailMaxLength: number;
 }
 
-/** The note info. */
+/**
+ * The note info.
+ */
 export interface NoteInfoProperties {
     /** The maximum length of a note. */
     noteMaxLength: number;
 }
 
-/** The report info. */
+/**
+ * The report info.
+ */
 export interface ReportInfoProperties {
     /** The maximum length of a report. */
     reportMsgMaxLength: number;
 }
 
-/** The support info. */
+/**
+ * The support info.
+ */
 export interface SupportInfoProperties {
     /** The maximum length of a ticket. */
     ticketMsgMaxLength: number;
 }
 
-/** The web client info. */
+/**
+ * The web client info.
+ */
 export interface WebClientInfoProperties {
     /** The version of the web client. */
     version: string;
 }
 
-/** A notice. @TODO Have not been able to inspect a notice, so the rid and full properties are not known */
+/**
+ * A notice. @TODO Have not been able to inspect a notice, so the rid and full properties are not known
+ */
 export interface NoticeProperties {
     /** The ID of the notice. */
     id: string;
@@ -1049,7 +1178,9 @@ export interface NoticeProperties {
     type: string;
 }
 
-/** A mail user, seen in a {@link PlayerMailMessage}. */
+/**
+ * A mail user, seen in a {@link models/PlayerMailMessage}.
+ */
 export interface MailUserProperties {
     /** The avatar of the user. */
     avatar: string;
@@ -1063,7 +1194,9 @@ export interface MailUserProperties {
     type: MailCharacterType;
 }
 
-/** A management token. */
+/**
+ * A management token.
+ */
 export interface TokenProperties {
     /** The creation timestamp of the token. */
     created: number;
@@ -1075,7 +1208,9 @@ export interface TokenProperties {
     secret: string;
 }
 
-/** A bot. */
+/**
+ * A bot.
+ */
 export interface BotProperties {
     /** The character associated with the bot. */
     char: Character;
@@ -1087,5 +1222,7 @@ export interface BotProperties {
     token: string;
 }
 
-/** The authenticated user's bots. */
+/**
+ * The authenticated user's bots.
+ */
 export interface BotsProperties {}

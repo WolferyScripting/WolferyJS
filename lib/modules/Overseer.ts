@@ -1,56 +1,12 @@
 import Base from "./Base.js";
-import { type RealmConfig } from "./Admin.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
 import type Identity from "../models/Identity.js";
-import { type BasicCharacterResponse, type Titles } from "../util/types.js";
+import type { UserIp, BasicCharacterResponse, Titles } from "../util/types.js";
 import type Commands from "../util/commands.js";
 import { PublicPepper } from "../util/Constants.js";
 import type Character from "../models/Character.js";
 import { createHash, createHmac } from "node:crypto";
 
-export interface UserIp {
-    firstUsed: number;
-    ip: string;
-    lastUsed: number;
-    used: number; // ?
-}
-export interface RealmConfigOverseer extends RealmConfig {
-    adminMaxCharProfiles: number;
-    adminMaxOwnedChars: number;
-    adminMaxRoomProfiles: number;
-    adminMaxRoomScripts: number;
-    builderMaxOwnedAreas: number;
-    builderMaxOwnedRooms: number;
-    charNameMaxLength: number;
-    charNameMinLength: number;
-    charSurnameMaxLength: number;
-    charSurnameMinLength: number;
-    communicationMaxLength: number;
-    descriptionMaxLength: number;
-    itemNameMaxLength: number;
-    keyMaxLength: number;
-    maxCharProfiles: number;
-    maxFollows: number;
-    maxImageSize: number;
-    maxListItems: number;
-    maxOwnedAreas: number;
-    maxOwnedChars: number;
-    maxOwnedRooms: number;
-    maxRoomCmds: number;
-    maxRoomExits: number;
-    maxRoomProfiles: number;
-    maxRoomScripts: number;
-    maxScheduledPosts: number;
-    maxScriptBinarySize: number;
-    propertyMaxLength: number;
-    scriptMaxLength: number;
-    shortDescriptionMaxLength: number;
-    supporterMaxCharProfiles: number;
-    supporterMaxImageSize: number;
-    supporterMaxOwnedChars: number;
-    supporterMaxRoomProfiles: number;
-    supporterMaxRoomScripts: number;
-}
 export default class Overseer extends Base {
     /**
      * Add a title to a user.

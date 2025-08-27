@@ -15,16 +15,7 @@ import type TagInfo from "../models/TagInfo.js";
 import type Tags from "../models/Tags.js";
 import type User from "../models/User.js";
 import type WebClientInfo from "../models/WebClientInfo.js";
-
-export interface Info {
-    core: CoreInfo;
-    mail: MailInfo;
-    note: NoteInfo;
-    report: ReportInfo;
-    support: SupportInfo;
-    tag: TagInfo;
-    webClient: WebClientInfo;
-}
+import { type Info } from "../util/types.js";
 
 /** Core classes/calls that don't require any id input */
 export default class Core extends Base {
@@ -115,7 +106,7 @@ export default class Core extends Base {
     }
 
     /**
-     * Get the authenticated user. For password authentication this will return {@link User}, for token authentication this will return {@link TokenUser}.
+     * Get the authenticated user. For password authentication this will return {@link models/User}, for token authentication this will return {@link models/TokenUser}.
      * @returns The authenticated user.
      */
     async getUser(): Promise<User | TokenUser> {

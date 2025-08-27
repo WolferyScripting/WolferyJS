@@ -1,6 +1,6 @@
 {
   "name": "wolfery.js",
-  "version": "0.0.1-beta.0",
+  "version": "0.0.1",
   "description": "",
   "types": "./dist/esm/index.d.mts",
   "main": "./dist/cjs/index.mjs",
@@ -40,18 +40,26 @@
     "build:schema:registry:collections": "npm run build:schema -- registry collections",
     "build:schema:registry:models": "npm run build:schema -- registry models"
   },
-  "keywords": [],
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WolferyScripting/WolferyJS.git"
+  },
+  "author": "Donovan_DMC <hewwo@yiff.rocks>",
+  "bugs": {
+    "url": "https://github.com/WolferyScripting/WolferyJS/issues"
+  },
+  "homepage": "https://github.com/WolferyScripting/WolferyJS#readme",
   "type": "module",
   "license": "MIT",
   "dependencies": {
     "file-type": "^21.0.0",
     "mock-socket": "^9.3.1",
-    "resclient-ts": "file:../resclient-ts",
+    "resclient-ts": "1.1.4",
     "tslib": "^2.8.1",
     "ws": "^8.18.3"
   },
   "devDependencies": {
+    "@mxssfd/typedoc-theme": "^1.1.7",
     "@sinclair/typebox": "^0.34.40",
     "@swc/core": "^1.13.2",
     "@swc/helpers": "^0.5.17",
@@ -85,6 +93,10 @@
     "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.16",
     "tsconfig-paths": "^4.2.0",
+    "typedoc": "^0.28.11",
+    "typedoc-plugin-extras": "^4.0.1",
+    "typedoc-plugin-mdn-links": "^5.0.9",
+    "typedoc-plugin-rename-defaults": "^0.7.3",
     "types-tsconfig": "^2.1.1",
     "typescript": "^5.8.3"
   },

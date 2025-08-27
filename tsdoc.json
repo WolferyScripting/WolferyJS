@@ -1,0 +1,23 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/tsdoc/v0/tsdoc.schema.json",
+  "extends": ["typedoc/tsdoc.json"],
+  "noStandardTags": false,
+  "tagDefinitions": [
+    {
+      "tagName": "@resourceID",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@note",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@roleRequired",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@TODO",
+      "syntaxKind": "modifier"
+    }
+  ]
+}

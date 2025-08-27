@@ -1,6 +1,10 @@
-import type { Messages, NavDirections, NavIcons } from "./types.js";
-import { type RealmConfig } from "../modules/Admin.ts";
-import { type RealmConfigOverseer } from "../modules/Overseer.ts";
+import type {
+    Messages,
+    NavDirections,
+    NavIcons,
+    RealmConfig,
+    RealmConfigOverseer
+} from "./types.js";
 
 declare namespace Commands {
     export interface LogEvents {

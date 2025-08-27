@@ -1,4 +1,3 @@
-/** @module TypedEmitter */
 import { Debug } from "./Debug.js";
 import { UncaughtError, UnsubscribeError } from "./Errors.js";
 import EventEmitter from "node:events";

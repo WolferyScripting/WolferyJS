@@ -57,34 +57,35 @@ export interface Options {
     pingCharacters?: boolean;
     /** Set to false to not fetch anything extra on startup. This takes precedent over all of the track options. */
     startup?: boolean;
-    track?: {
-        /** If awake characters should be tracked. Defaults to `true`. */
-        awake?: boolean;
-        /** If the player's bots should be tracked. Defaults to `true`. */
-        bots?: boolean;
-        /** If broadcasts should be tracked. Defaults to `true`. */
-        broadcast?: boolean;
-        /** If character info should be fetched for {@link Chracter} models. Required for seeing about/lfrpDesc changes. Defaults to `false`. See also {@link charInfo} */
-        charInfo?: boolean;
-        /** If character info should be fetched for offline {@link Character} models. Defaults to `false`. */
-        charInfoOffline?: boolean;
-        /** If incoming requests should be tracked. Defaults to `true`. */
-        incomingRequests?: boolean;
-        /** If unread mail should be tracked. Defaults to `true` if `authentication.type` === "password", has no effect otherwise. */
-        mail?: boolean;
-        /** If note changes should be tracked. Each note must be fetched individually to track changes, so this can potentially flood the server with requests and expand the cache significantly. */
-        noteChanges?: boolean;
-        /** If note additions & removals should be tracked. This will not track text changes in individual notes. Defaults to `true` */
-        notes?: boolean;
-        /** If outgoing requests should be tracked. Defaults to `true`. */
-        outgoingRequests?: boolean;
-        /** If the player's tokens should be tracked. Defaults to `true`. */
-        tokens?: boolean;
-        /** If watched characters should be tracked. Defaults to the same as `trackAwake`. */
-        watched?: boolean;
-    };
+    track?: TrackOptions;
     resClientFactory?(this: void, client: WolferyJS): ResClient;
     wsFactory?(this: void, client: WolferyJS): WebSocket;
+}
+export interface TrackOptions {
+    /** If awake characters should be tracked. Defaults to `true`. */
+    awake?: boolean;
+    /** If the player's bots should be tracked. Defaults to `true`. */
+    bots?: boolean;
+    /** If broadcasts should be tracked. Defaults to `true`. */
+    broadcast?: boolean;
+    /** If character info should be fetched for {@link models/Character} models. Required for seeing about/lfrpDesc changes. Defaults to `false`. See also {@link charInfo} */
+    charInfo?: boolean;
+    /** If character info should be fetched for offline {@link models/Character} models. Defaults to `false`. */
+    charInfoOffline?: boolean;
+    /** If incoming requests should be tracked. Defaults to `true`. */
+    incomingRequests?: boolean;
+    /** If unread mail should be tracked. Defaults to `true` if `authentication.type` === "password", has no effect otherwise. */
+    mail?: boolean;
+    /** If note changes should be tracked. Each note must be fetched individually to track changes, so this can potentially flood the server with requests and expand the cache significantly. */
+    noteChanges?: boolean;
+    /** If note additions & removals should be tracked. This will not track text changes in individual notes. Defaults to `true` */
+    notes?: boolean;
+    /** If outgoing requests should be tracked. Defaults to `true`. */
+    outgoingRequests?: boolean;
+    /** If the player's tokens should be tracked. Defaults to `true`. */
+    tokens?: boolean;
+    /** If watched characters should be tracked. Defaults to the same as `trackAwake`. */
+    watched?: boolean;
 }
 
 export interface InstanceOptions {
@@ -111,7 +112,7 @@ export interface InstanceOptions {
     wsFactory(this: void, client: WolferyJS): WebSocket;
 }
 
-type AnyUser = User | TokenUser | BotUser;
+export type AnyUser = User | TokenUser | BotUser;
 export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter<Events> {
     private _player!: Player | null;
     private _res!: ResClient | null;
@@ -459,7 +460,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         return null;
     }
 
-    /** If the authentication used was for a {@link BotUser}. */
+    /** If the authentication used was for a {@link models/BotUser}. */
     isBot(): this is WolferyJS<BotUser> {
         return (this._user && this._user instanceof BotUser) ?? false;
     }
@@ -474,7 +475,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         return player.controlled.hasKey(charId);
     }
 
-    /** If the authentication used was for a {@link User} and {@link Player}. */
+    /** If the authentication used was for a {@link models/User} and {@link models/Player}. */
     isPlayer(): this is WolferyJS<User> {
         return this.isUser() && this._player !== null;
     }
@@ -484,12 +485,12 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         return player.id === playerId;
     }
 
-    /** If the authentication used was for a {@link TokenUser}. */
+    /** If the authentication used was for a {@link models/TokenUser}. */
     isToken(): this is WolferyJS<TokenUser> {
         return (this._user && this._user instanceof TokenUser) ?? false;
     }
 
-    /** If the authentication used was for a {@link User}. */
+    /** If the authentication used was for a {@link models/User}. */
     isUser(): this is WolferyJS<User> {
         return (this._user && this._user instanceof User) ?? false;
     }
