@@ -18,6 +18,7 @@
     "lint:fix": "eslint lib --fix",
     "prepack": "npm run build",
     "test": "c8 mocha",
+    "test:docs": "rimraf docs && npx --yes typedoc --options static/typedoc.json",
     "coverage": "c8 report --reporter=text-lcov | coveralls",
     "schema:write": "node --no-warnings --no-deprecation --experimental-specifier-resolution=node --enable-source-maps --loader ts-node/esm/transpile-only -r tsconfig-paths/register schema/write.ts",
     "build:schema": "node --no-warnings --no-deprecation --experimental-specifier-resolution=node --enable-source-maps --loader ts-node/esm/transpile-only -r tsconfig-paths/register schema/Builder.ts",
