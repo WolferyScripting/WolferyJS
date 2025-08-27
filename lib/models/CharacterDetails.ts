@@ -10,7 +10,7 @@ declare interface CharacterDetails extends BaseModel, CharacterDetailsProperties
 // do not edit the first line of the class comment
 /**
  * A character with extra details, seen when looking at a character.
- * @resourceID CHARACTER_DETAILS(core.char.{id}.details)
+ * @resourceID {@link ResourceIDs.CHARACTER_DETAILS | CHARACTER_DETAILS}
  */
 class CharacterDetails extends BaseModel implements CharacterDetailsProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

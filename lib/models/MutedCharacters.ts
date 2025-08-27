@@ -7,7 +7,7 @@ import type { CollectionModelAddRemove, ResClient } from "resclient-ts";
 // do not edit the first line of the class comment
 /**
  * The characters that are muted.
- * @resourceID MUTED_CHARACTERS(core.player.{id}.mutedchars)
+ * @resourceID {@link ResourceIDs.MUTED_CHARACTERS | MUTED_CHARACTERS}
  */
 class MutedCharacters extends BaseCollectionModel<CharacterMin>  {
     private onAdd = this._onAdd.bind(this);

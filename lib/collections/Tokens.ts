@@ -6,7 +6,7 @@ import type { CollectionAddRemove, ResClient } from "resclient-ts";
 // do not edit the first line of the class comment
 /**
  * The authenticated user's management tokens.
- * @resourceID TOKENS(auth.user.{id}.tokens)
+ * @resourceID {@link ResourceIDs.TOKENS | TOKENS}
  */
 class Tokens extends BaseCollection<Token> {
     private onAdd = this._onAdd.bind(this);

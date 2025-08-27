@@ -68,9 +68,9 @@ export interface TrackOptions {
     bots?: boolean;
     /** If broadcasts should be tracked. Defaults to `true`. */
     broadcast?: boolean;
-    /** If character info should be fetched for {@link models/Character} models. Required for seeing about/lfrpDesc changes. Defaults to `false`. See also {@link charInfo} */
+    /** If character info should be fetched for {@link Character} models. Required for seeing about/lfrpDesc changes. Defaults to `false`. See also {@link charInfo} */
     charInfo?: boolean;
-    /** If character info should be fetched for offline {@link models/Character} models. Defaults to `false`. */
+    /** If character info should be fetched for offline {@link Character} models. Defaults to `false`. */
     charInfoOffline?: boolean;
     /** If incoming requests should be tracked. Defaults to `true`. */
     incomingRequests?: boolean;
@@ -460,7 +460,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         return null;
     }
 
-    /** If the authentication used was for a {@link models/BotUser}. */
+    /** If the authentication used was for a {@link BotUser}. */
     isBot(): this is WolferyJS<BotUser> {
         return (this._user && this._user instanceof BotUser) ?? false;
     }
@@ -475,7 +475,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         return player.controlled.hasKey(charId);
     }
 
-    /** If the authentication used was for a {@link models/User} and {@link models/Player}. */
+    /** If the authentication used was for a {@link User} and {@link Player}. */
     isPlayer(): this is WolferyJS<User> {
         return this.isUser() && this._player !== null;
     }
@@ -485,12 +485,12 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         return player.id === playerId;
     }
 
-    /** If the authentication used was for a {@link models/TokenUser}. */
+    /** If the authentication used was for a {@link TokenUser}. */
     isToken(): this is WolferyJS<TokenUser> {
         return (this._user && this._user instanceof TokenUser) ?? false;
     }
 
-    /** If the authentication used was for a {@link models/User}. */
+    /** If the authentication used was for a {@link User}. */
     isUser(): this is WolferyJS<User> {
         return (this._user && this._user instanceof User) ?? false;
     }
@@ -522,11 +522,6 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         if (this.isBot()) {
             const ctrl = await this.user!.controlChar();
             return ctrl.wakeup(hidden);
-        }
-
-        if (this.isToken()) {
-            // @TODO
-            throw new Error("don't know how to wakeup a character with a token user");
         }
 
         return this.modules.core.getPlayer().then(player => player.controlChar(char.id, true)

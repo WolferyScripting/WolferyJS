@@ -12,7 +12,7 @@ declare interface Character extends BaseModel, CharacterProperties {}
 // do not edit the first line of the class comment
 /**
  * A character
- * @resourceID CHARACTER(core.char.{id})
+ * @resourceID {@link ResourceIDs.CHARACTER | CHARACTER}
  */
 class Character extends BaseModel implements CharacterProperties {
     private _info!: CharacterInfo | null;

@@ -8,7 +8,7 @@ declare interface Tag extends BaseModel, TagProperties {}
 // do not edit the first line of the class comment
 /**
  * A tag.
- * @resourceID TAG(tag.tag.{id})
+ * @resourceID {@link ResourceIDs.TAG | TAG}
  */
 class Tag extends BaseModel implements TagProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

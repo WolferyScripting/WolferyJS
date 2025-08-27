@@ -8,7 +8,7 @@ import type { ResClient, CollectionAddRemove } from "resclient-ts";
 // do not edit the first line of the class comment
 /**
  * The characters owned by the player.
- * @resourceID OWNED_CHARACTERS(core.player.{id}.chars)
+ * @resourceID {@link ResourceIDs.OWNED_CHARACTERS | OWNED_CHARACTERS}
  */
 export default class OwnedCharacters extends BaseCollection<OwnedCharacter> {
     private onAdd = this._onAdd.bind(this);

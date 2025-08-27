@@ -10,7 +10,7 @@ declare interface OwnedCharacter extends BaseModel, OwnedCharacterProperties {}
 // do not edit the first line of the class comment
 /**
  * An owned character.
- * @resourceID OWNED_CHARACTER(core.char.{id}.owned)
+ * @resourceID {@link ResourceIDs.OWNED_CHARACTER | OWNED_CHARACTER}
  */
 class OwnedCharacter extends BaseModel implements OwnedCharacterProperties {
     private onChange = this._onChange.bind(this);

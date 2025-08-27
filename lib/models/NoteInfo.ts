@@ -8,7 +8,7 @@ declare interface NoteInfo extends BaseModel, NoteInfoProperties {}
 // do not edit the first line of the class comment
 /**
  * The note info.
- * @resourceID NOTE_INFO(note.info)
+ * @resourceID {@link ResourceIDs.NOTE_INFO | NOTE_INFO}
  */
 class NoteInfo extends BaseModel implements NoteInfoProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

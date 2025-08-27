@@ -8,7 +8,7 @@ declare interface ScriptLog extends BaseModel, ScriptLogProperties {}
 // do not edit the first line of the class comment
 /**
  * A log for a room script.
- * @resourceID SCRIPT_LOG(core.script.log.{id})
+ * @resourceID {@link ResourceIDs.SCRIPT_LOG | SCRIPT_LOG}
  */
 class ScriptLog extends BaseModel implements ScriptLogProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

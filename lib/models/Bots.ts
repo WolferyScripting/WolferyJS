@@ -6,7 +6,7 @@ import type { CollectionModelAddRemove, ResClient } from "resclient-ts";
 // do not edit the first line of the class comment
 /**
  * The authenticated user's bots.
- * @resourceID BOTS(auth.user.{id}.bots)
+ * @resourceID {@link ResourceIDs.BOTS | BOTS}
  */
 class Bots extends BaseCollectionModel<Bot> {
     private onAdd = this._onAdd.bind(this);

@@ -7,7 +7,7 @@ import { type CollectionModelAddRemove, type ResClient, ResRef } from "resclient
 // do not edit the first line of the class comment
 /**
  * Unread mail.
- * @resourceID UNREAD_MAIL(mail.player.{id}.unread)
+ * @resourceID {@link ResourceIDs.UNREAD_MAIL | UNREAD_MAIL}
  */
 class UnreadMail extends BaseCollectionModel<ResRef<PlayerMailMessage>> {
     private onAdd = this._onAdd.bind(this);

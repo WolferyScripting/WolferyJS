@@ -8,7 +8,7 @@ declare interface AfarRoom extends BaseModel, AfarRoomProperties {}
 // do not edit the first line of the class comment
 /**
  * A partial room seen as an exit target.
- * @resourceID AFAR_ROOM(core.room.{id}.afar)
+ * @resourceID {@link ResourceIDs.AFAR_ROOM | AFAR_ROOM}
  */
 class AfarRoom extends BaseModel implements AfarRoomProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

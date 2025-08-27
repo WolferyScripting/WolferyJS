@@ -8,7 +8,7 @@ declare interface ReportInfo extends BaseModel, ReportInfoProperties {}
 // do not edit the first line of the class comment
 /**
  * The report info.
- * @resourceID REPORT_INFO(report.info)
+ * @resourceID {@link ResourceIDs.REPORT_INFO | REPORT_INFO}
  */
 class ReportInfo extends BaseModel implements ReportInfoProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

@@ -8,7 +8,7 @@ declare interface CharacterMin extends BaseModel, CharacterMinProperties {}
 // do not edit the first line of the class comment
 /**
  * A minimal character, seen in the list of muted and focused characters.
- * @resourceID CHARACTER_MIN(core.char.{id}.min)
+ * @resourceID {@link ResourceIDs.CHARACTER_MIN | CHARACTER_MIN}
  */
 class CharacterMin extends BaseModel implements CharacterMinProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

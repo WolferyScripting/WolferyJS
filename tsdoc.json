@@ -5,18 +5,38 @@
   "tagDefinitions": [
     {
       "tagName": "@resourceID",
-      "syntaxKind": "modifier"
+      "syntaxKind": "block"
     },
     {
       "tagName": "@note",
-      "syntaxKind": "modifier"
-    },
-    {
-      "tagName": "@roleRequired",
-      "syntaxKind": "modifier"
+      "syntaxKind": "block"
     },
     {
       "tagName": "@TODO",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@builderRoleRequired",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@staffRoleRequired",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@helperRoleRequired",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@moderatorRoleRequired",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@adminRoleRequired",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@overseerRoleRequired",
       "syntaxKind": "modifier"
     }
   ]

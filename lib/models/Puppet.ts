@@ -10,7 +10,7 @@ declare interface Puppet extends BaseModel, PuppetProperties {}
 // do not edit the first line of the class comment
 /**
  * A puppet.
- * @resourceID PUPPET(core.char.{char}.puppet.{puppet})
+ * @resourceID {@link ResourceIDs.PUPPET | PUPPET}
  */
 class Puppet extends BaseModel implements PuppetProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

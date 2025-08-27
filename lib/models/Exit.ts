@@ -9,7 +9,7 @@ declare interface Exit extends BaseModel, ExitProperties {}
 // do not edit the first line of the class comment
 /**
  * An exit.
- * @resourceID EXIT(core.exit.{id})
+ * @resourceID {@link ResourceIDs.EXIT | EXIT}
  */
 class Exit extends BaseModel implements ExitProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

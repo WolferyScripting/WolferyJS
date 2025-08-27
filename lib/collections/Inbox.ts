@@ -9,7 +9,7 @@ import type { ResClient } from "resclient-ts";
 // do not edit the first line of the class comment
 /**
  * The player's mail inbox.
- * @resourceID INBOX(mail.player.{id}.inbox)
+ * @resourceID {@link ResourceIDs.INBOX | INBOX}
  */
 class Inbox extends BaseCollection<PlayerMailMessage> {
     private onAdd = this._onAdd.bind(this);

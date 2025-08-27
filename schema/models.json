@@ -1738,7 +1738,7 @@
     }
   },
   {
-    "description": "A mail user, seen in a {@link models/PlayerMailMessage}.",
+    "description": "A mail user, seen in a {@link PlayerMailMessage}.",
     "id": [],
     "name": "MailUser",
     "props": {

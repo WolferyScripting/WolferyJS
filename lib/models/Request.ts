@@ -8,7 +8,7 @@ declare interface Request extends BaseModel, RequestProperties {}
 // do not edit the first line of the class comment
 /**
  * A request for changing ownership of areas and rooms, creating exits, etc.
- * @resourceID REQUEST(core.request.{id})
+ * @resourceID {@link ResourceIDs.REQUEST | REQUEST}
  */
 class Request extends BaseModel implements RequestProperties {
     private onChange = this._onChange.bind(this);

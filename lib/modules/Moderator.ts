@@ -18,7 +18,7 @@ export default class Moderator extends Base {
      * Ban a player.
      * @param charId The ID of the character to ban.
      * @param reason The ban reason.
-     * @roleRequired Moderator
+     * @moderatorRoleRequired
      */
     async banPlayer(charId: string, reason: string): Promise<unknown> {
         return this.client.modules.core.getPlayer().then(player => player.call("banPlayer", { charId, reason }));
@@ -28,7 +28,7 @@ export default class Moderator extends Base {
      * Compare two characters.
      * @param charId The ID of the character to compare.
      * @param compareCharId The ID of the character to compare with.
-     * @roleRequired Moderator
+     * @moderatorRoleRequired
      */
     async compare(charId: string, compareCharId: string): Promise<Record<"emailMatch" | "ipMatch" | "userMatch", boolean>> {
         return this.client.modules.core.getPlayer().then(player => player.call<Record<"emailMatch" | "ipMatch" | "userMatch", boolean>>("compare", { charId, compareCharId }));
@@ -37,7 +37,7 @@ export default class Moderator extends Base {
     /**
      * Inspect a character.
      * @param charId The ID of the character to inspect.
-     * @roleRequired Moderator
+     * @moderatorRoleRequired
      */
     async inspect(charId: string): Promise<CharacterInspection> {
         return this.client.modules.core.getPlayer().then(player => player.call<RawCharacterInspection>("inspectChar", { charId })
@@ -53,7 +53,7 @@ export default class Moderator extends Base {
      * Set attributes about a player.
      * @param charId The ID of the character to set the attributes for.
      * @param options The attributes to set.
-     * @roleRequired Moderator
+     * @moderatorRoleRequired
      */
     async setPlayer(charId: string, options: Commands.Moderator.SetPlayerOptions): Promise<unknown> {
         return this.client.modules.core.getPlayer().then(player => player.call("setPlayer", { charId, ...options }));
@@ -64,7 +64,7 @@ export default class Moderator extends Base {
      * @param ctrl The controlled character to suspend the character with.
      * @param charId The ID of the character to suspend.
      * @param reason The reason for suspending the character.
-     * @roleRequired Moderator
+     * @moderatorRoleRequired
      */
     async suspend(ctrl: ControlledCharacter, charId: string, reason: string): Promise<Character> {
         return ctrl.call<BasicCharacterResponse<"char">>("suspend", { charId, reason })
@@ -74,7 +74,7 @@ export default class Moderator extends Base {
     /**
      * Unban a player.
      * @param charId The ID of the character to unban.
-     * @roleRequired Moderator
+     * @moderatorRoleRequired
      */
     async unbanPlayer(charId: string): Promise<unknown> {
         return this.client.modules.core.getPlayer().then(player => player.call("unbanPlayer", { charId }));
@@ -84,7 +84,7 @@ export default class Moderator extends Base {
      * Unsuspend a character.
      * @param ctrl The controlled character to unsuspend the character with.
      * @param charId The ID of the character to unsuspend.
-     * @roleRequired Moderator
+     * @moderatorRoleRequired
      */
     async unsuspend(ctrl: ControlledCharacter, charId: string): Promise<Character> {
         return ctrl.call<BasicCharacterResponse<"char">>("unsuspend", { charId })
@@ -96,7 +96,7 @@ export default class Moderator extends Base {
      * @param charIds The IDs of the characters to warn.
      * @param msg The message of the warning.
      * @param pose If the warning is a pose.
-     * @roleRequired Moderator
+     * @moderatorRoleRequired
      */
     async warn(charIds: Array<string>, msg: string, pose?: boolean): Promise<unknown> {
         return this.client.modules.core.getPlayer().then(player => player.call("warn", { charIds, msg, pose }));
@@ -105,7 +105,7 @@ export default class Moderator extends Base {
     /**
      * Wipe a character's avatar.
      * @param charId The ID of the character to wipe the avatar for.
-     * @roleRequired Moderator
+     * @moderatorRoleRequired
      */
     async wipeCharAvatar(charId: string): Promise<unknown> {
         return this.client.modules.core.getPlayer().then(player => player.call("wipeCharAvatar", { charId }));
@@ -114,7 +114,7 @@ export default class Moderator extends Base {
     /**
      * Wipe a character's image.
      * @param charId The ID of the character to wipe the image for.
-     * @roleRequired Moderator
+     * @moderatorRoleRequired
      */
     async wipeCharImage(charId: string): Promise<unknown> {
         return this.client.modules.core.getPlayer().then(player => player.call("wipeCharImage", { charId }));

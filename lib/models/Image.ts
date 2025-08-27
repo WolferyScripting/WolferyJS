@@ -8,9 +8,9 @@ declare interface Image extends BaseModel, ImageProperties {}
 // do not edit the first line of the class comment
 /**
  * An image.
- * @resourceID AREA_IMAGE(core.area.img.{id})
- * @resourceID CHARACTER_IMAGE(core.char.img.{id})
- * @resourceID ROOM_IMAGE(core.room.img.{id})
+ * @resourceID {@link ResourceIDs.AREA_IMAGE | AREA_IMAGE}
+ * @resourceID {@link ResourceIDs.CHARACTER_IMAGE | CHARACTER_IMAGE}
+ * @resourceID {@link ResourceIDs.ROOM_IMAGE | ROOM_IMAGE}
  */
 class Image extends BaseModel implements ImageProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

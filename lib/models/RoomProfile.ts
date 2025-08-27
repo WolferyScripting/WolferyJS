@@ -11,7 +11,7 @@ declare interface RoomProfile extends BaseModel, RoomProfileProperties {}
 // do not edit the first line of the class comment
 /**
  * A profile of a room.
- * @resourceID ROOM_PROFILE(core.roomprofile.{id})
+ * @resourceID {@link ResourceIDs.ROOM_PROFILE | ROOM_PROFILE}
  */
 class RoomProfile extends BaseModel implements RoomProfileProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

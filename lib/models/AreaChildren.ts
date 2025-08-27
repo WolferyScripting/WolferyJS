@@ -10,7 +10,7 @@ interface AreaChildren extends BaseCollectionModel<AreaChild | RoomChild>, AreaC
 // do not edit the first line of the class comment
 /**
  * The child areas of an area.
- * @resourceID AREA_CHILDREN(core.area.{id}.children)
+ * @resourceID {@link ResourceIDs.AREA_CHILDREN | AREA_CHILDREN}
  */
 class AreaChildren extends BaseCollectionModel<AreaChild | RoomChild> implements AreaChildrenProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

@@ -9,7 +9,7 @@ declare interface CoreInfo extends BaseModel, CoreInfoProperties {}
 // do not edit the first line of the class comment
 /**
  * The core info about the realm.
- * @resourceID CORE_INFO(core.info)
+ * @resourceID {@link ResourceIDs.CORE_INFO | CORE_INFO}
  */
 class CoreInfo extends BaseModel implements CoreInfoProperties {
     private onOut = this._onOut.bind(this);

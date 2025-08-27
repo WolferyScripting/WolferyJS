@@ -10,7 +10,7 @@ import type { ResClient, CollectionAddRemove } from "resclient-ts";
 // do not edit the first line of the class comment
 /**
  * The rooms owned by a character.
- * @resourceID OWNED_ROOMS(core.char.{id}.rooms)
+ * @resourceID {@link ResourceIDs.OWNED_ROOMS | OWNED_ROOMS}
  */
 export default class OwnedRooms extends BaseCollection<Room> {
     private onAdd = this._onAdd.bind(this);

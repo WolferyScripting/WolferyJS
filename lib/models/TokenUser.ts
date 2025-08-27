@@ -8,7 +8,7 @@ declare interface TokenUser extends BaseModel, TokenUserProperties {}
 // do not edit the first line of the class comment
 /**
  * The user when logged in with a management token.
- * @resourceID TOKEN_USER(auth.user.{id}.safe)
+ * @resourceID {@link ResourceIDs.TOKEN_USER | TOKEN_USER}
  */
 class TokenUser extends BaseModel implements TokenUserProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

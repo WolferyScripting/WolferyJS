@@ -7,8 +7,8 @@ import type { ResClient, CollectionAddRemove } from "resclient-ts";
 // do not edit the first line of the class comment
 /**
  * The notices for the logged in user.
- * @resourceID AUTH_NOTICES(auth.user.{id}.notices)
- * @resourceID IDENTITY_NOTICES(identity.user.{id}.notices)
+ * @resourceID {@link ResourceIDs.AUTH_NOTICES | AUTH_NOTICES}
+ * @resourceID {@link ResourceIDs.IDENTITY_NOTICES | IDENTITY_NOTICES}
  */
 export default class Notices extends BaseCollection<Notice> {
     private onAdd = this._onAdd.bind(this);

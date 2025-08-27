@@ -8,7 +8,7 @@ import type { AnyObject, ResClient } from "resclient-ts";
 declare interface MailUser extends NonResModel, MailUserProperties {}
 // do not edit the first line of the class comment
 /**
- * A mail user, seen in a {@link models/PlayerMailMessage}.
+ * A mail user, seen in a {@link PlayerMailMessage}.
  * This is not a real RES model. It has been made into a model for convinience.
  */
 class MailUser extends NonResModel implements MailUserProperties {

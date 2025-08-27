@@ -8,7 +8,7 @@ declare interface RoomChild extends BaseModel, RoomChildProperties {}
 // do not edit the first line of the class comment
 /**
  * A child room of an area.
- * @resourceID ROOM_CHILD(core.room.{id}.child)
+ * @resourceID {@link ResourceIDs.ROOM_CHILD | ROOM_CHILD}
  */
 class RoomChild extends BaseModel implements RoomChildProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

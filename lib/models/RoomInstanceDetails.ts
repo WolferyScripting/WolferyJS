@@ -8,7 +8,7 @@ declare interface RoomInstanceDetails extends RoomDetails, RoomInstanceDetailsPr
 // do not edit the first line of the class comment
 /**
  * A detailed view of a room instance.
- * @resourceID ROOM_INSTANCE_DETAILS(core.instance.{instance}.room.{room}.details)
+ * @resourceID {@link ResourceIDs.ROOM_INSTANCE_DETAILS | ROOM_INSTANCE_DETAILS}
  */
 class RoomInstanceDetails extends RoomDetails implements RoomInstanceDetailsProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

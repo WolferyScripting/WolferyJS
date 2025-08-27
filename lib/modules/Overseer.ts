@@ -12,7 +12,7 @@ export default class Overseer extends Base {
      * Add a title to a user.
      * @param userId The ID of the user to add the title to.
      * @param idRole The title to add to the user.
-     * @roleRequired Overseer
+     * @overseerRoleRequired
      */
     async addUserTitle(userId: string, idRole: Titles): Promise<unknown> {
         return this.client.api.call("identity.overseer", "addUserIdRole", { userId, idRole });
@@ -22,7 +22,7 @@ export default class Overseer extends Base {
      * Create a login for a user without a username/password.
      * @param userId The ID of the user to create a login for.
      * @param options The options for creating the login.
-     * @roleRequired Overseer
+     * @overseerRoleRequired
      */
     async createUserLogin(userId: string, options: Commands.Overseer.CreateUserLoginOptions): Promise<unknown> {
         return this.client.api.call("identity.overseer", "createUserLogin", {
@@ -35,7 +35,7 @@ export default class Overseer extends Base {
 
     /**
      * Perform a database dump.
-     * @roleRequired Overseer
+     * @overseerRoleRequired
      */
     async databaseDump(): Promise<Record<"auth" | "core" | "file" | "identity" | "mail" | "note" | "report" | "tag", number>> {
         return this.client.api.call("core", "createId").then(idResult => Promise.all([
@@ -53,7 +53,7 @@ export default class Overseer extends Base {
     /**
      * Delete the registered OpenID from a user account.
      * @param userId The ID of the user.
-     * @roleRequired Overseer
+     * @overseerRoleRequired
      */
     async deleteUserOpenId(userId: string): Promise<unknown> {
         return this.client.api.call("identity.overseer", "deleteUserOpenId", { userId });
@@ -62,7 +62,7 @@ export default class Overseer extends Base {
     /**
      * Get a user by their ID.
      * @param userId The user ID.
-     * @roleRequired Overseer
+     * @overseerRoleRequired
      */
     async getUserById(userId: string): Promise<unknown> {
         return this.client.api.call("identity.overseer", "getUserById", { userId });
@@ -71,7 +71,7 @@ export default class Overseer extends Base {
     /**
      * Get a user by their username.
      * @param username The username.
-     * @roleRequired Overseer
+     * @overseerRoleRequired
      */
     async getUserByUsername(username: string): Promise<unknown> {
         return this.client.api.call("identity.overseer", "getUserByUsername", { username });
@@ -80,7 +80,7 @@ export default class Overseer extends Base {
     /**
      * Get a user's identity.
      * @param userId The ID of the user to get the identity of.
-     * @roleRequired Overseer
+     * @overseerRoleRequired
      */
     async getUserIdentity(userId: string): Promise<Identity> {
         return this.client.api.get<Identity>(ResourceIDs.IDENTITY({ id: userId }));
@@ -89,7 +89,7 @@ export default class Overseer extends Base {
     /**
      * Get the ip addresses for a user.
      * @param userId The ID of the user.
-     * @roleRequired Overseer
+     * @overseerRoleRequired
      */
     async getUserIps(userId: string): Promise<Array<UserIp>> {
         return this.client.api.call(ResourceIDs.IDENTITY({ id: userId }), "getIps");
@@ -98,7 +98,7 @@ export default class Overseer extends Base {
     /**
      * Get users by their email address.
      * @param email The email address.
-     * @roleRequired Overseer
+     * @overseerRoleRequired
      */
     async getUsersByEmail(email: string): Promise<unknown> {
         return this.client.api.call("identity.overseer", "getUsersByEmail", { email });
@@ -108,7 +108,7 @@ export default class Overseer extends Base {
      * Remove a title from a user.
      * @param userId The ID of the user to remove the title from.
      * @param idRole The title to remove from the user.
-     * @roleRequired Overseer
+     * @overseerRoleRequired
      */
     async removeUserTitle(userId: string, idRole: Titles): Promise<unknown> {
         return this.client.api.call("identity.overseer", "removeUserIdRole", { userId, idRole });
@@ -118,7 +118,7 @@ export default class Overseer extends Base {
      * Set a user's password.
      * @param userId The ID of the user.
      * @param password The new password.
-     * @roleRequired Overseer
+     * @overseerRoleRequired
      */
     async resetPassword(userId: string, password: string): Promise<unknown> {
         return this.client.api.call("identity.overseer", "resetPassword", {
@@ -131,7 +131,7 @@ export default class Overseer extends Base {
     /**
      * Set the realm config.
      * @param options The options to set.
-     * @roleRequired Overseer
+     * @overseerRoleRequired
      */
     async setConfig(options: Commands.Overseer.SetConfigOptions): Promise<unknown> {
         return this.client.modules.core.getPlayer().then(player => player.call("setConfig", options));
@@ -141,7 +141,7 @@ export default class Overseer extends Base {
      * Set the attributes of a user.
      * @param userId The ID of the user.
      * @param options The options to set.
-     * @roleRequired Overseer
+     * @overseerRoleRequired
      */
     async setUser(userId: string, options: Commands.Overseer.SetUserOptions): Promise<unknown> {
         return this.client.api.call(ResourceIDs.IDENTITY({ id: userId }), "set", { userId, ...options });
@@ -151,7 +151,7 @@ export default class Overseer extends Base {
      * Transfer a character to a player.
      * @param playerId The ID of the player.
      * @param charId The ID of the character.
-     * @roleRequired Overseer
+     * @overseerRoleRequired
      */
     async transferChar(playerId: string, charId: string): Promise<Character> {
         return this.client.modules.core.getPlayer().then(player => player.call<BasicCharacterResponse<"char">>("transferChar", { playerId, charId })
@@ -161,7 +161,7 @@ export default class Overseer extends Base {
     /**
      * Wipe a user.
      * @param userId The ID of the user.
-     * @roleRequired Overseer
+     * @overseerRoleRequired
      */
     async wipeUser(userId: string): Promise<unknown> {
         return this.client.api.call("identity.overseer", "wipeUser", { userId });

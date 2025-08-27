@@ -7,7 +7,7 @@ import type { ResClient } from "resclient-ts";
 // do not edit the first line of the class comment
 /**
  * The logs for a room script.
- * @resourceID SCRIPT_LOGS(core.script.{id}.logs)
+ * @resourceID {@link ResourceIDs.SCRIPT_LOGS | SCRIPT_LOGS}
  */
 export default class ScriptLogs extends BaseCollection<ScriptLog> {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

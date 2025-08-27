@@ -1179,7 +1179,7 @@ export interface NoticeProperties {
 }
 
 /**
- * A mail user, seen in a {@link models/PlayerMailMessage}.
+ * A mail user, seen in a {@link PlayerMailMessage}.
  */
 export interface MailUserProperties {
     /** The avatar of the user. */

@@ -11,7 +11,7 @@ declare interface Note extends BaseModel, NoteProperties {}
 // do not edit the first line of the class comment
 /**
  * A note on a character.
- * @resourceID NOTE(note.player.{player}.note.{char})
+ * @resourceID {@link ResourceIDs.NOTE | NOTE}
  */
 class Note extends BaseModel implements NoteProperties {
     private onChange = this._onChange.bind(this);

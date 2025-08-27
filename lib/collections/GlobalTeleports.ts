@@ -7,7 +7,7 @@ import type { ResClient, CollectionAddRemove } from "resclient-ts";
 // do not edit the first line of the class comment
 /**
  * The global teleport nodes.
- * @resourceID NODES(core.nodes)
+ * @resourceID {@link ResourceIDs.NODES | NODES}
  */
 export default class GlobalTeleports extends BaseCollection<Node> {
     private onAdd = this._onAdd.bind(this);

@@ -9,7 +9,7 @@ import type { ResClient, CollectionAddRemove } from "resclient-ts";
 // do not edit the first line of the class comment
 /**
  * The profiles for a character.
- * @resourceID PROFILES(core.char.{id}.profiles)
+ * @resourceID {@link ResourceIDs.PROFILES | PROFILES}
  */
 export default class Profiles extends BaseCollection<Profile> {
     private onAdd = this._onAdd.bind(this);

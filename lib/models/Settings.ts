@@ -8,8 +8,8 @@ declare interface Settings extends BaseModel, SettingsProperties {}
 // do not edit the first line of the class comment
 /**
  * The settings for a character or puppet.
- * @resourceID CHARACTER_SETTINGS(core.char.{id}.settings)
- * @resourceID PUPPET_SETTINGS(core.char.{ctrl}.puppet.{puppet}.settings)
+ * @resourceID {@link ResourceIDs.CHARACTER_SETTINGS | CHARACTER_SETTINGS}
+ * @resourceID {@link ResourceIDs.PUPPET_SETTINGS | PUPPET_SETTINGS}
  */
 class Settings extends BaseModel implements SettingsProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

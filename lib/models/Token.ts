@@ -8,7 +8,7 @@ declare interface Token extends BaseModel, TokenProperties {}
 // do not edit the first line of the class comment
 /**
  * A management token.
- * @resourceID TOKEN(auth.token.{id})
+ * @resourceID {@link ResourceIDs.TOKEN | TOKEN}
  */
 class Token extends BaseModel implements TokenProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

@@ -1,6 +1,11 @@
 {
   "upgrade": true,
   "reject": [
-    "@uwu-codes/tsconfig"
+    "@uwu-codes/tsconfig",
+    "typedoc",
+    "typedoc-plugin-extras",
+    "typedoc-plugin-mdn-links",
+    "typedoc-plugin-merge-modules",
+    "typedoc-plugin-rename-defaults"
   ]
 }

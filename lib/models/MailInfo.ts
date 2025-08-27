@@ -8,7 +8,7 @@ declare interface MailInfo extends BaseModel, MailInfoProperties {}
 // do not edit the first line of the class comment
 /**
  * The mail info.
- * @resourceID MAIL_INFO(mail.info)
+ * @resourceID {@link ResourceIDs.MAIL_INFO | MAIL_INFO}
  */
 class MailInfo extends BaseModel implements MailInfoProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

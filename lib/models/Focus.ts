@@ -10,8 +10,8 @@ interface Focus extends BaseModel, FocusProperties {}
 // do not edit the first line of the class comment
 /**
  * The focus options for a character.
- * @resourceID CHARACTER_FOCUS(core.char.{id}.focus)
- * @resourceID PUPPET_FOCUS(core.char.{char}.puppet.{puppet}.focus)
+ * @resourceID {@link ResourceIDs.CHARACTER_FOCUS | CHARACTER_FOCUS}
+ * @resourceID {@link ResourceIDs.PUPPET_FOCUS | PUPPET_FOCUS}
  */
 class Focus extends BaseModel implements FocusProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

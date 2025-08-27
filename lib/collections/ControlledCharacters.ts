@@ -7,7 +7,7 @@ import type { ResClient, CollectionAddRemove } from "resclient-ts";
 // do not edit the first line of the class comment
 /**
  * The controlled characters.
- * @resourceID CONTROLLED_CHARACTERS(core.player.{id}.ctrls)
+ * @resourceID {@link ResourceIDs.CONTROLLED_CHARACTERS | CONTROLLED_CHARACTERS}
  */
 export default class ControlledCharacters extends BaseCollection<ControlledCharacter> {
     private onAdd = this._onAdd.bind(this);

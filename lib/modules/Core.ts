@@ -106,7 +106,7 @@ export default class Core extends Base {
     }
 
     /**
-     * Get the authenticated user. For password authentication this will return {@link models/User}, for token authentication this will return {@link models/TokenUser}.
+     * Get the authenticated user. For password authentication this will return {@link User}, for token authentication this will return {@link TokenUser}.
      * @returns The authenticated user.
      */
     async getUser(): Promise<User | TokenUser> {

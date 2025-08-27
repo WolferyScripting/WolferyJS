@@ -8,7 +8,7 @@ declare interface CharacterInfo extends BaseModel, CharacterInfoProperties {}
 // do not edit the first line of the class comment
 /**
  * Extra info about a character. Reliability of lfrpDesc seems patchy at best.
- * @resourceID CHARACTER_INFO(core.char.{id}.info)
+ * @resourceID {@link ResourceIDs.CHARACTER_INFO | CHARACTER_INFO}
  */
 class CharacterInfo extends BaseModel implements CharacterInfoProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

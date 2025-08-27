@@ -9,7 +9,7 @@ declare interface Identity extends BaseModel, IdentityProperties {}
 // do not edit the first line of the class comment
 /**
  * The logged in player's identity.
- * @resourceID IDENTITY(identity.user.{id})
+ * @resourceID {@link ResourceIDs.IDENTITY | IDENTITY}
  */
 class Identity extends BaseModel implements IdentityProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

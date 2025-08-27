@@ -8,7 +8,7 @@ declare interface Bot extends BaseModel, BotProperties {}
 // do not edit the first line of the class comment
 /**
  * A bot.
- * @resourceID BOT(auth.user.{user}.bot.{bot})
+ * @resourceID {@link ResourceIDs.BOT | BOT}
  */
 class Bot extends BaseModel implements BotProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {

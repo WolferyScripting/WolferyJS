@@ -76,7 +76,7 @@ class Builder<T extends BuilderType = BuilderType> {
                 ids.push(`export const ${resource.name} = "${resource.raw}";`);
             } else {
                 for (const arg of resource.args) args.add(arg);
-                ids.push(`export const ${resource.name} = f\`${resource.raw.replaceAll("{", "${")}\`;`);
+                ids.push(`/** ${resource.raw} */`, `export const ${resource.name} = f\`${resource.raw.replaceAll("{", "${")}\`;`);
             }
         }
 
@@ -281,7 +281,7 @@ class Builder<T extends BuilderType = BuilderType> {
             const classStart = contents.findIndex(line => line.includes(`class ${resource.name}`));
             const commentStart = contents.findIndex((line, index) => index < classStart && line.match(/^\s*\/\*\*/));
             const docLine = (str: string): string => ` * ${(str.trim().startsWith("*") ? str.trim().slice(1) : str).trim()}`;
-            const formatRIDs = (): Array<string> => resource.id.map(id => docLine(`@resourceID ${id}`));
+            const formatRIDs = (): Array<string> => resource.id.map(id => docLine(`@resourceID {@link ResourceIDs.${id.slice(0, id.indexOf("("))} | ${id.slice(0, id.indexOf("("))}}`));
             if (commentStart === -1) {
                 // no comment, create a multi-line comment
                 contents.splice(classStart, 0, "/**", ` * ${resource.description}`, " */");

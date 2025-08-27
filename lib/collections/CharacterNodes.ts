@@ -9,7 +9,7 @@ import type { ResClient, CollectionAddRemove } from "resclient-ts";
 // do not edit the first line of the class comment
 /**
  * The teleport nodes a character has.
- * @resourceID CHARACTER_NODES(core.char.{id}.nodes)
+ * @resourceID {@link ResourceIDs.CHARACTER_NODES | CHARACTER_NODES}
  */
 export default class CharacterNodes extends BaseCollection<Node> {
     private onAdd = this._onAdd.bind(this);

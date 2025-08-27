@@ -5,6 +5,7 @@
   "plugin": [
     "typedoc-plugin-extras",
     "typedoc-plugin-mdn-links",
+    "typedoc-plugin-merge-modules",
     "typedoc-plugin-rename-defaults",
     "@mxssfd/typedoc-theme",
     "./dark.cjs"
@@ -21,7 +22,8 @@
   "out": "../docs",
   "json": "../docs/docs.json",
   "exclude": [],
-  "favicon": "./favicon.ico",
+  "favicon": "./static/favicon.ico",
   "titleLink": "https://wolferyjs.furry.cool",
+  "mergeModulesMergeMode": "project",
   "kindSortOrder": ["Class", "Namespace"]
 }
