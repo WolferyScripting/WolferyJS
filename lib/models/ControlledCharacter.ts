@@ -141,6 +141,8 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
     private async _onOut(data: Messages.Any): Promise<void> {
         const sent = "char" in data && this.id === data.char.id;
 
+        if (data.type === "broadcast") return; // do characters even get these?
+
         if (data.type === "privateDescribe") {
             const target = await this.api.get<Character>(ResourceIDs.CHARACTER({ id: data.target.id }));
             this.client.emit("message", "privateDescribe", sent, this, data.msg, target, data.script);

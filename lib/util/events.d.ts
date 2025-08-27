@@ -97,6 +97,8 @@ export interface OwnedCharacterEvents {
 }
 
 export interface CharacterEvents {
+    "areas.add": [char: Character, area: Area];
+    "areas.remove": [char: Character, area: Area];
     /** Emitted when a character wakes up. */
     "awakeCharacters.add": [char: Character];
     /** Emitted when a character goes to sleep. */
@@ -105,8 +107,6 @@ export interface CharacterEvents {
     "characterTags.remove": [char: Character, tag: Tag, pref: TagPref];
     /** Emitted when a character's idle status changes. */
     "idleStatusChange": [char: Character, status: IdleState, oldStatus: IdleState];
-    "areas.add": [char: Character, area: Area];
-    "areas.remove": [char: Character, area: Area];
     "rooms.add": [char: Character, area: Area];
     "rooms.remove": [char: Character, area: Area];
 }
@@ -145,6 +145,7 @@ export interface UserEvents {
 }
 
 export interface MiscEvents {
+    "broadcast": [msg: Messages.Broadcast];
     /** Emitted when a global teleport node is added. */
     "globalTeleports.add": [node: Node];
     /** Emitted when a global teleport node is removed. */

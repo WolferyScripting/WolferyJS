@@ -53,8 +53,8 @@ export interface LookupCharacter {
 
 export namespace Messages {
     export type Char = Record<"id" | "name" | "surname", string>;
-    export type MessageTypes = "wakeup" | "sleep" | "travel" | "say" | "pose" | "ooc" | "whisper" | "message" | "action" | "describe" | "mail" | "roll" | "leave" | "arrive" | "address" | "privateDescribe" | "info";
-    export type Any = Wakeup | Sleep | Travel | Say | Pose | OOC | Whisper | Message | Action | Describe | Mail | Roll | Leave | Arrive | Address | PrivateDescribe | Info;
+    export type MessageTypes = "wakeup" | "sleep" | "travel" | "say" | "pose" | "ooc" | "whisper" | "message" | "action" | "describe" | "mail" | "roll" | "leave" | "arrive" | "address" | "privateDescribe" | "info" | "broadcast";
+    export type Any = Wakeup | Sleep | Travel | Say | Pose | OOC | Whisper | Message | Action | Describe | Mail | Roll | Leave | Arrive | Address | PrivateDescribe | Info | Broadcast;
     export interface Base<T extends MessageTypes = MessageTypes> {
         id: string;
         sig: string;
@@ -168,6 +168,11 @@ export namespace Messages {
 
     export interface Info extends Base<"info"> {
         msg: string;
+    }
+
+    export interface Broadcast extends Base<"broadcast"> {
+        msg: string;
+        title?: string;
     }
 }
 

@@ -24,7 +24,7 @@ class Character extends BaseModel implements CharacterProperties {
     }
 
     private async _onChange(data: Partial<this>): Promise<void> {
-        if (data.awake !== undefined && this.awake !== data.awake && this.awake && this.client.options.fetch.charInfo && this._info === null) {
+        if (data.awake !== undefined && this.awake !== data.awake && this.awake && this.client.options.track.charInfo && this._info === null) {
             await this.getInfo().then(info => info.keep());
         }
 
@@ -39,7 +39,7 @@ class Character extends BaseModel implements CharacterProperties {
         const m = on ? "resourceOn" : "resourceOff";
         this[m]("change", this.onChange);
         if (on) {
-            if (this.client.options.fetch.charInfo && (this.awake || this.client.options.fetch.charInfoOffline)) {
+            if (this.client.options.track.charInfo && (this.awake || this.client.options.track.charInfoOffline)) {
                 this._info = await this.getInfo();
                 this._info.keep();
             }

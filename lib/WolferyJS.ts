@@ -53,34 +53,36 @@ export interface Options {
         username?: string;
     };
     clientOptions?: ClientOptions;
-    fetch?: {
+    /** If pings should be sent to prevent being released for inactivity. Defaults to `true` */
+    pingCharacters?: boolean;
+    /** Set to false to not fetch anything extra on startup. This takes precedent over all of the track options. */
+    startup?: boolean;
+    track?: {
+        /** If awake characters should be tracked. Defaults to `true`. */
+        awake?: boolean;
+        /** If the player's bots should be tracked. Defaults to `true`. */
+        bots?: boolean;
+        /** If broadcasts should be tracked. Defaults to `true`. */
+        broadcast?: boolean;
         /** If character info should be fetched for {@link Chracter} models. Required for seeing about/lfrpDesc changes. Defaults to `false`. See also {@link charInfo} */
         charInfo?: boolean;
         /** If character info should be fetched for offline {@link Character} models. Defaults to `false`. */
         charInfoOffline?: boolean;
-        /** Set to false to not fetch anything extra on startup. This takes precedent over all of the track options. */
-        startup?: boolean;
-        /** If awake characters should be tracked. Defaults to `true`. */
-        trackAwake?: boolean;
-        /** If the player's bots should be tracked. Defaults to `true`. */
-        trackBots?: boolean;
         /** If incoming requests should be tracked. Defaults to `true`. */
-        trackIncomingRequests?: boolean;
+        incomingRequests?: boolean;
         /** If unread mail should be tracked. Defaults to `true` if `authentication.type` === "password", has no effect otherwise. */
-        trackMail?: boolean;
+        mail?: boolean;
         /** If note changes should be tracked. Each note must be fetched individually to track changes, so this can potentially flood the server with requests and expand the cache significantly. */
-        trackNoteChanges?: boolean;
+        noteChanges?: boolean;
         /** If note additions & removals should be tracked. This will not track text changes in individual notes. Defaults to `true` */
-        trackNotes?: boolean;
+        notes?: boolean;
         /** If outgoing requests should be tracked. Defaults to `true`. */
-        trackOutgoingRequests?: boolean;
+        outgoingRequests?: boolean;
         /** If the player's tokens should be tracked. Defaults to `true`. */
-        trackTokens?: boolean;
+        tokens?: boolean;
         /** If watched characters should be tracked. Defaults to the same as `trackAwake`. */
-        trackWatched?: boolean;
+        watched?: boolean;
     };
-    /** If pings should be sent to prevent being released for inactivity. Defaults to `true` */
-    pingCharacters?: boolean;
     resClientFactory?(this: void, client: WolferyJS): ResClient;
     wsFactory?(this: void, client: WolferyJS): WebSocket;
 }
@@ -89,21 +91,22 @@ export interface InstanceOptions {
     authentication: PasswordAuthentication | BotAuthentication | TokenAuthentication;
     clientOptions: ClientOptions;
     domain: string;
-    fetch: {
+    pingCharacters: boolean;
+    startup: boolean;
+    track: {
+        awake: boolean;
+        bots: boolean;
+        broadcast: boolean;
         charInfo: boolean;
         charInfoOffline: boolean;
-        startup: boolean;
-        trackAwake: boolean;
-        trackBots: boolean;
-        trackIncomingRequests: boolean;
-        trackMail: boolean;
-        trackNoteChanges: boolean;
-        trackNotes: boolean;
-        trackOutgoingRequests: boolean;
-        trackTokens: boolean;
-        trackWatched: boolean;
+        incomingRequests: boolean;
+        mail: boolean;
+        noteChanges: boolean;
+        notes: boolean;
+        outgoingRequests: boolean;
+        tokens: boolean;
+        watched: boolean;
     };
-    pingCharacters: boolean;
     resClientFactory(this: void, client: WolferyJS): ResClient;
     wsFactory(this: void, client: WolferyJS): WebSocket;
 }
@@ -162,20 +165,21 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
                 defaultErrorFactory:      (api, rid): ResError => this._missingRes("error", api, rid, options.clientOptions?.defaultErrorFactory),
                 defaultModelFactory:      (api, rid): ResModel => this._missingRes("model", api, rid, options.clientOptions?.defaultModelFactory)
             },
-            domain: options.apiDomain ?? "wolfery.com",
-            fetch:  {
-                charInfo:              options.fetch?.charInfo ?? false,
-                charInfoOffline:       options.fetch?.charInfoOffline ?? false,
-                startup:               options.fetch?.startup ?? true,
-                trackAwake:            options.fetch?.trackAwake ?? true,
-                trackBots:             options.fetch?.trackBots ?? true,
-                trackIncomingRequests: options.fetch?.trackIncomingRequests ?? true,
-                trackMail:             options.fetch?.trackMail ?? options.authentication.type === "password",
-                trackNoteChanges:      options.fetch?.trackNoteChanges ?? false,
-                trackNotes:            options.fetch?.trackNotes ?? true,
-                trackOutgoingRequests: options.fetch?.trackOutgoingRequests ?? true,
-                trackTokens:           options.fetch?.trackTokens ?? true,
-                trackWatched:          options.fetch?.trackWatched ?? options.fetch?.trackAwake ?? true
+            domain:  options.apiDomain ?? "wolfery.com",
+            startup: options.startup ?? false,
+            track:   {
+                awake:            options.track?.awake ?? true,
+                bots:             options.track?.bots ?? true,
+                broadcast:        options.track?.broadcast ?? true,
+                charInfo:         options.track?.charInfo ?? false,
+                charInfoOffline:  options.track?.charInfoOffline ?? false,
+                incomingRequests: options.track?.incomingRequests ?? true,
+                mail:             options.track?.mail ?? options.authentication.type === "password",
+                noteChanges:      options.track?.noteChanges ?? false,
+                notes:            options.track?.notes ?? true,
+                outgoingRequests: options.track?.outgoingRequests ?? true,
+                tokens:           options.track?.tokens ?? true,
+                watched:          options.track?.watched ?? options.track?.awake ?? true
             },
             pingCharacters:   options.pingCharacters ?? true,
             wsFactory:        options.wsFactory ?? ((client: WolferyJS): WebSocket => new WebSocket(client.wsURL, { handshakeTimeout: 5000 })),
@@ -193,33 +197,36 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
 
     private async _afterAuthenticate(type: "password" | "token" | "bot"): Promise<void> {
         const promises: Array<Promise<unknown>> = [];
-        if (this.options.fetch.startup) {
-            if (this.options.fetch.trackAwake) {
+        if (this.options.startup) {
+            if (this.options.track.awake) {
                 promises.push(this.api.subscribe(ResourceIDs.AWAKE_CHARACTERS, true));
             }
 
             if (type === "password") {
                 const player = await this.modules.core.getPlayer();
-                if (this.options.fetch.trackAwake) {
+                if (this.options.track.awake) {
                     promises.push(this.api.subscribe(ResourceIDs.WATCHES({ id: player.id }), true));
                 }
-                if (this.options.fetch.trackMail) {
+                if (this.options.track.mail) {
                     promises.push(this.api.subscribe(ResourceIDs.UNREAD_MAIL({ id: player.id }), true));
                 }
-                if (this.options.fetch.trackIncomingRequests) {
+                if (this.options.track.incomingRequests) {
                     promises.push(this.api.subscribe(ResourceIDs.INCOMING_REQUESTS({ id: player.id }), true));
                 }
-                if (this.options.fetch.trackOutgoingRequests) {
+                if (this.options.track.outgoingRequests) {
                     promises.push(this.api.subscribe(ResourceIDs.OUTGOING_REQUESTS({ id: player.id }), true));
                 }
-                if (this.options.fetch.trackBots) {
+                if (this.options.track.bots) {
                     promises.push(this.api.subscribe(ResourceIDs.BOTS({ id: player.id }), true));
                 }
-                if (this.options.fetch.trackTokens) {
+                if (this.options.track.tokens) {
                     promises.push(this.api.subscribe(ResourceIDs.TOKENS({ id: player.id }), true));
                 }
-                if (this.options.fetch.trackNotes) {
-                    if (this.options.fetch.trackNoteChanges) {
+                if (this.options.track.broadcast) {
+                    promises.push(this.api.subscribe(ResourceIDs.CORE_INFO, true));
+                }
+                if (this.options.track.notes) {
+                    if (this.options.track.noteChanges) {
                         const notes = await this.api.get<Notes>(ResourceIDs.NOTES({ id: player.id }), true);
                         for (const note of notes.list) {
                             promises.push(this.api.get(note.rid, true));
