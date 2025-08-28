@@ -25,6 +25,8 @@ import ResEventObserver from "../util/ResEventObserver.js";
 import type { ControlledCharacterProperties } from "../generated/models/types.js";
 import { ControlledCharacterDefinition } from "../generated/models/definitions.js";
 import { PING_DURATION } from "../util/Constants.js";
+import type RoomProfiles from "../collections/RoomProfiles.js";
+import type RoomScripts from "../collections/RoomScripts.js";
 import { fileTypeFromBuffer } from "file-type";
 import type { AnyFunction, CollectionAddRemove, ResClient } from "resclient-ts";
 
@@ -37,6 +39,8 @@ declare interface ControlledCharacter extends BaseModel, ControlledCharacterProp
  */
 class ControlledCharacter extends BaseModel implements ControlledCharacterProperties {
     private _pingTimeout!: NodeJS.Timeout | null;
+    private _roomProfiles!: RoomProfiles | null;
+    private _roomScripts!: RoomScripts | null;
     private onChange = this._onChange.bind(this);
     private onExitAdd = this._onExitAdd.bind(this);
     private onExitChange = this._onExitChange.bind(this);
@@ -45,12 +49,18 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
     private onOut = this._onOut.bind(this);
     private onRoomCharAdd = this._onRoomCharAdd.bind(this);
     private onRoomCharRemove = this._onRoomCharRemove.bind(this);
+    private onRoomProfileAdd = this._onRoomProfileAdd.bind(this);
+    private onRoomProfileRemove = this._onRoomProfileRemove.bind(this);
+    private onRoomScriptAdd = this._onRoomScriptAdd.bind(this);
+    private onRoomScriptRemove = this._onRoomScriptRemove.bind(this);
     private roomExitAwakeCharAddListeners!: Array<{ exit: Exit; fn: AnyFunction; }>;
     private roomExitAwakeCharRemoveListeners!: Array<{ exit: Exit; fn: AnyFunction; }>;
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: ControlledCharacterDefinition });
         this.p
             .writable("_pingTimeout", null)
+            .writable("_roomProfiles", null)
+            .writable("_roomScripts", null)
             .writable("onChange")
             .writable("onExitAdd")
             .writable("onExitChange")
@@ -59,6 +69,10 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
             .writable("onOut")
             .writable("onRoomCharAdd")
             .writable("onRoomCharRemove")
+            .writable("onRoomProfileAdd")
+            .writable("onRoomProfileRemove")
+            .writable("onRoomScriptAdd")
+            .writable("onRoomScriptRemove")
             .writable("roomExitAwakeCharAddListeners", [])
             .writable("roomExitAwakeCharRemoveListeners", []);
     }
@@ -74,8 +88,8 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         }
 
         if (data.inRoom !== undefined) {
-            this._listenInRoom(false, data.inRoom);
-            this._listenInRoom(true, this.inRoom);
+            this._listenRoom(false, data.inRoom);
+            this._listenRoom(true, this.inRoom);
         }
     }
 
@@ -219,6 +233,22 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         this.client.emit("roomCharacters.exit.remove", this, room, exit, char);
     }
 
+    private _onRoomProfileAdd(data: CollectionAddRemove<RoomProfile>): void {
+        this.client.emit("roomProfiles.add", this, this.inRoom, data.item);
+    }
+
+    private _onRoomProfileRemove(data: CollectionAddRemove<RoomProfile>): void {
+        this.client.emit("roomProfiles.remove", this, this.inRoom, data.item);
+    }
+
+    private _onRoomScriptAdd(data: CollectionAddRemove<RoomScript>): void {
+        this.client.emit("roomScripts.add", this, this.inRoom, data.item);
+    }
+
+    private _onRoomScriptRemove(data: CollectionAddRemove<RoomScript>): void {
+        this.client.emit("roomScripts.remove", this, this.inRoom, data.item);
+    }
+
     protected override async _listen(on: boolean): Promise<void> {
         await super._listen(on);
         const m = on ? "resourceOn" : "resourceOff";
@@ -234,14 +264,12 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
             }
         }
 
-        this._listenInRoom(on, this.inRoom);
+        await this._listenRoom(on, this.inRoom);
     }
 
     protected _listenExit(on: boolean, exit: Exit): void {
-        console.log(exit.id, exit.target);
         if (on && exit.target?.awake) {
             const room = exit.target;
-            console.log("listen exit", this.fullname, exit.id);
             const add = (data: CollectionAddRemove<Character>): void => this._onRoomExitAwakeCharAdd(data.item, exit, room);
             const remove = (data: CollectionAddRemove<Character>): void => this._onRoomExitAwakeCharRemove(data.item, exit, room);
             exit.target.awake.resourceOn("add", add);
@@ -262,23 +290,33 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         }
     }
 
-    protected _listenInRoom(on: boolean, room: RoomDetails): void {
-        console.log("listenRoom", on, room, room.exits.list);
+    protected async _listenLookedAt(on: boolean): Promise<void> {
+        const m = on ? "resourceOn" : "resourceOff";
+        this.lookedAt[m]("change", this.onLookedAtChange);
+    }
+
+    protected async _listenRoom(on: boolean, room: RoomDetails): Promise<void> {
         if (on) {
             room.exits.resourceOn("add", this.onExitAdd);
             room.exits.resourceOn("remove", this.onExitRemove);
-            console.log("listen exits", room.id);
             for (const exit of room.exits) {
                 exit.resourceOn("change", this.onExitChange);
                 this._listenExit(on, exit);
             }
             room.chars?.resourceOn("add", this.onRoomCharAdd);
             room.chars?.resourceOn("remove", this.onRoomCharRemove);
-            console.log("listen room chars", this.fullname, room.id, !!room.chars);
+            if (room.owner.id === this.id) {
+                // we own the room, listen for profile & script changes
+                this._roomProfiles = await room.getProfiles();
+                this._roomScripts = await room.getScripts();
+                this._roomProfiles.resourceOn("add", this.onRoomProfileAdd);
+                this._roomProfiles.resourceOn("remove", this.onRoomProfileRemove);
+                this._roomScripts.resourceOn("add", this.onRoomScriptAdd);
+                this._roomScripts.resourceOn("remove", this.onRoomScriptRemove);
+            }
         } else {
             room.exits.resourceOff("add", this.onExitAdd);
             room.exits.resourceOff("remove", this.onExitRemove);
-            console.log("unlisten exits", room.id);
             for (const exit of room.exits) {
                 exit.resourceOff("change", this.onExitChange);
                 this._listenExit(on, exit);
@@ -287,13 +325,17 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
             this.roomExitAwakeCharRemoveListeners = [];
             room.chars?.resourceOff("add", this.onRoomCharAdd);
             room.chars?.resourceOff("remove", this.onRoomCharRemove);
-            console.log("unlisten room chars", this.fullname, room.id, !!room.chars);
+            if (this._roomProfiles) {
+                this._roomProfiles.resourceOff("add", this.onRoomProfileAdd);
+                this._roomProfiles.resourceOff("remove", this.onRoomProfileRemove);
+                this._roomProfiles = null;
+            }
+            if (this._roomScripts) {
+                this._roomScripts.resourceOff("add", this.onRoomScriptAdd);
+                this._roomScripts.resourceOff("remove", this.onRoomScriptRemove);
+                this._roomScripts = null;
+            }
         }
-    }
-
-    protected async _listenLookedAt(on: boolean): Promise<void> {
-        const m = on ? "resourceOn" : "resourceOff";
-        this.lookedAt[m]("change", this.onLookedAtChange);
     }
 
     get avatarURL(): string | null {

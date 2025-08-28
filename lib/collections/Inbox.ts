@@ -4,7 +4,7 @@ import type WolferyJS from "../WolferyJS.js";
 import type Commands from "../util/commands.js";
 import type Character from "../models/Character.js";
 import type { BasicCharacterResponse } from "../util/types.js";
-import type { ResClient } from "resclient-ts";
+import type { CollectionAddRemove, ResClient } from "resclient-ts";
 
 // do not edit the first line of the class comment
 /**
@@ -18,12 +18,12 @@ class Inbox extends BaseCollection<PlayerMailMessage> {
         super(client, api, rid);
     }
 
-    private async _onAdd(mail: PlayerMailMessage): Promise<void> {
-        console.log("add messages", mail);
+    private async _onAdd(data: CollectionAddRemove<PlayerMailMessage>): Promise<void> {
+        this.client.emit("inbox.add", data.item);
     }
 
-    private async _onRemove(mail: PlayerMailMessage): Promise<void> {
-        console.log("remove messages", mail);
+    private async _onRemove(data: CollectionAddRemove<PlayerMailMessage>): Promise<void> {
+        this.client.emit("inbox.remove", data.item);
     }
 
     protected override async _listen(on: boolean): Promise<void> {

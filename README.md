@@ -1,5 +1,5 @@
 <p align="center">
-  <img width=25% src="static/icon-transparent.png">
+  <img width=25% src="https://raw.githubusercontent.com/WolferyScripting/WolferyJS/b4f029eec7424d043df15b4d5b8ff02979e924f7/static/icon-transparent.png">
   <p align="center">A comprehensive API wrapper for https://wolfery.com.</p>
 </p>
 <p align="center">
@@ -94,8 +94,8 @@ client.connect();
 
 ## Contributing
 Contributions are welcome and appreciated.<br>
-The comments, definitions, exports, types, resource ids, and properties of collections and models are generated from the [collections.json](schema/collections.json) and [models.json](schema/models.json) files in the [schema](schema/) folder.<br>
-An overview of how these are structured can be found in the [schema.ts](schema/schema.ts) file as typebox json schema definitions.<br>
+The comments, definitions, exports, types, resource ids, and properties of collections and models are generated from the [collections.json](https://github.com/WolferyScripting/WolferyJS/blob/dev/schema/collections.json) and [models.json](https://github.com/WolferyScripting/WolferyJS/blob/dev/schema/models.json) files in the [schema](https://github.com/WolferyScripting/WolferyJS/tree/dev/schema) folder.<br>
+An overview of how these are structured can be found in the [schema.ts](https://github.com/WolferyScripting/WolferyJS/blob/dev/schema/schema.ts) file as typebox json schema definitions.<br>
 To regenerate the collections & models, simply run `pnpm build:schema`. Subcommands exist to run only rebuild specifics.
 
-Do not directly edit anything in the [generated](generated/) folder, or the comments on collections or models. The first line and any line containing `@resourceID` will be overwritten when the schema is built.
+Do not directly edit anything in the [generated](https://github.com/WolferyScripting/WolferyJS/tree/dev/generated) folder, or the comments on collections or models. The first line and any line containing `@resourceID` will be overwritten when the schema is built.

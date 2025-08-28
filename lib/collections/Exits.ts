@@ -12,17 +12,10 @@ import type { ResClient } from "resclient-ts";
 export default class Exits extends BaseCollection<Exit> {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { idCallback: toID });
-        console.log("construct exits", this.rid);
     }
 
     // @TODO
     async getHidden(): Promise<unknown> {
         return this.api.get(`${this.rid}.hidden`);
-    }
-
-    override async init(data?: Array<Exit> | undefined): Promise<this> {
-        await super.init(data);
-        console.log("init exits", this.rid);
-        return this;
     }
 }

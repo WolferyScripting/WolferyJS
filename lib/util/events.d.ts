@@ -56,13 +56,13 @@ export interface ControlledCharacterEvents {
     /** Emitted when a character leaves the room a controlled character is in. */
     "roomCharacters.remove": [ctrl: ControlledCharacter, room: RoomDetails, roomChar: RoomCharacter];
     /** Emitted when a room profile is added for an owned character. */
-    "roomProfiles.add": [ctrl: ControlledCharacter, room: Room, roomProfile: RoomProfile];
+    "roomProfiles.add": [ctrl: ControlledCharacter, room: RoomDetails, roomProfile: RoomProfile];
     /** Emitted when a room profile is removed for an owned character. */
-    "roomProfiles.remove": [ctrl: ControlledCharacter, room: Room, roomProfile: RoomProfile];
+    "roomProfiles.remove": [ctrl: ControlledCharacter, room: RoomDetails, roomProfile: RoomProfile];
     /** Emitted when a room script is added for an owned character. */
-    "roomScripts.add": [ctrl: ControlledCharacter, room: Room, roomScript: RoomScript];
+    "roomScripts.add": [ctrl: ControlledCharacter, room: RoomDetails, roomScript: RoomScript];
     /** Emitted when a room script is removed for an owned character. */
-    "roomScripts.remove": [ctrl: ControlledCharacter, room: Room, roomScript: RoomScript];
+    "roomScripts.remove": [ctrl: ControlledCharacter, room: RoomDetails, roomScript: RoomScript];
 }
 
 export interface OwnedCharacterEvents {
@@ -114,6 +114,8 @@ export interface CharacterEvents {
 export interface PlayerEvents {
     "bots.add": [bot: Bot];
     "bots.remove": [bot: Bot];
+    "inbox.add": [mail: PlayerMailMessage];
+    "inbox.remove": [mail: PlayerMailMessage];
     "mutedCharacters.add": [char: CharacterMin];
     "mutedCharacters.remove": [char: CharacterMin];
     "notes.add": [note: Note, char: Character];
