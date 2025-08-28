@@ -8,7 +8,7 @@ import type TagInfo from "../models/TagInfo.ts";
 import type WebClientInfo from "../models/WebClientInfo.ts";
 export type { FocusOptions } from "../models/Focus.ts";
 
-export type Writeable<T> = { -readonly [P in keyof T]: T[P] };
+export type Writable<T> = { -readonly [P in keyof T]: T[P] };
 export type AuthTypes = "password" | "bot" | "token";
 
 export interface PasswordAuthentication {

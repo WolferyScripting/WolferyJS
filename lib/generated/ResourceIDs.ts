@@ -1,4 +1,4 @@
-import type { Writeable } from "../util/types.js";
+import type { Writable } from "../util/types.js";
 
 /* eslint-disable @typescript-eslint/no-namespace, @typescript-eslint/explicit-function-return-type*/
 namespace ResourceIDs {
@@ -50,7 +50,7 @@ namespace ResourceIDs {
                 return new RegExp(`^${pattern}$`);
             }
         });
-        func.parts = (value: string) => getRIDParts(func as unknown as RIDFunction<Writeable<Parts>>, value);
+        func.parts = (value: string) => getRIDParts(func as unknown as RIDFunction<Writable<Parts>>, value);
         return func satisfies ((args: ArgObject<Parts>) => string) as unknown as RIDFunction<Parts>;
     }
 
@@ -212,6 +212,8 @@ namespace ResourceIDs {
     export const BOT = f`auth.user.${user}.bot.${bot}`;
     /** auth.user.{id}.bots */
     export const BOTS = f`auth.user.${id}.bots`;
+    /** core.room.{id}.exits.hidden */
+    export const HIDDEN_EXITS = f`core.room.${id}.exits.hidden`;
     /** core.char.{id}.nodes */
     export const CHARACTER_NODES = f`core.char.${id}.nodes`;
     /** core.player.{id}.ctrls */

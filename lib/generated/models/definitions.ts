@@ -634,3 +634,5 @@ export const BotDefinition: Record<string, PropertyDefinition> = {
 };
 
 export const BotsDefinition: Record<string, PropertyDefinition> = {};
+
+export const HiddenExitsDefinition: Record<string, PropertyDefinition> = {};

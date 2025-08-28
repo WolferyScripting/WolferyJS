@@ -1234,3 +1234,8 @@ export interface BotProperties {
  * The authenticated user's bots.
  */
 export interface BotsProperties {}
+
+/**
+ * The hidden exits in a room.
+ */
+export interface HiddenExitsProperties {}

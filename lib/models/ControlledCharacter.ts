@@ -12,6 +12,7 @@ import type RoomCharacter from "./RoomCharacter.js";
 import type RoomDetails from "./RoomDetails.js";
 import type LookedAt from "./LookedAt.js";
 import type FocusChars from "./FocusChars.js";
+import type HiddenExits from "./HiddenExits.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
 import {
     type KeyBasicResponse,
@@ -41,6 +42,7 @@ declare interface ControlledCharacter extends BaseModel, ControlledCharacterProp
  */
 class ControlledCharacter extends BaseModel implements ControlledCharacterProperties {
     private _focusChars!: FocusChars | null;
+    private _hiddenExits!: HiddenExits | null;
     private _pingTimeout!: NodeJS.Timeout | null;
     private _roomProfiles!: RoomProfiles | null;
     private _roomScripts!: RoomScripts | null;
@@ -51,6 +53,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         super(client, api, rid, { definition: ControlledCharacterDefinition });
         this.p
             .writable("_focusChars", null)
+            .writable("_hiddenExits", null)
             .writable("_pingTimeout", null)
             .writable("_roomProfiles", null)
             .writable("_roomScripts", null)
@@ -208,6 +211,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
     protected async _listenRoom(on: boolean, room: RoomDetails): Promise<void> {
         const owner = room.owner.id === this.id;
         if (on) {
+            if (this.client.options.track.hiddenExits && owner) this._hiddenExits = await room.getHiddenExits();
             if (this.client.options.track.roomProfiles && owner) this._roomProfiles = await room.getProfiles();
             if (this.client.options.track.roomScripts && owner) this._roomScripts = await room.getScripts();
         }
@@ -221,6 +225,12 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         if (room.chars) {
             this.listeners.addOrRemove(on, room.chars, data => this.client.emit("roomCharacters.add", this, room, data.item), data => this.client.emit("roomCharacters.remove", this, room, data.item), kControlledCharacter(this.id));
         }
+        if (this.client.options.track.hiddenExits && owner && this._hiddenExits) {
+            this.listeners.addOrRemove(on, this._hiddenExits, data => this.client.emit("exits.hidden.add", this, room, data.item), data => this.client.emit("exits.hidden.remove", this, room, data.item), kControlledCharacter(this.id));
+            for (const exit of this._hiddenExits) {
+                this._listenExit(on, exit);
+            }
+        }
         if (this.client.options.track.roomProfiles && owner && this._roomProfiles) {
             this.listeners.addOrRemove(on, this._roomProfiles, data => this.client.emit("roomProfiles.add", this, room, data.item), data => this.client.emit("roomProfiles.remove", this, room, data.item), kControlledCharacter(this.id));
         }
@@ -229,6 +239,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         }
 
         if (!on) {
+            this._hiddenExits = null;
             this._roomProfiles = null;
             this._roomScripts = null;
         }

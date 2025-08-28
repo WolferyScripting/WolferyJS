@@ -85,6 +85,8 @@ export interface TrackOptions {
     globalTags?: boolean;
     /** If global teleports should be tracked. Defaults to `true`. */
     globalTeleports?: boolean;
+    /** If hidden exits should be tracked. Defaults to `true`. */
+    hiddenExits?: boolean;
     /** If incoming requests should be tracked. Defaults to `true`. */
     incomingRequests?: boolean;
     /** If unread mail should be tracked. Defaults to `true` if `authentication.type` === "password", has no effect otherwise. */
@@ -125,6 +127,7 @@ export interface InstanceOptions {
         focusChars: boolean;
         globalTags: boolean;
         globalTeleports: boolean;
+        hiddenExits: boolean;
         incomingRequests: boolean;
         mail: boolean;
         noteChanges: boolean;
@@ -208,6 +211,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
                 focusChars:       options.track?.focusChars ?? true,
                 globalTags:       options.track?.globalTags ?? true,
                 globalTeleports:  options.track?.globalTeleports ?? true,
+                hiddenExits:      options.track?.hiddenExits ?? true,
                 incomingRequests: authRequired(options.track?.incomingRequests ?? true, "password"),
                 mail:             authRequired(options.track?.mail ?? true, "password"),
                 noteChanges:      authRequired(options.track?.noteChanges ?? false, "password"),

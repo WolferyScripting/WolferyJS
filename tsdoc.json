@@ -38,6 +38,14 @@
     {
       "tagName": "@overseerRoleRequired",
       "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@roomOwnershipRequired",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@areaOwnershipRequired",
+      "syntaxKind": "modifier"
     }
   ]
 }

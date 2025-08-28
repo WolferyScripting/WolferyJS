@@ -1780,5 +1780,12 @@
     "id": ["BOTS(auth.user.{id}.bots)"],
     "name": "Bots",
     "model": "Bot"
+  },
+  {
+    "collection": true,
+    "description": "The hidden exits in a room.",
+    "id": ["HIDDEN_EXITS(core.room.{id}.exits.hidden)"],
+    "name": "HiddenExits",
+    "model": "Exit"
   }
 ]

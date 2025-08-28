@@ -70,6 +70,7 @@ import Notice from "../../models/Notice.js";
 import Token from "../../models/Token.js";
 import Bot from "../../models/Bot.js";
 import Bots from "../../models/Bots.js";
+import HiddenExits from "../../models/HiddenExits.js";
 
 export default function registerModels(client: WolferyJS, res: ResClient): void {
     res.registerModelType(ResourceIDs.AFAR_ROOM({ id: "*" }), (api, rid) => new AfarRoom(client, api, rid));
@@ -146,4 +147,5 @@ export default function registerModels(client: WolferyJS, res: ResClient): void 
     res.registerModelType(ResourceIDs.TOKEN({ id: "*" }), (api, rid) => new Token(client, api, rid));
     res.registerModelType(ResourceIDs.BOT({ user: "*", bot: "*" }), (api, rid) => new Bot(client, api, rid));
     res.registerModelType(ResourceIDs.BOTS({ id: "*" }), (api, rid) => new Bots(client, api, rid));
+    res.registerModelType(ResourceIDs.HIDDEN_EXITS({ id: "*" }), (api, rid) => new HiddenExits(client, api, rid));
 }

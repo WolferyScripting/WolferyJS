@@ -43,7 +43,7 @@ const client = new WolferyJS({
 });
 // user = https://wolferyjs.furry.cool/latest/classes/User.html
 // player = https://wolferyjs.furry.cool/latest/classes/Player.html
-client.on("connected", async (user, player) => {
+client.on("connected.player", async (user, player) => {
     console.log(`Logged in as @${user.identity.name} (${user.id})`);
     const ctrl = await player.chars.first().wakeup();
     await ctrl.say("I said this through the WolferyJS wrapper.");
@@ -62,8 +62,7 @@ const client = new WolferyJS({
     }
 });
 // user = https://wolferyjs.furry.cool/latest/classes/BotUser.html
-// no player
-client.on("connected", async (user) => {
+client.on("connected.bot", async user => {
     console.log(`Logged in as bot ${user.char.fullname} (${user.char.id})`);
     const ctrl = await user.wakeup();
     await ctrl.say("I said this through the WolferyJS wrapper.");
@@ -82,12 +81,8 @@ const client = new WolferyJS({
     }
 });
 // user = https://wolferyjs.furry.cool/latest/classes/TokenUser.html
-// no player
-client.on("connected", async (user) => {
-    console.log(`Logged in as bot ${user.char.fullname} (${user.char.id})`);
-    const ctrl = await user.wakeup();
-    await ctrl.say("I said this through the WolferyJS wrapper.");
-    await ctrl.sleep();
+client.on("connected.token", async (user) => {
+    console.log(`Logged in with token for user ${user.id}`);
 });
 client.connect();
 ```
@@ -98,4 +93,6 @@ The comments, definitions, exports, types, resource ids, and properties of colle
 An overview of how these are structured can be found in the [schema.ts](https://github.com/WolferyScripting/WolferyJS/blob/dev/schema/schema.ts) file as typebox json schema definitions.<br>
 To regenerate the collections & models, simply run `pnpm build:schema`. Subcommands exist to run only rebuild specifics.
 
-Do not directly edit anything in the [generated](https://github.com/WolferyScripting/WolferyJS/tree/dev/generated) folder, or the comments on collections or models. The first line and any line containing `@resourceID` will be overwritten when the schema is built.
+Do not directly edit anything in the [generated](https://github.com/WolferyScripting/WolferyJS/tree/dev/generated) folder, or the comments on collections or models.<br>
+The first line on collections and models and any line containing `@resourceID` will be overwritten when the schema is built.<br>
+If an interface needs to be exported from a collection or model, export it at the bottom of the file and re-export it from [util/types.d.ts](https://github.com/WolferyScripting/WolferyJS/blob/dev/lib/util/types.d.ts)

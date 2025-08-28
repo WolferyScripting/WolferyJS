@@ -39,6 +39,8 @@ import type { AnyObject } from "resclient-ts";
 export interface ControlledCharacterEvents {
     "exits.add": [ctrl: ControlledCharacter, room: RoomDetails, exit: Exit];
     "exits.change": [ctrl: ControlledCharacter, room: RoomDetails, exit: Exit, data: Partial<Exit>];
+    "exits.hidden.add": [ctrl: ControlledCharacter, room: RoomDetails, exit: Exit];
+    "exits.hidden.remove": [ctrl: ControlledCharacter, room: RoomDetails, exit: Exit];
     "exits.remove": [ctrl: ControlledCharacter, room: RoomDetails, exit: Exit];
     "focus.add": [ctrl: ControlledCharacter, options: FocusOptions];
     "focus.remove": [ctrl: ControlledCharacter, options: FocusOptions];

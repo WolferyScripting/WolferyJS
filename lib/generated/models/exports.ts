@@ -68,3 +68,4 @@ export { default as MailUser } from "../../models/MailUser.js";
 export { default as Token } from "../../models/Token.js";
 export { default as Bot } from "../../models/Bot.js";
 export { default as Bots } from "../../models/Bots.js";
+export { default as HiddenExits } from "../../models/HiddenExits.js";

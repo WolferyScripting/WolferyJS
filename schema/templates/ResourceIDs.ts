@@ -1,4 +1,4 @@
-import type { Writeable } from "@util/types.js";
+import type { Writable } from "@util/types.js";
 
 /* eslint-disable @typescript-eslint/no-namespace, @typescript-eslint/explicit-function-return-type*/
 namespace ResourceIDs {
@@ -50,7 +50,7 @@ namespace ResourceIDs {
                 return new RegExp(`^${pattern}$`);
             }
         });
-        func.parts = (value: string) => getRIDParts(func as unknown as RIDFunction<Writeable<Parts>>, value);
+        func.parts = (value: string) => getRIDParts(func as unknown as RIDFunction<Writable<Parts>>, value);
         return func satisfies ((args: ArgObject<Parts>) => string) as unknown as RIDFunction<Parts>;
     }
 
