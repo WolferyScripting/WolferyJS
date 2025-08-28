@@ -282,6 +282,8 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         })
             .then(async() => {
                 const user = await this.modules.core.getBotUser();
+                this.emit("authenticated");
+                this.emit("authenticated.bot", user);
                 await this._afterAuthenticate("bot");
                 return { user };
             })
@@ -301,6 +303,8 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             .then(async() => {
                 const user = await this.modules.core.getFullUser();
                 const player = await this.modules.core.getPlayer();
+                this.emit("authenticated");
+                this.emit("authenticated.player", user, player);
                 await this._afterAuthenticate("password");
                 return { user, player };
             })
@@ -317,6 +321,8 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         })
             .then(async() => {
                 const user = await this.modules.core.getTokenUser();
+                this.emit("authenticated");
+                this.emit("authenticated.token", user);
                 await this._afterAuthenticate("token");
                 return { user };
             })
@@ -451,7 +457,21 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
                     throw new Error(`Invalid authentication type: ${(this.options.authentication as { type: string; }).type}`);
                 }
             }
-            this.emit("connected", this._user! as User, this._player as Player);
+            this.emit("connected");
+            switch (this.options.authentication.type) {
+                case "password": {
+                    this.emit("connected.player", this._user as User, this._player as Player);
+                    break;
+                }
+                case "bot": {
+                    this.emit("connected.bot", this._user as BotUser);
+                    break;
+                }
+                case "token": {
+                    this.emit("connected.token", this._user as TokenUser);
+                    break;
+                }
+            }
         }, (api, err) => this.emit("error", err));
         await res.connect();
     }

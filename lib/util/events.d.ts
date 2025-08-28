@@ -174,7 +174,22 @@ export interface MiscEvents {
 }
 
 export interface ClientEvents {
-    connected: [user: User, player: Player] | [user: TokenUser, player: null] | [bot: BotUser, player: null];
+    /** Emitted after the client has successfully authenticated. This is emitted before any tracking is setup. */
+    "authenticated": [];
+    /** Emitted after the client has successfully authenticated as a bot. This is emitted before any tracking is setup. */
+    "authenticated.bot": [bot: BotUser];
+    /** Emitted after the client has successfully authenticated as a player. This is emitted before any tracking is setup. */
+    "authenticated.player": [user: User, player: Player];
+    /** Emitted after the client has successfully authenticated as a management token. This is emitted before any tracking is setup. */
+    "authenticated.token": [token: TokenUser];
+    /** Emitted when the client is connected and ready. */
+    "connected": [];
+    /** Emitted when the client is connected and ready as a bot. */
+    "connected.bot": [bot: BotUser];
+    /** Emitted when the client is connected and ready as a player. */
+    "connected.player": [user: User, player: Player];
+    /** Emitted when the client is connected and ready as a management token. */
+    "connected.token": [token: TokenUser];
     /** Emitted when the client is manually disconnected. */
     disconnected: [];
     error: [error: unknown];
