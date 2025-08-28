@@ -9,6 +9,9 @@
   <a href="https://coveralls.io/github/WolferyScripting/WolferyJS"><img src="https://coveralls.io/repos/github/WolferyScripting/WolferyJS/badge.svg" alt="Coverage Status" /></a>
 </p>
 
+
+If you need help getting things to work or want to report an issue, we have a [post on the wolfery forum](https://forum.wolfery.com/t/3271). You can also create an issue here.
+
 # Sections
 [Installation](#installation) | [Documentation](#documentation) | [Node Version](#node-version) | [Basic Usage](#basic-usage) | [Contributing](#contributing)
 
