@@ -8,7 +8,7 @@
 </p>
 
 # Sections
-[Installation](#installation) | [Documentation](#documentation) | [Basic Usage](#basic-usage)
+[Installation](#installation) | [Documentation](#documentation) | [Basic Usage](#basic-usage) | [Contributing](#contributing)
 
 ## Installation
 

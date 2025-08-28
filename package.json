@@ -19,6 +19,7 @@
     "prepack": "npm run build",
     "test": "c8 mocha",
     "test:docs": "rimraf docs && npx --yes typedoc --options static/typedoc.json",
+    "test:build": "sh build.sh",
     "coverage": "c8 report --reporter=text-lcov | coveralls",
     "schema:write": "node --no-warnings --no-deprecation --experimental-specifier-resolution=node --enable-source-maps --loader ts-node/esm/transpile-only -r tsconfig-paths/register schema/write.ts",
     "build:schema": "node --no-warnings --no-deprecation --experimental-specifier-resolution=node --enable-source-maps --loader ts-node/esm/transpile-only -r tsconfig-paths/register schema/Builder.ts",
@@ -54,7 +55,6 @@
   "license": "MIT",
   "dependencies": {
     "file-type": "^21.0.0",
-    "mock-socket": "^9.3.1",
     "resclient-ts": "1.1.4",
     "tslib": "^2.8.1",
     "ws": "^8.18.3"
@@ -88,6 +88,7 @@
     "eslint-plugin-unicorn": "^56.0.1",
     "eslint-plugin-unused-imports": "^4.1.4",
     "mocha": "^11.7.1",
+    "mock-socket": "^9.3.1",
     "pnpm": "^10.13.1",
     "rimraf": "^6.0.1",
     "sinon": "^21.0.0",
