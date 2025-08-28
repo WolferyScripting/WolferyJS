@@ -34,10 +34,6 @@ import type { MessageEvent } from "ws";
 import type { AnyObject } from "resclient-ts";
 
 export interface ControlledCharacterEvents {
-    /** Emitted when a character is controlled. */
-    "controlledCharacters.add": [ctrl: ControlledCharacter];
-    /** Emitted when a character is released. */
-    "controlledCharacters.remove": [ctrl: ControlledCharacter];
     "exits.add": [ctrl: ControlledCharacter, room: RoomDetails, exit: Exit];
     "exits.change": [ctrl: ControlledCharacter, room: RoomDetails, exit: Exit, data: Partial<Exit>];
     "exits.remove": [ctrl: ControlledCharacter, room: RoomDetails, exit: Exit];
@@ -47,6 +43,10 @@ export interface ControlledCharacterEvents {
     "lookedAt.add": [ctrl: ControlledCharacter, char: Character];
     /** Emitted when a character stops looking at a controlled character. */
     "lookedAt.remove": [ctrl: ControlledCharacter, char: Character];
+    /** Emitted when a profile is created for an owned character. */
+    "profiles.add": [ctrl: ControlledCharacter, profile: Profile];
+    /** Emitted when a profile is deleted for an owned character. */
+    "profiles.remove": [ctrl: ControlledCharacter, profile: Profile];
     /** Emitted when a character enters the room a controlled character is in. */
     "roomCharacters.add": [char: ControlledCharacter, room: RoomDetails, roomChar: RoomCharacter];
     /** Emitted when a character enters a room adjacent to the room a controlled character is in, where the exit to the room they entered is transparent. */
@@ -67,31 +67,19 @@ export interface ControlledCharacterEvents {
 
 export interface OwnedCharacterEvents {
     /** Emitted when a teleport node is added. */
-    "characterNodes.add": [char: OwnedCharacter, node: Node];
+    "characterNodes.add": [char: ControlledCharacter, node: Node];
     /** Emitted when a teleport node is removed. */
-    "characterNodes.remove": [char: OwnedCharacter, node: Node];
+    "characterNodes.remove": [char: ControlledCharacter, node: Node];
     /** Emitted when a message is sent or received. */
     "message": AnyMessageEvent;
     /** Emitted when an area is created for an owned character. */
-    "ownedAreas.add": [ctrl: OwnedCharacter, area: Area];
+    "ownedAreas.add": [ctrl: ControlledCharacter, area: Area];
     /** Emitted when an area is deleted for an owned character. */
-    "ownedAreas.remove": [ctrl: OwnedCharacter, area: Area];
-    /** Emitted when an owned character is created. */
-    "ownedCharacters.add": [char: OwnedCharacter];
-    /** Emitted when an owned character is deleted. */
-    "ownedCharacters.remove": [char: OwnedCharacter];
+    "ownedAreas.remove": [ctrl: ControlledCharacter, area: Area];
     /** Emitted when a room is created for an owned character. */
-    "ownedRooms.add": [ctrl: OwnedCharacter, room: Room];
+    "ownedRooms.add": [ctrl: ControlledCharacter, room: Room];
     /** Emitted when a room is deleted for an owned character. */
-    "ownedRooms.remove": [ctrl: OwnedCharacter, room: Room];
-    /** Emitted when a profile is created for an owned character. */
-    "profiles.add": [ctrl: OwnedCharacter, profile: Profile];
-    /** Emitted when a profile is deleted for an owned character. */
-    "profiles.remove": [ctrl: OwnedCharacter, profile: Profile];
-    /** Emitted when a puppet is added. */
-    "puppets.add": [char: OwnedCharacter, puppet: Puppet];
-    /** Emitted when a puppet is removed. */
-    "puppets.remove": [char: OwnedCharacter, puppet: Puppet];
+    "ownedRooms.remove": [ctrl: ControlledCharacter, room: Room];
     /** Emitted when an owned character's room changes (where the character is located, not the details of the room). */
     "roomChange": [char: OwnedCharacter, room: Room, oldRoom: Room];
 }
@@ -114,6 +102,10 @@ export interface CharacterEvents {
 export interface PlayerEvents {
     "bots.add": [bot: Bot];
     "bots.remove": [bot: Bot];
+    /** Emitted when a character is controlled. */
+    "controlledCharacters.add": [player: Player, ctrl: ControlledCharacter];
+    /** Emitted when a character is released. */
+    "controlledCharacters.remove": [player: Player, ctrl: ControlledCharacter];
     "inbox.add": [mail: PlayerMailMessage];
     "inbox.remove": [mail: PlayerMailMessage];
     "mutedCharacters.add": [char: CharacterMin];
@@ -121,6 +113,14 @@ export interface PlayerEvents {
     "notes.add": [note: Note, char: Character];
     "notes.remove": [note: Note, char: Character];
     "notes.textChange": [note: Note, char: Character, text: string, oldText: string];
+    /** Emitted when an owned character is created. */
+    "ownedCharacters.add": [player: Player, char: OwnedCharacter];
+    /** Emitted when an owned character is deleted. */
+    "ownedCharacters.remove": [player: Player, char: OwnedCharacter];
+    /** Emitted when a puppet is added. */
+    "puppets.add": [player: Player, puppet: Puppet];
+    /** Emitted when a puppet is removed. */
+    "puppets.remove": [player: Player, puppet: Puppet];
     "requests.incoming.accepted": [request: Request];
     "requests.incoming.add": [request: Request];
     "requests.incoming.expired": [request: Request];

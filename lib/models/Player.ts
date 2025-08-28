@@ -5,6 +5,8 @@ import BaseModel from "./BaseModel.js";
 import type Watches from "./Watches.js";
 import type Notes from "./Notes.js";
 import type UnreadMail from "./UnreadMail.js";
+import type Puppet from "./Puppet.js";
+import type OwnedCharacter from "./OwnedCharacter.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
 import type { BasicCharacterResponse, LookupCharacter, OptionalBasicCharacterResponse } from "../util/types.js";
 import type WolferyJS from "../WolferyJS.js";
@@ -14,7 +16,7 @@ import type { PlayerProperties } from "../generated/models/types.js";
 import { PlayerDefinition } from "../generated/models/definitions.js";
 import type IncomingRequests from "../collections/IncomingRequests.js";
 import type OutgoingRequests from "../collections/OutgoingRequests.js";
-import type { ResClient } from "resclient-ts";
+import { Properties, type CollectionAddRemove, type ResClient } from "resclient-ts";
 
 declare interface Player extends BaseModel, PlayerProperties {}
 // do not edit the first line of the class comment
@@ -23,14 +25,57 @@ declare interface Player extends BaseModel, PlayerProperties {}
  * @resourceID {@link ResourceIDs.PLAYER | PLAYER}
  */
 class Player extends BaseModel implements PlayerProperties {
+    private onControlledCharacterAdd = this._onControlledCharacterAdd.bind(this);
+    private onControlledCharacterRemove = this._onControlledCharacterRemove.bind(this);
+    private onOwnedCharacterAdd = this._onOwnedCharacterAdd.bind(this);
+    private onOwnedCharacterRemove = this._onOwnedCharacterRemove.bind(this);
+    private onPuppetAdd = this._onPuppetAdd.bind(this);
+    private onPuppetRemove = this._onPuppetRemove.bind(this);
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: PlayerDefinition });
+        Properties.of(this)
+            .readOnly("onControlledCharacterAdd")
+            .readOnly("onControlledCharacterRemove")
+            .readOnly("onOwnedCharacterAdd")
+            .readOnly("onOwnedCharacterRemove")
+            .readOnly("onPuppetAdd")
+            .readOnly("onPuppetRemove");
+    }
+
+    private _onControlledCharacterAdd(data: CollectionAddRemove<ControlledCharacter>): void {
+        this.client.emit("controlledCharacters.add", this, data.item);
+    }
+
+    private _onControlledCharacterRemove(data: CollectionAddRemove<ControlledCharacter>): void {
+        this.client.emit("controlledCharacters.remove", this, data.item);
+    }
+
+    private _onOwnedCharacterAdd(data: CollectionAddRemove<OwnedCharacter>): void {
+        this.client.emit("ownedCharacters.add", this, data.item);
+    }
+
+    private _onOwnedCharacterRemove(data: CollectionAddRemove<OwnedCharacter>): void {
+        this.client.emit("ownedCharacters.remove", this, data.item);
+    }
+
+    private _onPuppetAdd(data: CollectionAddRemove<Puppet>): void {
+        this.client.emit("puppets.add", this, data.item);
+    }
+
+    private _onPuppetRemove(data: CollectionAddRemove<Puppet>): void {
+        this.client.emit("puppets.remove", this, data.item);
     }
 
     protected override async _listen(on: boolean): Promise<void> {
         await super._listen(on);
         const m = on ? "resourceOn" : "resourceOff";
         this[m]("unsubscribe", this.client.onUnsubscribe);
+        this.puppets[m]("add", this.onPuppetAdd);
+        this.puppets[m]("remove", this.onPuppetRemove);
+        this.chars[m]("add", this.onOwnedCharacterAdd);
+        this.chars[m]("remove", this.onOwnedCharacterRemove);
+        this.controlled[m]("add", this.onControlledCharacterAdd);
+        this.controlled[m]("remove", this.onControlledCharacterRemove);
     }
 
     /**

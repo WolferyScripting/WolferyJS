@@ -11,6 +11,7 @@ import type Puppet from "./Puppet.js";
 import type RoomCharacter from "./RoomCharacter.js";
 import type RoomDetails from "./RoomDetails.js";
 import type AfarRoom from "./AfarRoom.js";
+import type Node from "./Node.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
 import {
     type KeyBasicResponse,
@@ -46,7 +47,15 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
     private onExitChange = this._onExitChange.bind(this);
     private onExitRemove = this._onExitRemove.bind(this);
     private onLookedAtChange = this._onLookedAtChange.bind(this);
+    private onNodeAdd = this._onNodeAdd.bind(this);
+    private onNodeRemove = this._onNodeRemove.bind(this);
     private onOut = this._onOut.bind(this);
+    private onOwnedAreaAdd = this._onOwnedAreaAdd.bind(this);
+    private onOwnedAreaRemove = this._onOwnedAreaRemove.bind(this);
+    private onOwnedRoomAdd = this._onOwnedRoomAdd.bind(this);
+    private onOwnedRoomRemove = this._onOwnedRoomRemove.bind(this);
+    private onProfileAdd = this._onProfileAdd.bind(this);
+    private onProfileRemove = this._onProfileRemove.bind(this);
     private onRoomCharAdd = this._onRoomCharAdd.bind(this);
     private onRoomCharRemove = this._onRoomCharRemove.bind(this);
     private onRoomProfileAdd = this._onRoomProfileAdd.bind(this);
@@ -66,7 +75,15 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
             .writable("onExitChange")
             .writable("onExitRemove")
             .writable("onLookedAtChange")
+            .writable("onNodeAdd")
+            .writable("onNodeRemove")
             .writable("onOut")
+            .writable("onOwnedAreaAdd")
+            .writable("onOwnedAreaRemove")
+            .writable("onOwnedRoomAdd")
+            .writable("onOwnedRoomRemove")
+            .writable("onProfileAdd")
+            .writable("onProfileRemove")
             .writable("onRoomCharAdd")
             .writable("onRoomCharRemove")
             .writable("onRoomProfileAdd")
@@ -88,8 +105,8 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         }
 
         if (data.inRoom !== undefined) {
-            this._listenRoom(false, data.inRoom);
-            this._listenRoom(true, this.inRoom);
+            await this._listenRoom(false, data.inRoom);
+            await this._listenRoom(true, this.inRoom);
         }
     }
 
@@ -150,6 +167,14 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
             const char =  await this.api.get<Character>(ResourceIDs.CHARACTER({ id: remove }));
             this.client.emit("lookedAt.remove", this, char);
         }
+    }
+
+    private _onNodeAdd(data: CollectionAddRemove<Node>): void {
+        this.client.emit("characterNodes.add", this, data.item);
+    }
+
+    private _onNodeRemove(data: CollectionAddRemove<Node>): void {
+        this.client.emit("characterNodes.remove", this, data.item);
     }
 
     private async _onOut(data: Messages.Any): Promise<void> {
@@ -217,6 +242,30 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         }
     }
 
+    private _onOwnedAreaAdd(data: CollectionAddRemove<Area>): void {
+        this.client.emit("ownedAreas.add", this, data.item);
+    }
+
+    private _onOwnedAreaRemove(data: CollectionAddRemove<Area>): void {
+        this.client.emit("ownedAreas.remove", this, data.item);
+    }
+
+    private _onOwnedRoomAdd(data: CollectionAddRemove<Room>): void {
+        this.client.emit("ownedRooms.add", this, data.item);
+    }
+
+    private _onOwnedRoomRemove(data: CollectionAddRemove<Room>): void {
+        this.client.emit("ownedRooms.remove", this, data.item);
+    }
+
+    private _onProfileAdd(data: CollectionAddRemove<Profile>): void {
+        this.client.emit("profiles.add", this, data.item);
+    }
+
+    private _onProfileRemove(data: CollectionAddRemove<Profile>): void {
+        this.client.emit("profiles.remove", this, data.item);
+    }
+
     private _onRoomCharAdd(data: CollectionAddRemove<RoomCharacter>): void {
         this.client.emit("roomCharacters.add", this, this.inRoom, data.item);
     }
@@ -265,6 +314,13 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         }
 
         await this._listenRoom(on, this.inRoom);
+        this.profiles[m]("add", this.onProfileAdd);
+        this.profiles[m]("remove", this.onProfileRemove);
+        this.ownedAreas[m]("add", this.onOwnedAreaAdd);
+        this.ownedAreas[m]("remove", this.onOwnedAreaRemove);
+        this.ownedRooms[m]("add", this.onOwnedRoomAdd);
+        this.ownedRooms[m]("remove", this.onOwnedRoomRemove);
+        this.nodes[m]("add", this.onNodeAdd);
     }
 
     protected _listenExit(on: boolean, exit: Exit): void {
