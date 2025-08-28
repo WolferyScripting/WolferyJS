@@ -6,6 +6,7 @@ import type ReportInfo from "../models/ReportInfo.ts";
 import type SupportInfo from "../models/SupportInfo.ts";
 import type TagInfo from "../models/TagInfo.ts";
 import type WebClientInfo from "../models/WebClientInfo.ts";
+export type { FocusOptions } from "../models/Focus.ts";
 
 export type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 export type AuthTypes = "password" | "bot" | "token";
@@ -236,7 +237,7 @@ export interface Info {
     webClient: WebClientInfo;
 }
 
-interface RawCharacterInspection extends BasicCharacterResponse<"char"> {
+export interface RawCharacterInspection extends BasicCharacterResponse<"char"> {
     banMatches: Array<OptionalBasicCharacterResponse<"char"> & { banReason: string; banned: number; }>;
     banned: number | null;
     charCreated: number;

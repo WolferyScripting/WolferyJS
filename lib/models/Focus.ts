@@ -1,21 +1,20 @@
-import BaseModel from "./BaseModel.js";
 import type FocusChars from "./FocusChars.js";
+import BaseCollectionModel from "./BaseCollectionModel.js";
 import type WolferyJS from "../WolferyJS.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
 import type { FocusProperties } from "../generated/models/types.js";
-import { FocusDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
-interface Focus extends BaseModel, FocusProperties {}
+interface Focus extends BaseCollectionModel<FocusOptions>, FocusProperties {}
 // do not edit the first line of the class comment
 /**
  * The focus options for a character.
  * @resourceID {@link ResourceIDs.CHARACTER_FOCUS | CHARACTER_FOCUS}
  * @resourceID {@link ResourceIDs.PUPPET_FOCUS | PUPPET_FOCUS}
  */
-class Focus extends BaseModel implements FocusProperties {
+class Focus extends BaseCollectionModel<FocusOptions> implements FocusProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
-        super(client, api, rid, { definition: FocusDefinition });
+        super(client, api, rid, () => true);
     }
 
     async getChars(): Promise<FocusChars> {
@@ -27,6 +26,11 @@ class Focus extends BaseModel implements FocusProperties {
             return this.api.get<FocusChars>(ResourceIDs.CHARACTER_FOCUS_CHARS({ id }));
         }
     }
+}
+
+export interface FocusOptions {
+    /** Hex color code prefixed with `#`. */
+    color: string;
 }
 
 export default Focus;

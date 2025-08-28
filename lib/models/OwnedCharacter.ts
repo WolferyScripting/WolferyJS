@@ -41,16 +41,15 @@ class OwnedCharacter extends BaseModel implements OwnedCharacterProperties {
     }
 
     get isAwake(): boolean {
-        return this.getControlled()?.state === "awake";
+        return this.state === "awake";
     }
 
     get isControlled(): boolean {
-        return this.getControlled() !== null;
+        return this.getControlled() !== null || this.isControlledBot;
     }
 
     get isControlledBot(): boolean {
-        const ctrl = this.getControlled();
-        return ctrl?.controller === "bot";
+        return this.controller === "bot";
     }
 
     getControlled(): ControlledCharacter | null {

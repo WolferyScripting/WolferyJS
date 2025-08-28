@@ -74,6 +74,8 @@ export interface TrackOptions {
     charInfo?: boolean;
     /** If character info should be fetched for offline {@link Character} models. Defaults to `false`. */
     charInfoOffline?: boolean;
+    /** If the focused characters should be tracked. Defaults to `true`. */
+    focusChars?: boolean;
     /** If global tags should be tracked. Defaults to `true`. */
     globalTags?: boolean;
     /** If global teleports should be tracked. Defaults to `true`. */
@@ -114,6 +116,7 @@ export interface InstanceOptions {
         broadcast: boolean;
         charInfo: boolean;
         charInfoOffline: boolean;
+        focusChars: boolean;
         globalTags: boolean;
         globalTeleports: boolean;
         incomingRequests: boolean;
@@ -195,6 +198,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
                 broadcast:        options.track?.broadcast ?? true,
                 charInfo:         options.track?.charInfo ?? false,
                 charInfoOffline:  options.track?.charInfoOffline ?? false,
+                focusChars:       options.track?.focusChars ?? true,
                 globalTags:       options.track?.globalTags ?? true,
                 globalTeleports:  options.track?.globalTeleports ?? true,
                 incomingRequests: authRequired(options.track?.incomingRequests ?? true, "password"),

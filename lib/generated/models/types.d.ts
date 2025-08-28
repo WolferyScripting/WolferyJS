@@ -798,7 +798,7 @@ export interface RoomInstanceDetailsProperties {
     /** The image associated with the room. */
     image: Image | null;
     /** The instance identifier of the room. */
-    instanceId: string;
+    instance: string;
     /** Whether the room is dark. */
     isDark: boolean;
     /** Whether the room can be set as a home. */

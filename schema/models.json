@@ -1271,7 +1271,7 @@
         "model": "?Image",
         "description": "The image associated with the room."
       },
-      "instanceId": {
+      "instance": {
         "type": "string",
         "description": "The instance identifier of the room."
       },
@@ -1419,7 +1419,6 @@
   {
     "description": "The user when logged in with a management token.",
     "id": ["TOKEN_USER(auth.user.{id}.safe)"],
-    "name": "TokenUser",
     "name": "TokenUser",
     "props": {
       "created": {

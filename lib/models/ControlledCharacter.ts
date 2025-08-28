@@ -11,6 +11,7 @@ import type Puppet from "./Puppet.js";
 import type RoomCharacter from "./RoomCharacter.js";
 import type RoomDetails from "./RoomDetails.js";
 import type LookedAt from "./LookedAt.js";
+import type FocusChars from "./FocusChars.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
 import {
     type KeyBasicResponse,
@@ -39,6 +40,7 @@ declare interface ControlledCharacter extends BaseModel, ControlledCharacterProp
  * @resourceID {@link ResourceIDs.CONTROLLED_PUPPET | CONTROLLED_PUPPET}
  */
 class ControlledCharacter extends BaseModel implements ControlledCharacterProperties {
+    private _focusChars!: FocusChars | null;
     private _pingTimeout!: NodeJS.Timeout | null;
     private _roomProfiles!: RoomProfiles | null;
     private _roomScripts!: RoomScripts | null;
@@ -48,6 +50,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: ControlledCharacterDefinition });
         this.p
+            .writable("_focusChars", null)
             .writable("_pingTimeout", null)
             .writable("_roomProfiles", null)
             .writable("_roomScripts", null)
@@ -163,10 +166,23 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
             }
         }
 
+        if (on) {
+            // eslint-disable-next-line unicorn/no-lonely-if
+            if (this.client.options.track.focusChars) this._focusChars = await this.settings.focus.getChars();
+        }
+
         this.listeners.addOrRemove(on, this.profiles, data => this.client.emit("profiles.add", this, data.item), data => this.client.emit("profiles.remove", this, data.item), kControlledCharacter(this.id));
         this.listeners.addOrRemove(on, this.ownedAreas, data => this.client.emit("ownedAreas.add", this, data.item), data => this.client.emit("ownedAreas.remove", this, data.item), kControlledCharacter(this.id));
         this.listeners.addOrRemove(on, this.ownedRooms, data => this.client.emit("ownedRooms.add", this, data.item), data => this.client.emit("ownedRooms.remove", this, data.item), kControlledCharacter(this.id));
         this.listeners.addOrRemove(on, this.nodes, data => this.client.emit("characterNodes.add", this, data.item), data => this.client.emit("characterNodes.remove", this, data.item), kControlledCharacter(this.id));
+        this.listeners.addOrRemove(on, this.settings.focus, data => this.client.emit("focus.add", this, data.item), data => this.client.emit("focus.remove", this, data.item), kControlledCharacter(this.id));
+        if (this.client.options.track.focusChars && this._focusChars) {
+            this.listeners.addOrRemove(on, this._focusChars, data => this.client.emit("focusChars.add", this, data.item, this.settings.focus.props[data.item.id]!), data => this.client.emit("focusChars.remove", this, data.item, this.settings.focus.props[data.item.id]!), kControlledCharacter(this.id));
+        }
+
+        if (!on) {
+            this._focusChars = null;
+        }
 
         this._listenLookedAt(on, this.lookedAt);
         await this._listenRoom(on, this.inRoom);

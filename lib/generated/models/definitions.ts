@@ -418,7 +418,7 @@ export const RoomInstanceDetailsDefinition: Record<string, PropertyDefinition> =
     exits: collectionProperty("exits", Exits, false, false),
     id: { type: "string" },
     image: modelProperty("image", Image, true, false),
-    instanceId: { type: "string" },
+    instance: { type: "string" },
     isDark: { type: "boolean" },
     isHome: { type: "boolean" },
     isInstance: { type: "boolean" },

@@ -32,6 +32,7 @@ import type Bot from "../models/Bot.ts";
 import type Token from "../models/Token.ts";
 import type Watch from "../models/Watch.ts";
 import type RoomCommand from "../models/RoomCommand.ts";
+import { type FocusOptions } from "../models/Focus.ts";
 import type { MessageEvent } from "ws";
 import type { AnyObject } from "resclient-ts";
 
@@ -39,6 +40,10 @@ export interface ControlledCharacterEvents {
     "exits.add": [ctrl: ControlledCharacter, room: RoomDetails, exit: Exit];
     "exits.change": [ctrl: ControlledCharacter, room: RoomDetails, exit: Exit, data: Partial<Exit>];
     "exits.remove": [ctrl: ControlledCharacter, room: RoomDetails, exit: Exit];
+    "focus.add": [ctrl: ControlledCharacter, options: FocusOptions];
+    "focus.remove": [ctrl: ControlledCharacter, options: FocusOptions];
+    "focusChars.add": [ctrl: ControlledCharacter, char: CharacterMin, options: FocusOptions];
+    "focusChars.remove": [ctrl: ControlledCharacter, char: CharacterMin, options: FocusOptions];
     /** Emitted when what a controlled character is looking at is changed. */
     "lookAtChange": [ctrl: ControlledCharacter, char: CharacterDetails | null, oldChar: CharacterDetails | null];
     /** Emitted when a character looks at a controlled character. */
