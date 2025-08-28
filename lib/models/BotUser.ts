@@ -1,4 +1,3 @@
-import type OwnedCharacter from "./OwnedCharacter.js";
 import BaseModel from "./BaseModel.js";
 import type ControlledCharacter from "./ControlledCharacter.js";
 import type WolferyJS from "../WolferyJS.js";
@@ -31,8 +30,8 @@ class BotUser extends BaseModel {
      * Control the character associated with this BotUser.
      * @returns The owned character instance associated with this BotUser.
      */
-    async controlChar(): Promise<OwnedCharacter> {
-        return this.call<OwnedCharacter>("controlChar");
+    async controlChar(): Promise<ControlledCharacter> {
+        return this.call<ControlledCharacter>("controlChar");
     }
 
     async release(): Promise<ControlledCharacter | null> {
@@ -53,7 +52,7 @@ class BotUser extends BaseModel {
             return this.controlled;
         }
         return this.controlChar()
-            .then(char => char.wakeup(hidden));
+            .then(char => char.wakeup(hidden).then(() => char));
     }
 }
 

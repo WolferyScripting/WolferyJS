@@ -1,0 +1,32 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    assignees:
+      - "DonovanDMC"
+    commit-message:
+      include: "scope"
+      prefix: ""
+    target-branch: "dev"
+    versioning-strategy: "increase"
+    labels:
+      - "dependencies"
+    ignore:
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@uwu-codes/tsconfig"
+        update-types: ["version-update:semver-patch"]
+      - dependency-name: "@typescript-eslint/parser"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@typescript-eslint/eslint-plugin"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typedoc"
+        update-types: ["version-update:semver-minor"]
+      - dependency-name: "typedoc-plugin-mdn-links"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typedoc-plugin-extras"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typedoc-plugin-merge-modules"
+        update-types: ["version-update:semver-major"]

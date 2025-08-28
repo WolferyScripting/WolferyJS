@@ -1,7 +1,7 @@
 {
   "name": "wolfery.js",
   "version": "0.0.1",
-  "description": "",
+  "description": "A comprehensive API wrapper for https://wolfery.com",
   "types": "./dist/esm/index.d.mts",
   "main": "./dist/cjs/index.mjs",
   "module": "./dist/esm/index.cjs",
@@ -67,7 +67,7 @@
     "@types/chai": "^5.2.2",
     "@types/debug": "^4.1.12",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^24.1.0",
+    "@types/node": "^20.19.11",
     "@types/ws": "^8.18.1",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
@@ -103,7 +103,7 @@
     "typescript": "^5.8.3"
   },
   "engines": {
-    "node": ">=22.17.1",
+    "node": ">=20.19.4",
     "pnpm": ">=10.13.1"
   },
   "engineStrict": true

@@ -46,8 +46,8 @@ importers:
         specifier: ^10.0.10
         version: 10.0.10
       '@types/node':
-        specifier: ^24.1.0
-        version: 24.1.0
+        specifier: ^20.19.11
+        version: 20.19.11
       '@types/ws':
         specifier: ^8.18.1
         version: 8.18.1
@@ -59,7 +59,7 @@ importers:
         version: 7.18.0(eslint@8.57.1)(typescript@5.8.3)
       '@uwu-codes/eslint-config':
         specifier: ^1.1.28
-        version: 1.1.28(@types/node@24.1.0)(typescript@5.8.3)
+        version: 1.1.28(@types/node@20.19.11)(typescript@5.8.3)
       '@uwu-codes/tsconfig':
         specifier: 1.0.7
         version: 1.0.7
@@ -119,7 +119,7 @@ importers:
         version: 21.0.0
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@swc/core@1.13.2(@swc/helpers@0.5.17))(@types/node@24.1.0)(typescript@5.8.3)
+        version: 10.9.2(@swc/core@1.13.2(@swc/helpers@0.5.17))(@types/node@20.19.11)(typescript@5.8.3)
       tsc-alias:
         specifier: ^1.8.16
         version: 1.8.16
@@ -442,6 +442,9 @@ packages:
 
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
+
+  '@types/node@20.19.11':
+    resolution: {integrity: sha512-uug3FEEGv0r+jrecvUUpbY8lLisvIjg6AAic6a2bSP5OEOLeJsDSnvhCDov7ipFFMXS3orMpzlmi0ZcuGkBbow==}
 
   '@types/node@24.1.0':
     resolution: {integrity: sha512-ut5FthK5moxFKH2T1CUOC6ctR67rQRvvHdFLCD2Ql6KXmMuCrjsSsRI9UsLCm9M18BMwClv4pn327UvB7eeO1w==}
@@ -2293,6 +2296,9 @@ packages:
     resolution: {integrity: sha512-nWJ91DjeOkej/TA8pXQ3myruKpKEYgqvpw9lz4OPHj/NWFNluYrjbz9j01CJ8yKQd2g4jFoOkINCTW2I5LEEyw==}
     engines: {node: '>= 0.4'}
 
+  undici-types@6.21.0:
+    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
+
   undici-types@7.8.0:
     resolution: {integrity: sha512-9UJ2xGDvQ43tYyVMpuHlsgApydB8ZKfVYTsLDhXkFL/6gfkp+U8xTGdh8pMJv1SpZna0zxG1DwsKZsreLbXBxw==}
 
@@ -2726,6 +2732,10 @@ snapshots:
 
   '@types/ms@2.1.0': {}
 
+  '@types/node@20.19.11':
+    dependencies:
+      undici-types: 6.21.0
+
   '@types/node@24.1.0':
     dependencies:
       undici-types: 7.8.0
@@ -2875,11 +2885,11 @@ snapshots:
 
   '@ungap/structured-clone@1.3.0': {}
 
-  '@uwu-codes/eslint-config@1.1.28(@types/node@24.1.0)(typescript@5.8.3)':
+  '@uwu-codes/eslint-config@1.1.28(@types/node@20.19.11)(typescript@5.8.3)':
     dependencies:
       '@typescript-eslint/eslint-plugin': 7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.8.3))(eslint@9.32.0)(typescript@5.8.3)
       '@typescript-eslint/parser': 7.18.0(eslint@9.32.0)(typescript@5.8.3)
-      '@uwu-codes/tsconfig': 1.0.14(@types/node@24.1.0)
+      '@uwu-codes/tsconfig': 1.0.14(@types/node@20.19.11)
       eslint: 9.32.0
       eslint-plugin-import: eslint-plugin-i@2.29.1(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.8.3))(eslint@9.32.0)
       eslint-plugin-import-newlines: 1.4.0(eslint@9.32.0)
@@ -2897,13 +2907,13 @@ snapshots:
       - supports-color
       - typescript
 
-  '@uwu-codes/tsconfig@1.0.14(@types/node@24.1.0)':
+  '@uwu-codes/tsconfig@1.0.14(@types/node@20.19.11)':
     dependencies:
       typescript: 5.8.3
     optionalDependencies:
       '@swc/core': 1.13.2(@swc/helpers@0.5.17)
       '@swc/helpers': 0.5.17
-      ts-node: 10.9.2(@swc/core@1.13.2(@swc/helpers@0.5.17))(@types/node@24.1.0)(typescript@5.8.3)
+      ts-node: 10.9.2(@swc/core@1.13.2(@swc/helpers@0.5.17))(@types/node@20.19.11)(typescript@5.8.3)
     transitivePeerDependencies:
       - '@swc/wasm'
       - '@types/node'
@@ -4825,14 +4835,14 @@ snapshots:
     dependencies:
       typescript: 5.8.3
 
-  ts-node@10.9.2(@swc/core@1.13.2(@swc/helpers@0.5.17))(@types/node@24.1.0)(typescript@5.8.3):
+  ts-node@10.9.2(@swc/core@1.13.2(@swc/helpers@0.5.17))(@types/node@20.19.11)(typescript@5.8.3):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.11
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 24.1.0
+      '@types/node': 20.19.11
       acorn: 8.15.0
       acorn-walk: 8.3.4
       arg: 4.1.3
@@ -4965,6 +4975,8 @@ snapshots:
       has-bigints: 1.1.0
       has-symbols: 1.1.0
       which-boxed-primitive: 1.1.1
+
+  undici-types@6.21.0: {}
 
   undici-types@7.8.0: {}
 

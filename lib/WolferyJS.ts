@@ -520,8 +520,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         }
 
         if (this.isBot()) {
-            const ctrl = await this.user!.controlChar();
-            return ctrl.wakeup(hidden);
+            return this.user!.wakeup(hidden);
         }
 
         return this.modules.core.getPlayer().then(player => player.controlChar(char.id, true)
