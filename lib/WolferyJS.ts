@@ -75,7 +75,7 @@ export interface TrackOptions {
     bots?: boolean;
     /** If broadcasts should be tracked. Defaults to `true`. */
     broadcast?: boolean;
-    /** If character info should be fetched for {@link Character} models. Required for seeing about/lfrpDesc changes. Defaults to `false`. See also {@link charInfo} */
+    /** If character info should be fetched for {@link Character} models. Required for seeing about/lfrpDesc changes. Defaults to `true`. See also {@link charInfo} */
     charInfo?: boolean;
     /** If character info should be fetched for offline {@link Character} models. Defaults to `false`. */
     charInfoOffline?: boolean;
@@ -206,7 +206,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
                 awake:            options.track?.awake ?? true,
                 bots:             authRequired(options.track?.bots ?? true, "password"),
                 broadcast:        options.track?.broadcast ?? true,
-                charInfo:         options.track?.charInfo ?? false,
+                charInfo:         options.track?.charInfo ?? true,
                 charInfoOffline:  options.track?.charInfoOffline ?? false,
                 focusChars:       options.track?.focusChars ?? true,
                 globalTags:       options.track?.globalTags ?? true,
