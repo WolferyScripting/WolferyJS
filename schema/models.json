@@ -150,6 +150,7 @@
         "type": "boolean",
         "description": "Whether the character is awake."
       },
+      "controller": { "type": "?string", "oneOf": ["bot"], "description": "The controller." },
       "deleted": {
         "type": "?number",
         "description": "The deletion timestamp of the character."
@@ -288,7 +289,7 @@
     }
   },
   {
-    "description": "A minimal character, seen in the list of muted and focused characters.",
+    "description": "A minimal character, seen in the list of muted, focused, tenant, and teleporter characters.",
     "id": ["CHARACTER_MIN(core.char.{id}.min)"],
     "name": "CharacterMin",
     "props": {
@@ -736,6 +737,7 @@
         "type": "string",
         "description": "The avatar unique identifier."
       },
+      "controller": { "type": "?string", "oneOf": ["bot"], "description": "The controller." },
       "created": {
         "type": "number",
         "description": "The timestamp when the character was created."
@@ -1036,6 +1038,7 @@
         "type": "string",
         "description": "The unique identifier of the character's avatar image."
       },
+      "controller": { "type": "?string", "oneOf": ["bot"], "description": "The controller." },
       "gender": {
         "type": "string",
         "description": "The gender of the character."
@@ -1615,7 +1618,7 @@
   },
   {
     "description": "A tag group.",
-    "id": ["TAG_GROUP(tag.groups.{id})"],
+    "id": ["TAG_GROUP(tag.group.{id})"],
     "name": "TagGroup",
     "props": {
       "key": { "type": "string", "description": "The key of the tag group." },

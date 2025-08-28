@@ -15,10 +15,69 @@ import type TagInfo from "../models/TagInfo.js";
 import type Tags from "../models/Tags.js";
 import type User from "../models/User.js";
 import type WebClientInfo from "../models/WebClientInfo.js";
-import { type Info } from "../util/types.js";
+import { type Messages, type Info } from "../util/types.js";
+import type WolferyJS from "../WolferyJS.js";
+import { kEvents } from "../util/Util.js";
+import { Properties } from "resclient-ts";
 
 /** Core classes/calls that don't require any id input */
 export default class Core extends Base {
+    private _awakeCharacters!: AwakeCharacters | null;
+    private _coreInfo!: CoreInfo | null;
+    private _globalTeleports!: GlobalTeleports | null;
+    private _tagGroups!: TagGroups | null;
+    private _tags!: Tags | null;
+    private onCoreInfoOut = this._onCoreInfoOut.bind(this);
+    constructor(client: WolferyJS) {
+        super(client);
+        Properties.of(this)
+            .writable("_awakeCharacters", null)
+            .writable("_coreInfo", null)
+            .writable("_globalTeleports", null)
+            .writable("_tagGroups", null)
+            .writable("_tags", null)
+            .readOnly("onCoreInfoOut");
+    }
+
+    private _onCoreInfoOut(data: Messages.Broadcast): void {
+        this.client.emit("broadcast", data);
+    }
+
+    /** @internal */
+    async _track(on: boolean): Promise<void> {
+        const m = on ? "resourceOn" : "resourceOff";
+        if (on) {
+            if (this.client.options.track.awake) this._awakeCharacters = await this.getAwakeCharacters();
+            if (this.client.options.track.globalTeleports) this._globalTeleports = await this.getGlobalTeleports();
+            if (this.client.options.track.tagGroups) this._tagGroups = await this.getTagGroups();
+            if (this.client.options.track.globalTags) this._tags = await this.getTags();
+            if (this.client.options.track.broadcast) this._coreInfo = await this.getCoreInfo();
+        }
+
+        if (this.client.options.track.awake && this._awakeCharacters) {
+            this._awakeCharacters.listeners.listenOrUnlisten(on, data => this.client.emit("awakeCharacters.add", data.item), data => this.client.emit("awakeCharacters.remove", data.item), kEvents);
+        }
+        if (this.client.options.track.globalTeleports && this._globalTeleports) {
+            this._globalTeleports.listeners.listenOrUnlisten(on, data => this.client.emit("globalTeleports.add", data.item), data => this.client.emit("globalTeleports.remove", data.item), kEvents);
+        }
+        if (this.client.options.track.tagGroups && this._tagGroups) {
+            this._tagGroups.listeners.listenOrUnlisten(on, data => this.client.emit("tagGroups.add", data.item), data => this.client.emit("tagGroups.remove", data.item), kEvents);
+        }
+        if (this.client.options.track.globalTags && this._tags) {
+            this._tags.listeners.listenOrUnlisten(on, data => this.client.emit("tags.add", data.item), data => this.client.emit("tags.remove", data.item), kEvents);
+        }
+        if (this.client.options.track.broadcast && this._coreInfo) {
+            this._coreInfo[m]("out", this.onCoreInfoOut);
+        }
+
+        if (!on) {
+            this._awakeCharacters = null;
+            this._globalTeleports = null;
+            this._tagGroups = null;
+            this._tags = null;
+        }
+    }
+
     async getAwakeCharacters(): Promise<AwakeCharacters> {
         return this.client.api.get<AwakeCharacters>(ResourceIDs.AWAKE_CHARACTERS);
     }

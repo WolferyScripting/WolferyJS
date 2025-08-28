@@ -182,3 +182,8 @@ export function ridOnlyClassAndList<C extends AnyClass>(clazz: C, rid: string, l
         }
     } }[clazz.name]!)() as InstanceType<C>;
 }
+
+export const kEvents = Symbol.for("wolferyjs.events");
+export const kControlledCharacter = (id: string): symbol => Symbol.for(`wolferyjs.controlledCharacter.${id}`);
+export const kCharacter = (id: string): symbol => Symbol.for(`wolferyjs.character.${id}`);
+export const kPlayer = (id: string): symbol => Symbol.for(`wolferyjs.player.${id}`);

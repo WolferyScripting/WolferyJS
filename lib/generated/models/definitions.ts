@@ -94,6 +94,7 @@ export const BotUserDefinition: Record<string, PropertyDefinition> = {
 export const CharacterDefinition: Record<string, PropertyDefinition> = {
     avatar: { type: "string" },
     awake: { type: "boolean" },
+    controller: { type: "?string" },
     deleted: { type: "?number" },
     gender: { type: "string" },
     id: { type: "string" },
@@ -262,6 +263,7 @@ export const NotesDefinition: Record<string, PropertyDefinition> = {};
 
 export const OwnedCharacterDefinition: Record<string, PropertyDefinition> = {
     avatar: { type: "string" },
+    controller: { type: "?string" },
     created: { type: "number" },
     desc: { type: "string" },
     gender: { type: "string" },
@@ -351,6 +353,7 @@ export const RoomDefinition: Record<string, PropertyDefinition> = {
 
 export const RoomCharacterDefinition: Record<string, PropertyDefinition> = {
     avatar: { type: "string" },
+    controller: { type: "?string" },
     gender: { type: "string" },
     id: { type: "string" },
     idle: { type: "number" },

@@ -30,6 +30,8 @@ import type AfarRoom from "../models/AfarRoom.ts";
 import type PlayerMailMessage from "../models/PlayerMailMessage.ts";
 import type Bot from "../models/Bot.ts";
 import type Token from "../models/Token.ts";
+import type Watch from "../models/Watch.ts";
+import type RoomCommand from "../models/RoomCommand.ts";
 import type { MessageEvent } from "ws";
 import type { AnyObject } from "resclient-ts";
 
@@ -47,6 +49,7 @@ export interface ControlledCharacterEvents {
     "profiles.add": [ctrl: ControlledCharacter, profile: Profile];
     /** Emitted when a profile is deleted for an owned character. */
     "profiles.remove": [ctrl: ControlledCharacter, profile: Profile];
+    "roomChange.details": [ctrl: ControlledCharacter, room: RoomDetails, oldRoom: RoomDetails];
     /** Emitted when a character enters the room a controlled character is in. */
     "roomCharacters.add": [char: ControlledCharacter, room: RoomDetails, roomChar: RoomCharacter];
     /** Emitted when a character enters a room adjacent to the room a controlled character is in, where the exit to the room they entered is transparent. */
@@ -55,6 +58,8 @@ export interface ControlledCharacterEvents {
     "roomCharacters.exit.remove": [ctrl: ControlledCharacter, room: AfarRoom, exit: Exit, char: Character];
     /** Emitted when a character leaves the room a controlled character is in. */
     "roomCharacters.remove": [ctrl: ControlledCharacter, room: RoomDetails, roomChar: RoomCharacter];
+    "roomCommands.add": [ctrl: ControlledCharacter, room: RoomDetails, roomCommand: RoomCommand];
+    "roomCommands.remove": [ctrl: ControlledCharacter, room: RoomDetails, roomCommand: RoomCommand];
     /** Emitted when a room profile is added for an owned character. */
     "roomProfiles.add": [ctrl: ControlledCharacter, room: RoomDetails, roomProfile: RoomProfile];
     /** Emitted when a room profile is removed for an owned character. */
@@ -85,8 +90,6 @@ export interface OwnedCharacterEvents {
 }
 
 export interface CharacterEvents {
-    "areas.add": [char: Character, area: Area];
-    "areas.remove": [char: Character, area: Area];
     /** Emitted when a character wakes up. */
     "awakeCharacters.add": [char: Character];
     /** Emitted when a character goes to sleep. */
@@ -95,24 +98,26 @@ export interface CharacterEvents {
     "characterTags.remove": [char: Character, tag: Tag, pref: TagPref];
     /** Emitted when a character's idle status changes. */
     "idleStatusChange": [char: Character, status: IdleState, oldStatus: IdleState];
-    "rooms.add": [char: Character, area: Area];
-    "rooms.remove": [char: Character, area: Area];
 }
 
 export interface PlayerEvents {
-    "bots.add": [bot: Bot];
-    "bots.remove": [bot: Bot];
+    "bots.add": [player: Player, bot: Bot];
+    "bots.remove": [player: Player, bot: Bot];
     /** Emitted when a character is controlled. */
     "controlledCharacters.add": [player: Player, ctrl: ControlledCharacter];
     /** Emitted when a character is released. */
     "controlledCharacters.remove": [player: Player, ctrl: ControlledCharacter];
-    "inbox.add": [mail: PlayerMailMessage];
-    "inbox.remove": [mail: PlayerMailMessage];
-    "mutedCharacters.add": [char: CharacterMin];
-    "mutedCharacters.remove": [char: CharacterMin];
-    "notes.add": [note: Note, char: Character];
-    "notes.remove": [note: Note, char: Character];
-    "notes.textChange": [note: Note, char: Character, text: string, oldText: string];
+    "inbox.add": [player: Player, mail: PlayerMailMessage];
+    "inbox.remove": [player: Player, mail: PlayerMailMessage];
+    "mutedCharacters.add": [player: Player, char: CharacterMin];
+    "mutedCharacters.remove": [player: Player, char: CharacterMin];
+    "notes.add": [player: Player, note: Note, char: Character];
+    "notes.remove": [player: Player, note: Note, char: Character];
+    "notes.textChange": [player: Player, note: Note, char: Character, text: string, oldText: string];
+    "notices.auth.add": [player: Player, notice: Notice];
+    "notices.auth.remove": [player: Player, notice: Notice];
+    "notices.identity.add": [player: Player, notice: Notice];
+    "notices.identity.remove": [player: Player, notice: Notice];
     /** Emitted when an owned character is created. */
     "ownedCharacters.add": [player: Player, char: OwnedCharacter];
     /** Emitted when an owned character is deleted. */
@@ -121,29 +126,26 @@ export interface PlayerEvents {
     "puppets.add": [player: Player, puppet: Puppet];
     /** Emitted when a puppet is removed. */
     "puppets.remove": [player: Player, puppet: Puppet];
-    "requests.incoming.accepted": [request: Request];
-    "requests.incoming.add": [request: Request];
-    "requests.incoming.expired": [request: Request];
-    "requests.incoming.failed": [request: Request];
-    "requests.incoming.rejected": [request: Request];
-    "requests.incoming.remove": [request: Request];
-    "requests.incoming.revoked": [request: Request];
-    "requests.outgoing.accepted": [request: Request];
-    "requests.outgoing.add": [request: Request];
-    "requests.outgoing.expired": [request: Request];
-    "requests.outgoing.failed": [request: Request];
-    "requests.outgoing.rejected": [request: Request];
-    "requests.outgoing.remove": [request: Request];
-    "requests.outgoing.revoked": [request: Request];
-    "tokens.add": [token: Token];
-    "tokens.remove": [token: Token];
-    "unreadMail.add": [mail: PlayerMailMessage];
-    "unreadMail.remove": [mail: PlayerMailMessage];
-}
-
-export interface UserEvents {
-    "notices.add": [notice: Notice];
-    "notices.remove": [notice: Notice];
+    "requests.incoming.accepted": [player: Player, request: Request];
+    "requests.incoming.add": [player: Player, request: Request];
+    "requests.incoming.expired": [player: Player, request: Request];
+    "requests.incoming.failed": [player: Player, request: Request];
+    "requests.incoming.rejected": [player: Player, request: Request];
+    "requests.incoming.remove": [player: Player, request: Request];
+    "requests.incoming.revoked": [player: Player, request: Request];
+    "requests.outgoing.accepted": [player: Player, request: Request];
+    "requests.outgoing.add": [player: Player, request: Request];
+    "requests.outgoing.expired": [player: Player, request: Request];
+    "requests.outgoing.failed": [player: Player, request: Request];
+    "requests.outgoing.rejected": [player: Player, request: Request];
+    "requests.outgoing.remove": [player: Player, request: Request];
+    "requests.outgoing.revoked": [player: Player, request: Request];
+    "tokens.add": [player: Player, token: Token];
+    "tokens.remove": [player: Player, token: Token];
+    "unreadMail.add": [player: Player, mail: PlayerMailMessage];
+    "unreadMail.remove": [player: Player, mail: PlayerMailMessage];
+    "watches.add": [player: Player, watch: Watch];
+    "watches.remove": [player: Player, watch: Watch];
 }
 
 export interface MiscEvents {
@@ -176,7 +178,7 @@ export interface ClientEvents {
     unsubscribe: [];
 }
 
-export type Events = ClientEvents & MiscEvents & CharacterEvents & OwnedCharacterEvents & ControlledCharacterEvents & PlayerEvents & UserEvents;
+export type Events = ClientEvents & MiscEvents & CharacterEvents & OwnedCharacterEvents & ControlledCharacterEvents & PlayerEvents;
 
 
 export type BaseMessageEvent<T extends Messages.MessageTypes> = [type: T, sent: boolean, to: ControlledCharacter];

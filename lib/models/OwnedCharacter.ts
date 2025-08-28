@@ -4,6 +4,7 @@ import type WolferyJS from "../WolferyJS.js";
 import type Commands from "../util/commands.js";
 import type { OwnedCharacterProperties } from "../generated/models/types.js";
 import { OwnedCharacterDefinition } from "../generated/models/definitions.js";
+import ResourceIDs from "../generated/ResourceIDs.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface OwnedCharacter extends BaseModel, OwnedCharacterProperties {}
@@ -37,6 +38,23 @@ class OwnedCharacter extends BaseModel implements OwnedCharacterProperties {
 
     get fullname(): string {
         return `${this.name} ${this.surname}`.trim();
+    }
+
+    get isAwake(): boolean {
+        return this.getControlled()?.state === "awake";
+    }
+
+    get isControlled(): boolean {
+        return this.getControlled() !== null;
+    }
+
+    get isControlledBot(): boolean {
+        const ctrl = this.getControlled();
+        return ctrl?.controller === "bot";
+    }
+
+    getControlled(): ControlledCharacter | null {
+        return this.client.api.getCached<ControlledCharacter>(ResourceIDs.CONTROLLED_CHARACTER({ id: this.id }));
     }
 
     /**

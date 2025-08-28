@@ -1,4 +1,5 @@
 import BaseModel from "./BaseModel.js";
+import type RoomCommands from "./RoomCommands.js";
 import type WolferyJS from "../WolferyJS.js";
 import { RoomDetailsDefinition } from "../generated/models/definitions.js";
 import type { RoomDetailsProperties } from "../generated/models/types.js";
@@ -19,6 +20,10 @@ class RoomDetails extends BaseModel implements RoomDetailsProperties {
     // eslint-disable-next-line unicorn/no-object-as-default-parameter
     constructor(client: WolferyJS, api: ResClient, rid: string, options: ResModelOptions = { definition: RoomDetailsDefinition }) {
         super(client, api, rid, options);
+    }
+
+    async getCommands(): Promise<RoomCommands> {
+        return this.api.get<RoomCommands>(ResourceIDs.ROOM_COMMANDS({ id: this.id }));
     }
 
     async getProfiles(): Promise<RoomProfiles> {

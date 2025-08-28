@@ -5,8 +5,8 @@ import BaseModel from "./BaseModel.js";
 import type Watches from "./Watches.js";
 import type Notes from "./Notes.js";
 import type UnreadMail from "./UnreadMail.js";
-import type Puppet from "./Puppet.js";
-import type OwnedCharacter from "./OwnedCharacter.js";
+import type Bots from "./Bots.js";
+import type Request from "./Request.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
 import type { BasicCharacterResponse, LookupCharacter, OptionalBasicCharacterResponse } from "../util/types.js";
 import type WolferyJS from "../WolferyJS.js";
@@ -16,7 +16,11 @@ import type { PlayerProperties } from "../generated/models/types.js";
 import { PlayerDefinition } from "../generated/models/definitions.js";
 import type IncomingRequests from "../collections/IncomingRequests.js";
 import type OutgoingRequests from "../collections/OutgoingRequests.js";
-import { Properties, type CollectionAddRemove, type ResClient } from "resclient-ts";
+import { kPlayer } from "../util/Util.js";
+import type Tokens from "../collections/Tokens.js";
+import type AuthNotices from "../collections/AuthNotices.js";
+import type IdentityNotices from "../collections/IdentityNotices.js";
+import { Properties, type ResClient } from "resclient-ts";
 
 declare interface Player extends BaseModel, PlayerProperties {}
 // do not edit the first line of the class comment
@@ -25,57 +29,178 @@ declare interface Player extends BaseModel, PlayerProperties {}
  * @resourceID {@link ResourceIDs.PLAYER | PLAYER}
  */
 class Player extends BaseModel implements PlayerProperties {
-    private onControlledCharacterAdd = this._onControlledCharacterAdd.bind(this);
-    private onControlledCharacterRemove = this._onControlledCharacterRemove.bind(this);
-    private onOwnedCharacterAdd = this._onOwnedCharacterAdd.bind(this);
-    private onOwnedCharacterRemove = this._onOwnedCharacterRemove.bind(this);
-    private onPuppetAdd = this._onPuppetAdd.bind(this);
-    private onPuppetRemove = this._onPuppetRemove.bind(this);
+    private _authNotices!: AuthNotices | null;
+    private _bots!: Bots | null;
+    private _identityNotices!: IdentityNotices | null;
+    private _inbox!: Inbox | null;
+    private _incomingRequests!: IncomingRequests | null;
+    private _notes!: Notes | null;
+    private _outgoingRequests!: OutgoingRequests | null;
+    private _tokens!: Tokens | null;
+    private _unreadMail!: UnreadMail | null;
+    private _watches!: Watches | null;
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: PlayerDefinition });
         Properties.of(this)
-            .readOnly("onControlledCharacterAdd")
-            .readOnly("onControlledCharacterRemove")
-            .readOnly("onOwnedCharacterAdd")
-            .readOnly("onOwnedCharacterRemove")
-            .readOnly("onPuppetAdd")
-            .readOnly("onPuppetRemove");
-    }
-
-    private _onControlledCharacterAdd(data: CollectionAddRemove<ControlledCharacter>): void {
-        this.client.emit("controlledCharacters.add", this, data.item);
-    }
-
-    private _onControlledCharacterRemove(data: CollectionAddRemove<ControlledCharacter>): void {
-        this.client.emit("controlledCharacters.remove", this, data.item);
-    }
-
-    private _onOwnedCharacterAdd(data: CollectionAddRemove<OwnedCharacter>): void {
-        this.client.emit("ownedCharacters.add", this, data.item);
-    }
-
-    private _onOwnedCharacterRemove(data: CollectionAddRemove<OwnedCharacter>): void {
-        this.client.emit("ownedCharacters.remove", this, data.item);
-    }
-
-    private _onPuppetAdd(data: CollectionAddRemove<Puppet>): void {
-        this.client.emit("puppets.add", this, data.item);
-    }
-
-    private _onPuppetRemove(data: CollectionAddRemove<Puppet>): void {
-        this.client.emit("puppets.remove", this, data.item);
+            .writable("_authNotices", null)
+            .writable("_bots", null)
+            .writable("_identityNotices", null)
+            .writable("_inbox", null)
+            .writable("_incomingRequests", null)
+            .writable("_notes", null)
+            .writable("_outgoingRequests", null)
+            .writable("_tokens", null)
+            .writable("_unreadMail", null)
+            .writable("_watches", null);
     }
 
     protected override async _listen(on: boolean): Promise<void> {
         await super._listen(on);
         const m = on ? "resourceOn" : "resourceOff";
         this[m]("unsubscribe", this.client.onUnsubscribe);
-        this.puppets[m]("add", this.onPuppetAdd);
-        this.puppets[m]("remove", this.onPuppetRemove);
-        this.chars[m]("add", this.onOwnedCharacterAdd);
-        this.chars[m]("remove", this.onOwnedCharacterRemove);
-        this.controlled[m]("add", this.onControlledCharacterAdd);
-        this.controlled[m]("remove", this.onControlledCharacterRemove);
+        if (on) {
+            if (this.client.options.track.notices) {
+                this._authNotices = await this.getAuthNotices();
+                this._identityNotices = await this.getIdentityNotices();
+            }
+            if (this.client.options.track.bots) this._bots = await this.getBots();
+            if (this.client.options.track.mail) {
+                this._inbox = await this.getInbox();
+                this._unreadMail = await this.getUnreadMail();
+            }
+            if (this.client.options.track.notes) this._notes = await this.getNotes();
+            if (this.client.options.track.incomingRequests) this._incomingRequests = await this.getIncomingRequests();
+            if (this.client.options.track.outgoingRequests) this._outgoingRequests = await this.getOutgoingRequests();
+            if (this.client.options.track.tokens) this._tokens = await this.getTokens();
+            if (this.client.options.track.watches) this._watches = await this.getWatches();
+        } else {
+            if (this._notes) {
+                for (const ref of this._notes.list) {
+                    const note = ref.getCached();
+                    if (note) this._listenNote(note, false);
+                }
+            }
+            if (this._incomingRequests) {
+                for (const request of this._incomingRequests.list) {
+                    this._listenRequest(request, true, false);
+                }
+            }
+            if (this._outgoingRequests) {
+                for (const request of this._outgoingRequests.list) {
+                    this._listenRequest(request, false, false);
+                }
+            }
+        }
+
+        this.listeners.addOrRemove(on, this.puppets, data => this.client.emit("puppets.add", this, data.item), data => this.client.emit("puppets.remove", this, data.item), kPlayer(this.id));
+        this.listeners.addOrRemove(on, this.chars, data => this.client.emit("ownedCharacters.add", this, data.item), data => this.client.emit("ownedCharacters.remove", this, data.item), kPlayer(this.id));
+        this.listeners.addOrRemove(on, this.controlled, data => this.client.emit("controlledCharacters.add", this, data.item), data => this.client.emit("controlledCharacters.remove", this, data.item), kPlayer(this.id));
+        this.listeners.addOrRemove(on, this.mutedChars, data => this.client.emit("mutedCharacters.add", this, data.item), data => this.client.emit("mutedCharacters.remove", this, data.item), kPlayer(this.id));
+        if (this.client.options.track.notices) {
+            if (this._authNotices) {
+                this.listeners.addOrRemove(on, this._authNotices, data => this.client.emit("notices.auth.add", this, data.item), data => this.client.emit("notices.auth.remove", this, data.item), kPlayer(this.id));
+            }
+            if (this._identityNotices) {
+                this.listeners.addOrRemove(on, this._identityNotices, data => this.client.emit("notices.identity.add", this, data.item), data => this.client.emit("notices.identity.remove", this, data.item), kPlayer(this.id));
+            }
+        }
+        if (this.client.options.track.bots && this._bots) {
+            this.listeners.addOrRemove(on, this._bots, data => this.client.emit("bots.add", this, data.item), data => this.client.emit("bots.remove", this, data.item), kPlayer(this.id));
+        }
+        if (this.client.options.track.mail) {
+            if (this._unreadMail) {
+                this.listeners.addOrRemove(on, this._unreadMail, async data => {
+                    const mail = await data.item.get();
+                    this.client.emit("unreadMail.add", this, mail);
+                }, async data => {
+                    const mail = await data.item.get();
+                    this.client.emit("unreadMail.remove", this, mail);
+                }, kPlayer(this.id));
+            }
+            if (this._inbox) {
+                this.listeners.addOrRemove(on, this._inbox, data => this.client.emit("inbox.add", this, data.item), data => this.client.emit("inbox.remove", this, data.item), kPlayer(this.id));
+            }
+        }
+        if (this.client.options.track.incomingRequests && this._incomingRequests) {
+            this.listeners.addOrRemove(on, this._incomingRequests, data => {
+                this._listenRequest(data.item, true, true);
+                this.client.emit("requests.incoming.add", this, data.item);
+            }, data => {
+                this._listenRequest(data.item, true, false);
+                this.client.emit("requests.incoming.remove", this, data.item);
+            }, kPlayer(this.id));
+        }
+        if (this.client.options.track.notes && this._notes) {
+            this.listeners.addOrRemove(on, this._notes, async data => {
+                const note = await data.item.get();
+                this._listenNote(note, true);
+                const char = await note.char.get();
+                this.client.emit("notes.add", this, note, char);
+            }, async data => {
+                const note = await data.item.get();
+                this._listenNote(note, false);
+                const char = await note.char.get();
+                this.client.emit("notes.remove", this, note, char);
+            }, kPlayer(this.id));
+        }
+        if (this.client.options.track.outgoingRequests && this._outgoingRequests) {
+            this.listeners.addOrRemove(on, this._outgoingRequests, data => {
+                this._listenRequest(data.item, false, true);
+                this.client.emit("requests.outgoing.add", this, data.item);
+            }, data => {
+                this._listenRequest(data.item, false, false);
+                this.client.emit("requests.outgoing.remove", this, data.item);
+            }, kPlayer(this.id));
+        }
+        if (this.client.options.track.tokens && this._tokens) {
+            this.listeners.addOrRemove(on, this._tokens, data => this.client.emit("tokens.add", this, data.item), data => this.client.emit("tokens.remove", this, data.item), kPlayer(this.id));
+        }
+        if (this.client.options.track.watches && this._watches) {
+            this.listeners.addOrRemove(on, this._watches, async data => {
+                const watch = await data.item.get();
+                this.client.emit("watches.add", this, watch);
+            }, async data => {
+                const watch = await data.item.get();
+                this.client.emit("watches.remove", this, watch);
+            }, kPlayer(this.id));
+        }
+
+        if (!on) {
+            this._authNotices = null;
+            this._bots = null;
+            this._identityNotices = null;
+            this._inbox = null;
+            this._incomingRequests = null;
+            this._notes = null;
+            this._outgoingRequests = null;
+            this._tokens = null;
+            this._unreadMail = null;
+            this._watches = null;
+        }
+    }
+
+    protected _listenNote(listenNote: Note, on: boolean): void {
+        if (on) {
+            const listener = (note: Note, char: Character, text: string, oldText: string): void => {
+                this.client.emit("notes.textChange", this, note, char, text, oldText);
+            };
+
+            listenNote.setOnTextChange(listener);
+        } else {
+            listenNote.setOnTextChange(null);
+        }
+    }
+
+    protected _listenRequest(listenRequest: Request, incoming: boolean, on: boolean): void {
+        if (on) {
+            const listener = (request: Request): void => {
+                if (request.state === "pending") return;
+                this.client.emit(`requests.${incoming ? "incoming" : "outgoing"}.${request.state}`, this, request);
+            };
+            listenRequest.setOnStateChange(listener);
+        } else {
+            listenRequest.setOnStateChange(null);
+        }
     }
 
     /**
@@ -155,6 +280,19 @@ class Player extends BaseModel implements PlayerProperties {
             .then(r => this.basicChar(r, "char"));
     }
 
+    /** Get the auth notices for the player. */
+    async getAuthNotices(): Promise<AuthNotices> {
+        return this.api.get<AuthNotices>(ResourceIDs.AUTH_NOTICES({ id: this.id }));
+    }
+
+    /**
+     * Get the bots for the player.
+     * @returns The bots for the player.
+     */
+    async getBots(): Promise<Bots> {
+        return this.api.get<Bots>(ResourceIDs.BOTS({ id: this.id }));
+    }
+
     /**
      * Get a character.
      * @note This will return a cached value if available.
@@ -166,6 +304,14 @@ class Player extends BaseModel implements PlayerProperties {
         const cached = this.api.getCached<Character>(rid);
         if (cached) return cached;
         return this.call<Character>("getChar", { charId });
+    }
+
+    /**
+     * Get the identity notices for the player.
+     * @returns The identity notices for the player.
+     */
+    async getIdentityNotices(): Promise<IdentityNotices> {
+        return this.api.get<IdentityNotices>(ResourceIDs.IDENTITY_NOTICES({ id: this.id }));
     }
 
     /**
@@ -204,6 +350,14 @@ class Player extends BaseModel implements PlayerProperties {
      */
     async getOutgoingRequests(): Promise<OutgoingRequests> {
         return this.api.get<OutgoingRequests>(ResourceIDs.OUTGOING_REQUESTS({ id: this.id }));
+    }
+
+    /**
+     * Get the management tokens for the player.
+     * @returns The management tokens for the player.
+     */
+    async getTokens(): Promise<Tokens> {
+        return this.api.get<Tokens>(ResourceIDs.TOKENS({ id: this.id }));
     }
 
     /**

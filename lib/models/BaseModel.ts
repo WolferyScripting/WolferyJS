@@ -1,16 +1,29 @@
 import type WolferyJS from "../WolferyJS.js";
 import { ridOnlyClass } from "../util/Util.js";
-import { type AnyObject, type ResClient, ResModel, type ResModelOptions } from "resclient-ts";
+import ModelListeners from "../util/ModelListeners.js";
+import {
+    type AnyObject,
+    Properties,
+    type ResClient,
+    ResModel,
+    type ResModelOptions
+} from "resclient-ts";
 import util, { type InspectOptions } from "node:util";
 
 export default class BaseModel extends ResModel {
     protected client!: WolferyJS;
+    listeners!: ModelListeners<this>;
     constructor(client: WolferyJS, api: ResClient, rid: string, options?: ResModelOptions) {
         super(api, rid, options);
-        Object.defineProperty(this, "client", {
-            enumerable: false,
-            value:      client
-        });
+        Properties.of(this)
+            .readOnly("client", client)
+            .readOnly("listeners", new ModelListeners(this));
+    }
+
+    protected override async _listen(on: boolean): Promise<void> {
+        await super._listen(on);
+        if (on) this.listeners.activate();
+        else this.listeners.deactivate();
     }
 
     override update(props: AnyObject, reset = false): AnyObject | null {

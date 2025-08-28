@@ -114,9 +114,15 @@
     }
   },
   {
-    "description": "The notices for the logged in user.",
-    "id": ["AUTH_NOTICES(auth.user.{id}.notices)", "IDENTITY_NOTICES(identity.user.{id}.notices)"],
-    "name": "Notices",
+    "description": "The auth notices for the logged in user. @TODO unfinished",
+    "id": ["AUTH_NOTICES(auth.user.{id}.notices)"],
+    "name": "AuthNotices",
+    "model": "Notice"
+  },
+  {
+    "description": "The identity notices for the logged in user. @TODO unfinished",
+    "id": ["IDENTITY_NOTICES(identity.user.{id}.notices)"],
+    "name": "IdentityNotices",
     "model": "Notice"
   },
   {

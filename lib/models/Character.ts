@@ -1,11 +1,13 @@
 import BaseModel from "./BaseModel.js";
 import type ControlledCharacter from "./ControlledCharacter.js";
 import type CharacterInfo from "./CharacterInfo.js";
+import { type TagPref } from "./CharacterTags.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
 import type WolferyJS from "../WolferyJS.js";
 import type Commands from "../util/commands.js";
 import type { CharacterProperties } from "../generated/models/types.js";
 import { CharacterDefinition } from "../generated/models/definitions.js";
+import { kCharacter } from "../util/Util.js";
 import type { ResModelOptions , ResClient } from "resclient-ts";
 
 declare interface Character extends BaseModel, CharacterProperties {}
@@ -45,7 +47,10 @@ class Character extends BaseModel implements CharacterProperties {
             }
         } else {
             this._info?.unkeep();
+            this._info = null;
         }
+
+        this.listeners.addOrRemove(on, this.tags, data => this.client.emit("characterTags.add", this, data.item, data.key.slice(data.key.indexOf("_") + 1) as TagPref), data => this.client.emit("characterTags.remove", this, data.item, data.key.slice(data.key.indexOf("_") + 1) as TagPref), kCharacter(this.id));
     }
 
     get avatarURL(): string | null {

@@ -1,7 +1,7 @@
 import type PlayerMailMessage from "./PlayerMailMessage.js";
 import BaseCollectionModel from "./BaseCollectionModel.js";
 import type WolferyJS from "../WolferyJS.js";
-import { type CollectionModelAddRemove, type ResClient, ResRef } from "resclient-ts";
+import { type ResClient, ResRef } from "resclient-ts";
 
 // @TODO
 // do not edit the first line of the class comment
@@ -10,27 +10,8 @@ import { type CollectionModelAddRemove, type ResClient, ResRef } from "resclient
  * @resourceID {@link ResourceIDs.UNREAD_MAIL | UNREAD_MAIL}
  */
 class UnreadMail extends BaseCollectionModel<ResRef<PlayerMailMessage>> {
-    private onAdd = this._onAdd.bind(this);
-    private onRemove = this._onRemove.bind(this);
     constructor(client: WolferyJS, api: ResClient, rid: string) {
-        super(client, api, rid, ResRef);
-    }
-
-    private async _onAdd(data: CollectionModelAddRemove<ResRef<PlayerMailMessage>>): Promise<void> {
-        const mail = await data.item.get();
-        this.client.emit("unreadMail.add", mail);
-    }
-
-    private async _onRemove(data: CollectionModelAddRemove<ResRef<PlayerMailMessage>>): Promise<void> {
-        const mail = await data.item.get();
-        this.client.emit("unreadMail.remove", mail);
-    }
-
-    protected override async _listen(on: boolean): Promise<void> {
-        await super._listen(on);
-        const m = on ? "on" : "off";
-        this[m]("add", this.onAdd);
-        this[m]("remove", this.onRemove);
+        super(client, api, rid, item => item instanceof ResRef);
     }
 
     async fetchAll(): Promise<void> {

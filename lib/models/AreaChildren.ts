@@ -3,7 +3,6 @@ import RoomChild from "./RoomChild.js";
 import BaseCollectionModel from "./BaseCollectionModel.js";
 import type WolferyJS from "../WolferyJS.js";
 import type { AreaChildrenProperties } from "../generated/models/types.js";
-import { AreaChildrenDefinition } from "../generated/models/definitions.js";
 import type { ResClient } from "resclient-ts";
 
 interface AreaChildren extends BaseCollectionModel<AreaChild | RoomChild>, AreaChildrenProperties {}
@@ -14,7 +13,7 @@ interface AreaChildren extends BaseCollectionModel<AreaChild | RoomChild>, AreaC
  */
 class AreaChildren extends BaseCollectionModel<AreaChild | RoomChild> implements AreaChildrenProperties {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
-        super(client, api, rid, [AreaChild, RoomChild], { definition: AreaChildrenDefinition });
+        super(client, api, rid, item => item instanceof AreaChild || item instanceof RoomChild);
     }
 
     get areas(): Array<AreaChild> {

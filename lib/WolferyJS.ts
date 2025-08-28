@@ -1,4 +1,4 @@
-import type { BotAuthentication, PasswordAuthentication, TokenAuthentication } from "./util/types.js";
+import type { AuthTypes, BotAuthentication, PasswordAuthentication, TokenAuthentication } from "./util/types.js";
 import TypedEmitter from "./util/TypedEmitter.js";
 import User from "./models/User.js";
 import BotUser from "./models/BotUser.js";
@@ -61,6 +61,8 @@ export interface Options {
     resClientFactory?(this: void, client: WolferyJS): ResClient;
     wsFactory?(this: void, client: WolferyJS): WebSocket;
 }
+
+/** Optional things to track. This only contains things which we must fetch something extra in order to track changes, if we are expected to get objects their tracking cannot be disabled. */
 export interface TrackOptions {
     /** If awake characters should be tracked. Defaults to `true`. */
     awake?: boolean;
@@ -72,6 +74,10 @@ export interface TrackOptions {
     charInfo?: boolean;
     /** If character info should be fetched for offline {@link Character} models. Defaults to `false`. */
     charInfoOffline?: boolean;
+    /** If global tags should be tracked. Defaults to `true`. */
+    globalTags?: boolean;
+    /** If global teleports should be tracked. Defaults to `true`. */
+    globalTeleports?: boolean;
     /** If incoming requests should be tracked. Defaults to `true`. */
     incomingRequests?: boolean;
     /** If unread mail should be tracked. Defaults to `true` if `authentication.type` === "password", has no effect otherwise. */
@@ -80,12 +86,20 @@ export interface TrackOptions {
     noteChanges?: boolean;
     /** If note additions & removals should be tracked. This will not track text changes in individual notes. Defaults to `true` */
     notes?: boolean;
+    /** If notices should be tracked. Defaults to `true`. */
+    notices?: boolean;
     /** If outgoing requests should be tracked. Defaults to `true`. */
     outgoingRequests?: boolean;
+    /** If profiles should be tracked. You must own the room. Defaults to `true`. */
+    roomProfiles?: boolean;
+    /** If scripts should be tracked. You must own the room. Defaults to `true`. */
+    roomScripts?: boolean;
+    /** If tag groups should be tracked. Defaults to `true`. */
+    tagGroups?: boolean;
     /** If the player's tokens should be tracked. Defaults to `true`. */
     tokens?: boolean;
-    /** If watched characters should be tracked. Defaults to the same as `trackAwake`. */
-    watched?: boolean;
+    /** If watches should be tracked. Defaults to the same as `trackAwake`. */
+    watches?: boolean;
 }
 
 export interface InstanceOptions {
@@ -100,13 +114,19 @@ export interface InstanceOptions {
         broadcast: boolean;
         charInfo: boolean;
         charInfoOffline: boolean;
+        globalTags: boolean;
+        globalTeleports: boolean;
         incomingRequests: boolean;
         mail: boolean;
         noteChanges: boolean;
         notes: boolean;
+        notices: boolean;
         outgoingRequests: boolean;
+        roomProfiles: boolean;
+        roomScripts: boolean;
+        tagGroups: boolean;
         tokens: boolean;
-        watched: boolean;
+        watches: boolean;
     };
     resClientFactory(this: void, client: WolferyJS): ResClient;
     wsFactory(this: void, client: WolferyJS): WebSocket;
@@ -158,6 +178,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         if (authOptions === undefined) throw new TypeError("Missing or invalid authentication.");
 
 
+        const authRequired = (v: boolean, auth: AuthTypes | Array<AuthTypes>): boolean => v && (Array.isArray(auth) ? auth.includes(authOptions.type) : auth === authOptions.type);
         const instanceOptions = {
             authentication: authOptions,
             clientOptions:  {
@@ -170,17 +191,23 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             startup: options.startup ?? false,
             track:   {
                 awake:            options.track?.awake ?? true,
-                bots:             options.track?.bots ?? true,
+                bots:             authRequired(options.track?.bots ?? true, "password"),
                 broadcast:        options.track?.broadcast ?? true,
                 charInfo:         options.track?.charInfo ?? false,
                 charInfoOffline:  options.track?.charInfoOffline ?? false,
-                incomingRequests: options.track?.incomingRequests ?? true,
-                mail:             options.track?.mail ?? options.authentication.type === "password",
-                noteChanges:      options.track?.noteChanges ?? false,
-                notes:            options.track?.notes ?? true,
-                outgoingRequests: options.track?.outgoingRequests ?? true,
-                tokens:           options.track?.tokens ?? true,
-                watched:          options.track?.watched ?? options.track?.awake ?? true
+                globalTags:       options.track?.globalTags ?? true,
+                globalTeleports:  options.track?.globalTeleports ?? true,
+                incomingRequests: authRequired(options.track?.incomingRequests ?? true, "password"),
+                mail:             authRequired(options.track?.mail ?? true, "password"),
+                noteChanges:      authRequired(options.track?.noteChanges ?? false, "password"),
+                notes:            authRequired(options.track?.notes ?? true, "password"),
+                notices:          authRequired(options.track?.notices ?? true, "password"),
+                outgoingRequests: authRequired(options.track?.outgoingRequests ?? true, "password"),
+                roomProfiles:     options.track?.roomProfiles ?? true,
+                roomScripts:      options.track?.roomScripts ?? true,
+                tagGroups:        authRequired(options.track?.tagGroups ?? true, "password"),
+                tokens:           authRequired(options.track?.tokens ?? true, "password"),
+                watches:          authRequired(options.track?.watches ?? options.track?.awake ?? true, "password")
             },
             pingCharacters:   options.pingCharacters ?? true,
             wsFactory:        options.wsFactory ?? ((client: WolferyJS): WebSocket => new WebSocket(client.wsURL, { handshakeTimeout: 5000 })),
@@ -199,47 +226,33 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
     private async _afterAuthenticate(type: "password" | "token" | "bot"): Promise<void> {
         const promises: Array<Promise<unknown>> = [];
         if (this.options.startup) {
-            if (this.options.track.awake) {
-                promises.push(this.api.subscribe(ResourceIDs.AWAKE_CHARACTERS, true));
-            }
-
-            if (type === "password") {
-                const player = await this.modules.core.getPlayer();
-                if (this.options.track.awake) {
-                    promises.push(this.api.subscribe(ResourceIDs.WATCHES({ id: player.id }), true));
-                }
-                if (this.options.track.mail) {
-                    promises.push(this.api.subscribe(ResourceIDs.UNREAD_MAIL({ id: player.id }), true));
-                }
-                if (this.options.track.incomingRequests) {
-                    promises.push(this.api.subscribe(ResourceIDs.INCOMING_REQUESTS({ id: player.id }), true));
-                }
-                if (this.options.track.outgoingRequests) {
-                    promises.push(this.api.subscribe(ResourceIDs.OUTGOING_REQUESTS({ id: player.id }), true));
-                }
-                if (this.options.track.bots) {
-                    promises.push(this.api.subscribe(ResourceIDs.BOTS({ id: player.id }), true));
-                }
-                if (this.options.track.tokens) {
-                    promises.push(this.api.subscribe(ResourceIDs.TOKENS({ id: player.id }), true));
-                }
-                if (this.options.track.broadcast) {
-                    promises.push(this.api.subscribe(ResourceIDs.CORE_INFO, true));
-                }
-                if (this.options.track.notes) {
-                    if (this.options.track.noteChanges) {
-                        const notes = await this.api.get<Notes>(ResourceIDs.NOTES({ id: player.id }), true);
-                        for (const note of notes.list) {
-                            promises.push(this.api.get(note.rid, true));
-                        }
-                    } else {
-                        promises.push(this.api.get(ResourceIDs.NOTES({ id: player.id }), true));
+            const player = type === "password" ? await this.modules.core.getPlayer() : null;
+            if (this.options.track.awake) promises.push(this.api.subscribe(ResourceIDs.AWAKE_CHARACTERS, true));
+            if (this.options.track.broadcast) promises.push(this.api.subscribe(ResourceIDs.CORE_INFO, true));
+            if (this.options.track.globalTags) promises.push(this.api.subscribe(ResourceIDs.TAGS, true));
+            if (this.options.track.globalTeleports) promises.push(this.api.subscribe(ResourceIDs.NODES, true));
+            if (this.options.track.tagGroups) promises.push(this.api.subscribe(ResourceIDs.TAG_GROUPS, true));
+            if (this.options.track.watches && player) promises.push(this.api.subscribe(ResourceIDs.WATCHES({ id: player.id }), true));
+            if (this.options.track.mail && player) promises.push(this.api.subscribe(ResourceIDs.UNREAD_MAIL({ id: player.id }), true));
+            if (this.options.track.incomingRequests && player) promises.push(this.api.subscribe(ResourceIDs.INCOMING_REQUESTS({ id: player.id }), true));
+            if (this.options.track.outgoingRequests && player) promises.push(this.api.subscribe(ResourceIDs.OUTGOING_REQUESTS({ id: player.id }), true));
+            if (this.options.track.bots && player) promises.push(this.api.subscribe(ResourceIDs.BOTS({ id: player.id }), true));
+            if (this.options.track.tokens && player) promises.push(this.api.subscribe(ResourceIDs.TOKENS({ id: player.id }), true));
+            if (this.options.track.notices && player) promises.push(this.api.subscribe(ResourceIDs.AUTH_NOTICES({ id: player.id }), true), this.api.subscribe(ResourceIDs.IDENTITY_NOTICES({ id: player.id }), true));
+            if (this.options.track.notes && player) {
+                if (this.options.track.noteChanges) {
+                    const notes = await this.api.get<Notes>(ResourceIDs.NOTES({ id: player.id }), true);
+                    for (const note of notes.list) {
+                        promises.push(this.api.get(note.rid, true));
                     }
+                } else {
+                    promises.push(this.api.get(ResourceIDs.NOTES({ id: player.id }), true));
                 }
             }
         }
 
         await Promise.all(promises);
+        await this.modules.core._track(true);
     }
 
     private async _authenticateBot(): Promise<{ user: BotUser; }> {

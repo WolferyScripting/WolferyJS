@@ -46,7 +46,9 @@ export const ScriptLogsDefinition: Record<string, PropertyDefinition> = {};
 
 export const TriggersDefinition: Record<string, PropertyDefinition> = {};
 
-export const NoticesDefinition: Record<string, PropertyDefinition> = {};
+export const AuthNoticesDefinition: Record<string, PropertyDefinition> = {};
+
+export const IdentityNoticesDefinition: Record<string, PropertyDefinition> = {};
 
 export const TokensDefinition: Record<string, PropertyDefinition> = {};
 

@@ -94,9 +94,14 @@ export interface ScriptLogsProperties {}
 export interface TriggersProperties {}
 
 /**
- * The notices for the logged in user.
+ * The auth notices for the logged in user. @TODO unfinished
  */
-export interface NoticesProperties {}
+export interface AuthNoticesProperties {}
+
+/**
+ * The identity notices for the logged in user. @TODO unfinished
+ */
+export interface IdentityNoticesProperties {}
 
 /**
  * The authenticated user's management tokens.

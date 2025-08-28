@@ -2,8 +2,9 @@ import BaseModel from "./BaseModel.js";
 import type WolferyJS from "../WolferyJS.js";
 import type { RequestProperties } from "../generated/models/types.js";
 import { RequestDefinition } from "../generated/models/definitions.js";
-import type { ResClient } from "resclient-ts";
+import { Properties, type ResClient } from "resclient-ts";
 
+export type OnStateChangeFunction = (request: Request) => void;
 declare interface Request extends BaseModel, RequestProperties {}
 // do not edit the first line of the class comment
 /**
@@ -12,14 +13,17 @@ declare interface Request extends BaseModel, RequestProperties {}
  */
 class Request extends BaseModel implements RequestProperties {
     private onChange = this._onChange.bind(this);
+    private onStateChange!: OnStateChangeFunction | null;
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: RequestDefinition });
+        Properties.of(this)
+            .readOnly("onChange")
+            .writable("onStateChange", null);
     }
 
     private async _onChange(data: Partial<RequestProperties>): Promise<void> {
-        if (data.state !== undefined && this.state !== "pending") {
-            const incoming = await this.client.modules.core.getPlayer().then(p => p.chars.some(c => c.id === this.to.id));
-            this.client.emit(`requests.${incoming ? "incoming" : "outgoing"}.${this.state}`, this);
+        if (data.state !== undefined) {
+            this.onStateChange?.(this);
         }
     }
 
@@ -34,6 +38,11 @@ class Request extends BaseModel implements RequestProperties {
         return this.client.modules.core.getPlayer().then(player => player.acceptRequest(this.id));
     }
 
+    /** @internal */
+    getOnStateChange(): OnStateChangeFunction | null {
+        return this.onStateChange;
+    }
+
     /** Reject this request. */
     async reject(): Promise<null> {
         return this.client.modules.core.getPlayer().then(player => player.rejectRequest(this.id));
@@ -42,6 +51,14 @@ class Request extends BaseModel implements RequestProperties {
     /** Revoke this request. */
     async revoke(): Promise<null> {
         return this.client.modules.core.getPlayer().then(player => player.revokeRequest(this.id));
+    }
+
+    /** @internal */
+    setOnStateChange(cb: OnStateChangeFunction | null): void {
+        if (this.onStateChange !== null && cb !== null) {
+            throw new Error(`Attempted to overwrite onStateChange for ${this.rid}`);
+        }
+        this.onStateChange = cb;
     }
 }
 

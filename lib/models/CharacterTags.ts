@@ -4,7 +4,7 @@ import type Character from "./Character.js";
 import type WolferyJS from "../WolferyJS.js";
 import type Commands from "../util/commands.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
-import type { ResClient, CollectionModelAddRemove } from "resclient-ts";
+import type { ResClient } from "resclient-ts";
 
 export type TagPref = "like" | "dislike";
 // do not edit the first line of the class comment
@@ -13,29 +13,8 @@ export type TagPref = "like" | "dislike";
  * @resourceID {@link ResourceIDs.CHARACTER_TAGS | CHARACTER_TAGS}
  */
 class CharacterTags extends BaseCollectionModel<Tag> {
-    private onAdd = this._onAdd.bind(this);
-    private onRemove = this._onRemove.bind(this);
     constructor(client: WolferyJS, api: ResClient, rid: string) {
-        super(client, api, rid, Tag);
-    }
-
-    private async _onAdd(data: CollectionModelAddRemove<Tag>): Promise<void> {
-        const char = await this.getChar();
-        const pref = data.key.slice(data.key.indexOf("_") + 1) as TagPref;
-        this.client.emit("characterTags.add", char, data.item, pref);
-    }
-
-    private async _onRemove(data: CollectionModelAddRemove<Tag>): Promise<void> {
-        const char = await this.getChar();
-        const pref = data.key.slice(data.key.indexOf("_") + 1) as TagPref;
-        this.client.emit("characterTags.remove", char, data.item, pref);
-    }
-
-    protected override async _listen(on: boolean): Promise<void> {
-        await super._listen(on);
-        const m = on ? "on" : "off";
-        this[m]("add", this.onAdd);
-        this[m]("remove", this.onRemove);
+        super(client, api, rid, item => item instanceof Tag);
     }
 
     get disliked(): Array<Tag> {

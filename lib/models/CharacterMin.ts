@@ -7,7 +7,7 @@ import type { ResClient } from "resclient-ts";
 declare interface CharacterMin extends BaseModel, CharacterMinProperties {}
 // do not edit the first line of the class comment
 /**
- * A minimal character, seen in the list of muted and focused characters.
+ * A minimal character, seen in the list of muted, focused, tenant, and teleporter characters.
  * @resourceID {@link ResourceIDs.CHARACTER_MIN | CHARACTER_MIN}
  */
 class CharacterMin extends BaseModel implements CharacterMinProperties {

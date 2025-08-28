@@ -195,8 +195,8 @@ namespace ResourceIDs {
     /** note.player.{id}.watches */
     export const WATCHES = f`note.player.${id}.watches`;
     export const TAGS = "tag.tags";
-    /** tag.groups.{id} */
-    export const TAG_GROUP = f`tag.groups.${id}`;
+    /** tag.group.{id} */
+    export const TAG_GROUP = f`tag.group.${id}`;
     export const TAG_GROUPS = "tag.groups";
     export const CORE_INFO = "core.info";
     export const TAG_INFO = "tag.info";

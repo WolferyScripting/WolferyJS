@@ -1,23 +1,23 @@
 import type WolferyJS from "../WolferyJS.js";
 import { ridOnlyClassAndList } from "../util/Util.js";
-import {
-    type ModelTypeUnion,
-    type ResClient,
-    ResCollectionModel,
-    type ResModel,
-    type ResModelOptions,
-    type ResRef
-} from "resclient-ts";
+import CollectionListeners from "../util/CollectionListeners.js";
+import { Properties, type ResClient, ResCollectionModel, type ResModelOptions } from "resclient-ts";
 import util, { type InspectOptions } from "node:util";
 
-export default class BaseCollectionModel<T extends ResModel | ResRef = ResModel | ResRef> extends ResCollectionModel<T> {
+export default class BaseCollectionModel<T = unknown> extends ResCollectionModel<T> {
     protected client!: WolferyJS;
-    constructor(client: WolferyJS, api: ResClient, rid: string, modelType: ModelTypeUnion<T> | Array<ModelTypeUnion<T>>, options?: Omit<ResModelOptions, "definition">) {
-        super(api, rid, modelType, options);
-        Object.defineProperty(this, "client", {
-            enumerable: false,
-            value:      client
-        });
+    listeners!: CollectionListeners<this>;
+    constructor(client: WolferyJS, api: ResClient, rid: string, validateItem: (item: T) => boolean, options?: Omit<ResModelOptions, "definition">) {
+        super(api, rid, validateItem, options);
+        Properties.of(this)
+            .readOnly("client", client)
+            .readOnly("listeners", new CollectionListeners(this));
+    }
+
+    protected override async _listen(on: boolean): Promise<void> {
+        await super._listen(on);
+        if (on) this.listeners.activate();
+        else this.listeners.deactivate();
     }
 
     [util.inspect.custom](depth: number, inspectOptions: InspectOptions, inspect: typeof util.inspect): string {

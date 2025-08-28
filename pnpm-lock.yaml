@@ -12,8 +12,8 @@ importers:
         specifier: ^21.0.0
         version: 21.0.0
       resclient-ts:
-        specifier: 1.1.4
-        version: 1.1.4
+        specifier: 1.1.6
+        version: 1.1.6
       tslib:
         specifier: ^2.8.1
         version: 2.8.1
@@ -2085,8 +2085,8 @@ packages:
     resolution: {integrity: sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==}
     engines: {node: '>=0.10.0'}
 
-  resclient-ts@1.1.4:
-    resolution: {integrity: sha512-OmhDuqQC/kgUoNRqxaPh5jFocGZfuCLHZSk8vSSY4lElqeXqxvMWYwZuM9jgksZssffpf9Zwx0ol9HWLN6X/yg==}
+  resclient-ts@1.1.6:
+    resolution: {integrity: sha512-c8A93rXgI6wstZM+A1LN/4ZRvepNCizi51Q2nO2E1D2fd/+xJH1CyPJVCasSs9wvOx2U2+GDCOlCs9awg5qFmw==}
     engines: {node: '>=18.13.0'}
 
   resolve-from@4.0.0:
@@ -4926,7 +4926,7 @@ snapshots:
 
   require-from-string@2.0.2: {}
 
-  resclient-ts@1.1.4:
+  resclient-ts@1.1.6:
     dependencies:
       tslib: 2.8.1
       ws: 8.18.3

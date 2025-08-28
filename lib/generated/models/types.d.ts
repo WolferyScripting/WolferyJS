@@ -143,6 +143,8 @@ export interface CharacterProperties {
     avatar: string;
     /** Whether the character is awake. */
     awake: boolean;
+    /** The controller. */
+    controller: "bot" | null;
     /** The deletion timestamp of the character. */
     deleted: number | null;
     /** The gender of the character. */
@@ -218,7 +220,7 @@ export interface CharacterInfoProperties {
 }
 
 /**
- * A minimal character, seen in the list of muted and focused characters.
+ * A minimal character, seen in the list of muted, focused, tenant, and teleporter characters.
  */
 export interface CharacterMinProperties {
     /** The avatar of the character. */
@@ -484,6 +486,8 @@ export interface NotesProperties {}
 export interface OwnedCharacterProperties {
     /** The avatar unique identifier. */
     avatar: string;
+    /** The controller. */
+    controller: "bot" | null;
     /** The timestamp when the character was created. */
     created: number;
     /** The description of the character. */
@@ -662,6 +666,8 @@ export interface RoomProperties {
 export interface RoomCharacterProperties {
     /** The unique identifier of the character's avatar image. */
     avatar: string;
+    /** The controller. */
+    controller: "bot" | null;
     /** The gender of the character. */
     gender: string;
     /** The unique identifier of the character. */
