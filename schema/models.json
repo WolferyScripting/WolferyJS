@@ -1724,8 +1724,8 @@
     }
   },
   {
-    "description": "The web client info.",
-    "id": ["WEB_CLIENT_INFO(web.client.info)"],
+    "description": "The client web info.",
+    "id": ["WEB_CLIENT_INFO(client.web.info)"],
     "name": "WebClientInfo",
     "props": {
       "version": { "type": "string", "description": "The version of the web client." }

@@ -200,7 +200,7 @@ export interface ClientEvents {
     unsubscribe: [];
 }
 
-export type Events = ClientEvents & MiscEvents & CharacterEvents & OwnedCharacterEvents & ControlledCharacterEvents & PlayerEvents;
+export interface Events extends ClientEvents, MiscEvents, CharacterEvents, OwnedCharacterEvents, ControlledCharacterEvents, PlayerEvents {}
 
 
 export type BaseMessageEvent<T extends Messages.MessageTypes> = [type: T, sent: boolean, to: ControlledCharacter];

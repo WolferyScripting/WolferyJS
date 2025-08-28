@@ -1169,7 +1169,7 @@ export interface SupportInfoProperties {
 }
 
 /**
- * The web client info.
+ * The client web info.
  */
 export interface WebClientInfoProperties {
     /** The version of the web client. */

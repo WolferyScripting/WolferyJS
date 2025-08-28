@@ -204,7 +204,7 @@ namespace ResourceIDs {
     export const NOTE_INFO = "note.info";
     export const REPORT_INFO = "report.info";
     export const SUPPORT_INFO = "support.info";
-    export const WEB_CLIENT_INFO = "web.client.info";
+    export const WEB_CLIENT_INFO = "client.web.info";
     export const NOTICE = "notice";
     /** auth.token.{id} */
     export const TOKEN = f`auth.token.${id}`;

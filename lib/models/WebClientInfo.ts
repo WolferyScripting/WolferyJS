@@ -7,7 +7,7 @@ import type { ResClient } from "resclient-ts";
 declare interface WebClientInfo extends BaseModel, WebClientInfoProperties {}
 // do not edit the first line of the class comment
 /**
- * The web client info.
+ * The client web info.
  * @resourceID {@link ResourceIDs.WEB_CLIENT_INFO | WEB_CLIENT_INFO}
  */
 class WebClientInfo extends BaseModel implements WebClientInfoProperties {
