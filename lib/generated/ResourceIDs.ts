@@ -259,6 +259,10 @@ namespace ResourceIDs {
     export const IDENTITY_NOTICES = f`identity.user.${id}.notices`;
     /** auth.user.{id}.tokens */
     export const TOKENS = f`auth.user.${id}.tokens`;
+    /** core.room.{id}.tenants */
+    export const TENANTS = f`core.room.${id}.tenants`;
+    /** core.room.{id}.nodes */
+    export const TELEPORTERS = f`core.room.${id}.nodes`;
 
     export const ROLLER = f`roller.char.${id}`;
 }

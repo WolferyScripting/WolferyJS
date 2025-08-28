@@ -145,6 +145,7 @@ export const ControlledCharacterDefinition: Record<string, PropertyDefinition> =
     about: { type: "string" },
     avatar: { type: "string" },
     ctrlSince: { type: "number" },
+    controller: { type: "?string" },
     customTeleportMsgs: { type: "boolean" },
     desc: { type: "string" },
     gender: { type: "string" },

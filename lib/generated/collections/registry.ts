@@ -23,6 +23,8 @@ import ScriptLogs from "../../collections/ScriptLogs.js";
 import Triggers from "../../collections/Triggers.js";
 import Notices from "../../collections/Notices.js";
 import Tokens from "../../collections/Tokens.js";
+import Tenants from "../../collections/Tenants.js";
+import Teleporters from "../../collections/Teleporters.js";
 
 export default function registerCollections(client: WolferyJS, res: ResClient): void {
     res.registerCollectionType(ResourceIDs.CHARACTER_NODES({ id: "*" }), (api, rid) => new CharacterNodes(client, api, rid));
@@ -49,4 +51,6 @@ export default function registerCollections(client: WolferyJS, res: ResClient): 
     res.registerCollectionType(ResourceIDs.AUTH_NOTICES({ id: "*" }), (api, rid) => new Notices(client, api, rid));
     res.registerCollectionType(ResourceIDs.IDENTITY_NOTICES({ id: "*" }), (api, rid) => new Notices(client, api, rid));
     res.registerCollectionType(ResourceIDs.TOKENS({ id: "*" }), (api, rid) => new Tokens(client, api, rid));
+    res.registerCollectionType(ResourceIDs.TENANTS({ id: "*" }), (api, rid) => new Tenants(client, api, rid));
+    res.registerCollectionType(ResourceIDs.TELEPORTERS({ id: "*" }), (api, rid) => new Teleporters(client, api, rid));
 }

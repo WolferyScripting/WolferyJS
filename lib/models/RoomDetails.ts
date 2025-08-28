@@ -5,6 +5,8 @@ import type { RoomDetailsProperties } from "../generated/models/types.js";
 import type RoomProfiles from "../collections/RoomProfiles.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
 import type RoomScripts from "../collections/RoomScripts.js";
+import type Tenants from "../collections/Tenants.js";
+import type Teleporters from "../collections/Teleporters.js";
 import type { ResClient, ResModelOptions } from "resclient-ts";
 
 declare interface RoomDetails extends BaseModel, RoomDetailsProperties {}
@@ -25,6 +27,24 @@ class RoomDetails extends BaseModel implements RoomDetailsProperties {
 
     async getScripts(): Promise<RoomScripts> {
         return this.api.get<RoomScripts>(ResourceIDs.ROOM_SCRIPTS({ id: this.id }));
+    }
+
+    async getTeleporters(limit?: number, page?: number): Promise<Teleporters> {
+        let rid = ResourceIDs.TELEPORTERS({ id: this.id });
+        if (limit !== undefined) {
+            page ??= 0;
+            rid += `?limit=${limit}&offset=${page * limit}`;
+        }
+        return this.api.get<Teleporters>(rid);
+    }
+
+    async getTenants(limit?: number, page?: number): Promise<Tenants> {
+        let rid = ResourceIDs.TENANTS({ id: this.id });
+        if (limit !== undefined) {
+            page ??= 0;
+            rid += `?limit=${limit}&offset=${page * limit}`;
+        }
+        return this.api.get<Tenants>(rid);
     }
 }
 

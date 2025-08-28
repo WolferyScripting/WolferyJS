@@ -15,6 +15,29 @@ export default class  BaseCollection<V = unknown> extends ResCollection<V> {
         });
     }
 
+    get isPaginated(): boolean {
+        return this.paginationOffset !== null && this.paginationLimit !== null;
+    }
+
+    get paginationLimit(): number | null {
+        const match = this.rid.match(/limit=(\d+)/);
+        return match ? Number(match[1]) : null;
+    }
+
+    get paginationOffset(): number | null {
+        const match = this.rid.match(/offset=(\d+)/);
+        return match ? Number(match[1]) : null;
+    }
+
+    async getNextPage(): Promise<this | null> {
+        if (!this.isPaginated) return null;
+        const offset = this.paginationOffset!;
+        const limit = this.paginationLimit!;
+        const nextOffset = offset + limit;
+        const nextRid = this.rid.replace(/offset=\d+/, `offset=${nextOffset}`);
+        return this.api.get<this>(nextRid);
+    }
+
     [util.inspect.custom](depth: number, inspectOptions: InspectOptions, inspect: typeof util.inspect): string {
         const base = inspect(ridOnlyClassAndList(this.constructor as typeof BaseCollection<V>, this.rid, this.list), inspectOptions).split("\n");
         const listStart = base.findIndex(l => l.includes("list: ["));

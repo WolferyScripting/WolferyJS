@@ -329,6 +329,7 @@
         "type": "number",
         "description": "The timestamp when control started."
       },
+      "controller": { "type": "?string", "oneOf": ["bot"], "description": "The controller." },
       "customTeleportMsgs": {
         "type": "boolean",
         "description": "Whether the character has custom teleport messages enabled."

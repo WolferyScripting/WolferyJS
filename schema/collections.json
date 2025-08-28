@@ -124,5 +124,17 @@
     "id": ["TOKENS(auth.user.{id}.tokens)"],
     "name": "Tokens",
     "model": "Token"
+  },
+  {
+    "description": "The characters that have their home set in a room.",
+    "id": ["TENANTS(core.room.{id}.tenants)"],
+    "name": "Tenants",
+    "model": "CharacterMin"
+  },
+  {
+    "description": "The characters that have a teleport registered in a room.",
+    "id": ["TELEPORTERS(core.room.{id}.nodes)"],
+    "name": "Teleporters",
+    "model": "CharacterMin"
   }
 ]

@@ -49,3 +49,7 @@ export const TriggersDefinition: Record<string, PropertyDefinition> = {};
 export const NoticesDefinition: Record<string, PropertyDefinition> = {};
 
 export const TokensDefinition: Record<string, PropertyDefinition> = {};
+
+export const TenantsDefinition: Record<string, PropertyDefinition> = {};
+
+export const TeleportersDefinition: Record<string, PropertyDefinition> = {};

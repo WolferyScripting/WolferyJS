@@ -102,3 +102,13 @@ export interface NoticesProperties {}
  * The authenticated user's management tokens.
  */
 export interface TokensProperties {}
+
+/**
+ * The characters that have their home set in a room.
+ */
+export interface TenantsProperties {}
+
+/**
+ * The characters that have a teleport registered in a room.
+ */
+export interface TeleportersProperties {}

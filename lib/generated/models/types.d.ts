@@ -243,6 +243,8 @@ export interface ControlledCharacterProperties {
     about: string;
     /** The avatar of the character. */
     avatar: string;
+    /** The controller. */
+    controller: "bot" | null;
     /** The timestamp when control started. */
     ctrlSince: number;
     /** Whether the character has custom teleport messages enabled. */
