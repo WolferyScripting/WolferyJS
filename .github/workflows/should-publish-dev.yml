@@ -19,7 +19,7 @@ jobs:
       - id: check
         name: Check If Publish Is Needed
         run: |
-          if ! node scripts/should-publish; then
+          if ! node scripts/should-publish.cjs; then
             echo "should-publish=false" >> "$GITHUB_OUTPUT"
           else 
             echo "should-publish=true" >> "$GITHUB_OUTPUT"
