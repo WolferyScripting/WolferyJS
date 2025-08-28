@@ -19,17 +19,12 @@ export default class BaseCollectionModel<T = unknown> extends ResCollectionModel
         if (on) this.listeners.activate();
         else this.listeners.deactivate();
     }
+}
 
-    [util.inspect.custom](depth: number, inspectOptions: InspectOptions, inspect: typeof util.inspect): string {
-        const base = inspect(ridOnlyClassAndList(this.constructor as typeof BaseCollectionModel<T>, this.rid, this.list), inspectOptions).split("\n");
-        const listStart = base.findIndex(l => l.includes("list: ["));
-        const listEnd = base.findIndex(l => l.includes("]"), listStart);
-        let list = base.splice(listStart, listEnd - listStart + 1).join("\n");
-        if (list.at(-1) === ",") {
-            list = list.slice(0, -1);
-            base[base.length - 2] = `${base.at(-2)},`;
+export function enableCustomInspectForCollectionModels(): void {
+    Object.defineProperty(BaseCollectionModel.prototype, util.inspect.custom, {
+        value(this: BaseCollectionModel, depth: number, inspectOptions: InspectOptions, inspect: typeof util.inspect): string {
+            return inspect(ridOnlyClassAndList(this.constructor as typeof BaseCollectionModel, this.rid, this.list), inspectOptions);
         }
-        base.splice(-1, 0, list.replace("list: ", ""));
-        return base.join("\n");
-    }
+    });
 }

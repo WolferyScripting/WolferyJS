@@ -174,8 +174,10 @@ export function ridOnlyClass<C extends AnyClass>(clazz: C, rid: string): Instanc
 
 export function ridOnlyClassAndList<C extends AnyClass>(clazz: C, rid: string, list: Array<unknown>): InstanceType<C> {
     return new ({ [clazz.name]: class {
-        list: Array<unknown>;
+        // we want the list sorted after rid, the order of properties here is the order they're defined in
         rid: string;
+        // eslint-disable-next-line @typescript-eslint/member-ordering
+        list: Array<unknown>;
         constructor() {
             this.rid = rid;
             this.list = list;

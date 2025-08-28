@@ -46,8 +46,13 @@ export default class BaseModel extends ResModel {
 
         return super.update(props, reset);
     }
+}
 
-    [util.inspect.custom](depth: number, inspectOptions: InspectOptions, inspect: typeof util.inspect): string {
-        return inspect(ridOnlyClass(this.constructor as typeof BaseModel, this.rid), inspectOptions);
-    }
+
+export function enableCustomInspectForModels(): void {
+    Object.defineProperty(BaseModel.prototype, util.inspect.custom, {
+        value(this: BaseModel, depth: number, inspectOptions: InspectOptions, inspect: typeof util.inspect): string {
+            return inspect(ridOnlyClass(this.constructor as typeof BaseModel, this.rid), inspectOptions);
+        }
+    });
 }

@@ -14,6 +14,9 @@ import registerModels from "./generated/models/registry.js";
 import type { Events } from "./util/events.js";
 import type Notes from "./models/Notes.js";
 import Modules from "./modules/Modules.js";
+import { enableCustomInspectForCollections } from "./collections/BaseCollection.js";
+import { enableCustomInspectForCollectionModels } from "./models/BaseCollectionModel.js";
+import { enableCustomInspectForModels } from "./models/BaseModel.js";
 import {
     type ClientOptions,
     ResError,
@@ -53,6 +56,8 @@ export interface Options {
         username?: string;
     };
     clientOptions?: ClientOptions;
+    /** If models should use a custom inspect function. The custom inspect function will only show the RID and (if applicable) list of items for any collection or model. Defaults to `true`. */
+    customInspect?: boolean;
     /** If pings should be sent to prevent being released for inactivity. Defaults to `true` */
     pingCharacters?: boolean;
     /** Set to false to not fetch anything extra on startup. This takes precedent over all of the track options. */
@@ -107,6 +112,7 @@ export interface TrackOptions {
 export interface InstanceOptions {
     authentication: PasswordAuthentication | BotAuthentication | TokenAuthentication;
     clientOptions: ClientOptions;
+    customInspect: boolean;
     domain: string;
     pingCharacters: boolean;
     startup: boolean;
@@ -190,9 +196,10 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
                 defaultErrorFactory:      (api, rid): ResError => this._missingRes("error", api, rid, options.clientOptions?.defaultErrorFactory),
                 defaultModelFactory:      (api, rid): ResModel => this._missingRes("model", api, rid, options.clientOptions?.defaultModelFactory)
             },
-            domain:  options.apiDomain ?? "wolfery.com",
-            startup: options.startup ?? false,
-            track:   {
+            customInspect: options.customInspect ?? true,
+            domain:        options.apiDomain ?? "wolfery.com",
+            startup:       options.startup ?? false,
+            track:         {
                 awake:            options.track?.awake ?? true,
                 bots:             authRequired(options.track?.bots ?? true, "password"),
                 broadcast:        options.track?.broadcast ?? true,
@@ -225,6 +232,12 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             .readOnly("modules", new Modules(this))
             .readOnly("onUnsubscribe")
             .readOnly("options", instanceOptions);
+
+        if (this.options.customInspect) {
+            enableCustomInspectForCollections();
+            enableCustomInspectForCollectionModels();
+            enableCustomInspectForModels();
+        }
     }
 
     private async _afterAuthenticate(type: "password" | "token" | "bot"): Promise<void> {
