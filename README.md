@@ -1,14 +1,16 @@
 <p align="center">
   <img width=25% src="static/icon-transparent.png">
   <p align="center">A comprehensive API wrapper for https://wolfery.com.</p>
-  <br>
+</p>
+<p align="center">
   <a href="https://npmjs.com/package/wolfery.js"><img src="https://img.shields.io/npm/v/wolfery.js.svg?style=flat-square&color=informational"></a>
   <img src="https://img.shields.io/github/stars/WolferyScripting/WolferyJS?color=yellow&style=flat-square">
   <img src="https://img.shields.io/npm/dw/wolfery.js?color=red&style=flat-square">
+  <a href="https://coveralls.io/github/WolferyScripting/WolferyJS"><img src="https://coveralls.io/repos/github/WolferyScripting/WolferyJS/badge.svg" alt="Coverage Status" /></a>
 </p>
 
 # Sections
-[Installation](#installation) | [Documentation](#documentation) | [Basic Usage](#basic-usage) | [Contributing](#contributing)
+[Installation](#installation) | [Documentation](#documentation) | [Node Version](#node-version) | [Basic Usage](#basic-usage) | [Contributing](#contributing)
 
 ## Installation
 
