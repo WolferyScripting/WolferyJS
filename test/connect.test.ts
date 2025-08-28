@@ -91,9 +91,7 @@ describe("WebSocket", () => {
                 username,
                 password
             },
-            fetch: {
-                startup: false
-            }
+            startup: false
         });
     });
 

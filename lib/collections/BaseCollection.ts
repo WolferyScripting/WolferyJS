@@ -47,6 +47,7 @@ export default class  BaseCollection<V = unknown> extends ResCollection<V> {
 }
 
 export function enableCustomInspectForCollections(): void {
+    if (util.inspect.custom in BaseCollection.prototype) return;
     Object.defineProperty(BaseCollection.prototype, util.inspect.custom, {
         value(this: BaseCollection, depth: number, inspectOptions: InspectOptions, inspect: typeof util.inspect): string {
             return inspect(ridOnlyClassAndList(this.constructor as typeof BaseCollection, this.rid, this.list), inspectOptions);

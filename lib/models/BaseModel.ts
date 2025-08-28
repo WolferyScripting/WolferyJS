@@ -50,6 +50,7 @@ export default class BaseModel extends ResModel {
 
 
 export function enableCustomInspectForModels(): void {
+    if (util.inspect.custom in BaseModel.prototype) return;
     Object.defineProperty(BaseModel.prototype, util.inspect.custom, {
         value(this: BaseModel, depth: number, inspectOptions: InspectOptions, inspect: typeof util.inspect): string {
             return inspect(ridOnlyClass(this.constructor as typeof BaseModel, this.rid), inspectOptions);
