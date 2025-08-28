@@ -1,6 +1,6 @@
 {
   "name": "wolfery.js",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "packageManager": "pnpm@10.13.1",
   "description": "A comprehensive API wrapper for https://wolfery.com",
   "types": "./dist/esm/index.d.mts",
@@ -56,7 +56,7 @@
   "license": "MIT",
   "dependencies": {
     "file-type": "^21.0.0",
-    "resclient-ts": "1.1.8",
+    "resclient-ts": "1.1.9",
     "tslib": "^2.8.1",
     "ws": "^8.18.3"
   },
