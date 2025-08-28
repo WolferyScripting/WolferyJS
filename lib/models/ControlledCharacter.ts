@@ -12,6 +12,7 @@ import type RoomCharacter from "./RoomCharacter.js";
 import type RoomDetails from "./RoomDetails.js";
 import type AfarRoom from "./AfarRoom.js";
 import type Node from "./Node.js";
+import type LookedAt from "./LookedAt.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
 import {
     type KeyBasicResponse,
@@ -100,8 +101,8 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         }
 
         if (data.lookedAt !== undefined) {
-            await this._listenLookedAt(false);
-            await this._listenLookedAt(true);
+            await this._listenLookedAt(false, data.lookedAt);
+            await this._listenLookedAt(true, this.lookedAt);
         }
 
         if (data.inRoom !== undefined) {
@@ -303,7 +304,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         const m = on ? "resourceOn" : "resourceOff";
         this[m]("change", this.onChange);
         this[m]("out", this.onOut);
-        await this._listenLookedAt(on);
+        await this._listenLookedAt(on, this.lookedAt);
 
         if (this.client.options.pingCharacters) {
             if (on) {
@@ -346,9 +347,9 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         }
     }
 
-    protected async _listenLookedAt(on: boolean): Promise<void> {
+    protected async _listenLookedAt(on: boolean, lookedAt: LookedAt): Promise<void> {
         const m = on ? "resourceOn" : "resourceOff";
-        this.lookedAt[m]("change", this.onLookedAtChange);
+        lookedAt[m]("change", this.onLookedAtChange);
     }
 
     protected async _listenRoom(on: boolean, room: RoomDetails): Promise<void> {
