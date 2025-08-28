@@ -1,0 +1,8 @@
+{
+  "$schema": "https://raw.githubusercontent.com/favware/npm-deprecate/main/assets/npm-deprecate.schema.json",
+  "name": "*dev*",
+  "deprecateDistTag": false,
+  "verbose": true,
+  "package": ["wolfery.js"],
+  "message": "This version has been superseded by a new build, update."
+}
