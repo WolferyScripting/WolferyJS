@@ -17,6 +17,10 @@ class CharacterTags extends BaseCollectionModel<Tag> {
         super(client, api, rid, item => item instanceof Tag);
     }
 
+    protected override async _listen(on: boolean): Promise<void> {
+        await super._listen(on, this.client.anyTracked("characterTags"));
+    }
+
     get disliked(): Array<Tag> {
         return Object.entries(this.props as Record<string, Tag>).filter(([key]) => key.split("_")[1] === "dislike").map(([,value]) => value);
     }

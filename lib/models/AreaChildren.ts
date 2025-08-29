@@ -16,6 +16,10 @@ class AreaChildren extends BaseCollectionModel<AreaChild | RoomChild> implements
         super(client, api, rid, item => item instanceof AreaChild || item instanceof RoomChild);
     }
 
+    protected override async _listen(on: boolean): Promise<void> {
+        await super._listen(on, this.client.anyTracked("population"));
+    }
+
     get areas(): Array<AreaChild> {
         return this.list.filter(child => child.type === "area") as Array<AreaChild>;
     }

@@ -13,6 +13,10 @@ class Bots extends BaseCollectionModel<Bot> {
         super(client, api, rid, item => item instanceof Bot);
     }
 
+    protected override async _listen(on: boolean): Promise<void> {
+        await super._listen(on, this.client.anyTracked("bots"));
+    }
+
     /**
      * Create a bot token.
      * @param charId The ID of the character the bot is for.

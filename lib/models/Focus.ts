@@ -17,6 +17,10 @@ class Focus extends BaseCollectionModel<FocusOptions> implements FocusProperties
         super(client, api, rid, () => true);
     }
 
+    protected override async _listen(on: boolean): Promise<void> {
+        await super._listen(on, this.client.anyTracked("focus"));
+    }
+
     async getChars(): Promise<FocusChars> {
         if (ResourceIDs.PUPPET_FOCUS.regex.test(this.rid)) {
             const { char, puppet } = ResourceIDs.PUPPET_FOCUS.parts(this.rid);

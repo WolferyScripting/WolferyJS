@@ -13,6 +13,10 @@ class Notes extends BaseCollectionModel<ResRef<Note>> {
         super(client, api, rid, item => item instanceof ResRef);
     }
 
+    protected override async _listen(on: boolean): Promise<void> {
+        await super._listen(on, this.client.anyTracked("notes"));
+    }
+
     async fetchAll(): Promise<Array<Note>> {
         return Promise.all(this.list.map(ref => ref.get()));
     }

@@ -14,6 +14,10 @@ class Watches extends BaseCollectionModel<ResRef<Watch>> {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, item => item instanceof ResRef);
     }
+
+    protected override async _listen(on: boolean): Promise<void> {
+        await super._listen(on, this.client.anyTracked("watches"));
+    }
 }
 
 export default Watches;

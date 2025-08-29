@@ -12,6 +12,10 @@ class AwakeCharacters extends BaseCollectionModel<Character> {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, item => item instanceof Character);
     }
+
+    protected override async _listen(on: boolean): Promise<void> {
+        await super._listen(on, this.client.anyTracked("awake"));
+    }
 }
 
 export default AwakeCharacters;

@@ -12,6 +12,10 @@ class HiddenExits extends BaseCollectionModel<Exit> {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, item => item instanceof Exit);
     }
+
+    protected override async _listen(on: boolean): Promise<void> {
+        await super._listen(on, this.client.anyTracked("hiddenExits"));
+    }
 }
 
 export default HiddenExits;

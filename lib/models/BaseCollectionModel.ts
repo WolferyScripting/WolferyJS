@@ -14,8 +14,8 @@ export default class BaseCollectionModel<T = unknown> extends ResCollectionModel
             .readOnly("listeners", new CollectionListeners(this));
     }
 
-    protected override async _listen(on: boolean): Promise<void> {
-        await super._listen(on);
+    protected override async _listen(on: boolean, changes = true): Promise<void> {
+        await super._listen(on, changes);
         if (on) this.listeners.activate();
         else this.listeners.deactivate();
     }

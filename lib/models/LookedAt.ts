@@ -18,6 +18,10 @@ class LookedAt extends BaseCollectionModel<boolean> implements LookedAtPropertie
         super(client, api, rid, item => typeof item === "boolean");
     }
 
+    protected override async _listen(on: boolean): Promise<void> {
+        await super._listen(on, this.client.anyTracked("lookedAt"));
+    }
+
     protected override _shouldPromoteKey(): boolean {
         return false;
     }
