@@ -62,6 +62,8 @@ export interface ControlledCharacterEvents {
     "lookedAt.add": [ctrl: ControlledCharacter, char: Character];
     /** Emitted when a character stops looking at a controlled character. */
     "lookedAt.remove": [ctrl: ControlledCharacter, char: Character];
+    /** Emitted when a message is sent or received. */
+    "message": AnyMessageEvent;
     /** Emitted when an area is created for an owned character. */
     "ownedAreas.add": [ctrl: ControlledCharacter, area: Area];
     /** Emitted when an area is deleted for an owned character. */
@@ -100,13 +102,12 @@ export interface ControlledCharacterEvents {
 }
 
 export interface OwnedCharacterEvents {
-    /** Emitted when a message is sent or received. */
-    "message": AnyMessageEvent;
     /** Emitted when an owned character's room changes (where the character is located, not the details of the room). */
     "roomChange": [char: OwnedCharacter, room: Room, oldRoom: Room];
 }
 
 export interface CharacterEvents {
+    "aboutChange": [char: Character, about: string, oldAbout: string];
     /** Emitted when a character wakes up. */
     "awakeCharacters.add": [char: Character];
     /** Emitted when a character goes to sleep. */
@@ -115,6 +116,8 @@ export interface CharacterEvents {
     "characterTags.remove": [char: Character, tag: Tag, pref: TagPref];
     /** Emitted when a character's idle status changes. */
     "idleStatusChange": [char: Character, status: IdleState, oldStatus: IdleState];
+    "lfrp.change": [char: Character, lfrp: boolean];
+    "lfrp.descChange": [char: Character, desc: string, oldDesc: string];
 }
 
 export interface PlayerEvents {

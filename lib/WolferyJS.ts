@@ -69,45 +69,205 @@ export interface Options {
 
 /** Optional things to track. This only contains things which we must fetch something extra in order to track changes, if we are expected to get objects their tracking cannot be disabled. */
 export interface TrackOptions {
-    /** If awake characters should be tracked. Defaults to `true`. */
+    /**
+     * If awake characters should be tracked.
+     * @default true
+     * @fetches {@link AwakeCharacters}
+     * @requiredForEvents
+     * * {@link CharacterEvents."awakeCharacters.add" | `awakeCharacters.add`}
+     * * {@link CharacterEvents."awakeCharacters.remove" | `awakeCharacters.remove` }
+     */
     awake?: boolean;
-    /** If the player's bots should be tracked. Defaults to `true`. */
+    /**
+     * If the player's bots should be tracked.
+     * @playerRequired
+     * @default true
+     * @fetches {@link Bots}
+     * @requiredForEvents
+     * * {@link PlayerEvents."bots.add" | `bots.add`}
+     * * {@link PlayerEvents."bots.remove" | `bots.remove`}
+     */
     bots?: boolean;
-    /** If broadcasts should be tracked. Defaults to `true`. */
+    /**
+     * If broadcasts should be tracked.
+     * @default true
+     * @fetches {@link CoreInfo}
+     * @requiredForEvents
+     * * {@link MiscEvents.broadcast | `broadcast`}
+     */
     broadcast?: boolean;
-    /** If character info should be fetched for {@link Character} models. Required for seeing about/lfrpDesc changes. Defaults to `true`. See also {@link charInfo} */
+    /**
+     * If character info should be fetched for {@link Character} models.
+     * @default true
+     * @fetches {@link CharacterInfo} for all awake characters.
+     * @requiredForEvents
+     * * {@link CharacterEvents.aboutChange | `aboutChange`}
+     * * {@link CharacterEvents."lfrp.change" | `lfrp.change`}
+     * * {@link CharacterEvents."lfrp.descChange" | `lfrp.descChange`}
+     */
     charInfo?: boolean;
-    /** If character info should be fetched for offline {@link Character} models. Defaults to `false`. */
+    /**
+     * If character info should be fetched for offline {@link Character} models.
+     * @default false
+     * @fetches {@link CharacterInfo} for all characters.
+     */
     charInfoOffline?: boolean;
-    /** If the focused characters should be tracked. Defaults to `true`. */
+    /**
+     * If the focused characters should be tracked.
+     * @default true
+     * @fetches {@link FocusChars} for all controlled characters.
+     * @requiredForEvents
+     * * {@link ControlledCharacterEvents."focusChars.add" | `focusChars.add`}
+     * * {@link ControlledCharacterEvents."focusChars.remove" | `focusChars.remove`}
+     */
     focusChars?: boolean;
-    /** If global tags should be tracked. Defaults to `true`. */
+    /**
+     * If global tags should be tracked.
+     * @default true
+     * @fetches {@link Tags}
+     * @requiredForEvents
+     * * {@link MiscEvents."tags.add" | `tags.add`}
+     * * {@link MiscEvents."tags.remove" | `tags.remove`}
+     */
     globalTags?: boolean;
-    /** If global teleports should be tracked. Defaults to `true`. */
+    /**
+     * If global teleports should be tracked.
+     * @default true
+     * @fetches {@link GlobalTeleports}
+     * @requiredForEvents
+     * * {@link MiscEvents."globalTeleports.add" | `globalTeleports.add`}
+     * * {@link MiscEvents."globalTeleports.remove" | `globalTeleports.remove`}
+     */
     globalTeleports?: boolean;
-    /** If hidden exits should be tracked. Defaults to `true`. */
+    /**
+     * If hidden exits should be tracked.
+     * @default true
+     * @fetches {@link HiddenExits} for all owned rooms.
+     * @requiredForEvents
+     * * {@link ControlledCharacterEvents."exits.hidden.add" | `exits.hidden.add`}
+     * * {@link ControlledCharacterEvents."exits.hidden.remove" | `exits.hidden.remove`}
+     */
     hiddenExits?: boolean;
-    /** If incoming requests should be tracked. Defaults to `true`. */
+    /**
+     * If incoming requests should be tracked.
+     * @playerRequired
+     * @default true
+     * @fetches {@link IncomingRequests}
+     * @requiredForEvents
+     * * {@link PlayerEvents."requests.incoming.accepted" | `requests.incoming.accepted`}
+     * * {@link PlayerEvents."requests.incoming.add" | `requests.incoming.add`}
+     * * {@link PlayerEvents."requests.incoming.expired" | `requests.incoming.expired`}
+     * * {@link PlayerEvents."requests.incoming.failed" | `requests.incoming.failed`}
+     * * {@link PlayerEvents."requests.incoming.rejected" | `requests.incoming.rejected`}
+     * * {@link PlayerEvents."requests.incoming.remove" | `requests.incoming.remove`}
+     * * {@link PlayerEvents."requests.incoming.revoked" | `requests.incoming.revoked`}
+     */
     incomingRequests?: boolean;
-    /** If unread mail should be tracked. Defaults to `true` if `authentication.type` === "password", has no effect otherwise. */
+    /**
+     * If mail should be tracked.
+     * @playerRequired
+     * @default true
+     * @fetches {@link UnreadMail} and {@link Inbox}
+     * @requiredForEvents
+     * * {@link PlayerEvents."inbox.add" | `inbox.add`}
+     * * {@link PlayerEvents."inbox.remove" | `inbox.remove`}
+     * * {@link PlayerEvents."unreadMail.add" | `unreadMail.add`}
+     * * {@link PlayerEvents."unreadMail.remove" | `unreadMail.remove`}
+     */
     mail?: boolean;
-    /** If note changes should be tracked. Each note must be fetched individually to track changes, so this can potentially flood the server with requests and expand the cache significantly. */
+    /**
+     * If note changes should be tracked.
+     * @playerRequired
+     * @default false
+     * @fetches Each {@link Note} individually, and keeps them cached. This can potentially flood the server on startup.
+     * @requiredForEvents
+     * * {@link PlayerEvents."notes.textChange" | `notes.textChange`}
+     */
     noteChanges?: boolean;
-    /** If note additions & removals should be tracked. This will not track text changes in individual notes. Defaults to `true` */
+    /**
+     * If note additions & removals should be tracked. This will not track text changes in individual notes.
+     * @playerRequired
+     * @default true
+     * @fetches {@link Notes}
+     * @requiredForEvents
+     * * {@link PlayerEvents."notes.add" | `notes.add`}
+     * * {@link PlayerEvents."notes.remove" | `notes.remove`}
+     */
     notes?: boolean;
-    /** If notices should be tracked. Defaults to `true`. */
+    /**
+     * If notices should be tracked.
+     * @playerRequired
+     * @default true
+     * @fetches {@link AuthNotices} and {@link IdentityNotices}
+     * @requiredForEvents
+     * * {@link PlayerEvents."notices.auth.add" | `notices.auth.add`}
+     * * {@link PlayerEvents."notices.auth.remove" | `notices.auth.remove`}
+     * * {@link PlayerEvents."notices.identity.add" | `notices.identity.add`}
+     * * {@link PlayerEvents."notices.identity.remove" | `notices.identity.remove`}
+     */
     notices?: boolean;
-    /** If outgoing requests should be tracked. Defaults to `true`. */
+    /**
+     * If outgoing requests should be tracked.
+     * @playerRequired
+     * @default true
+     * @fetches {@link OutgoingRequests}
+     * @requiredForEvents
+     * * {@link PlayerEvents."requests.outgoing.accepted" | `requests.outgoing.accepted`}
+     * * {@link PlayerEvents."requests.outgoing.add" | `requests.outgoing.add`}
+     * * {@link PlayerEvents."requests.outgoing.expired" | `requests.outgoing.expired`}
+     * * {@link PlayerEvents."requests.outgoing.failed" | `requests.outgoing.failed`}
+     * * {@link PlayerEvents."requests.outgoing.rejected" | `requests.outgoing.rejected`}
+     * * {@link PlayerEvents."requests.outgoing.remove" | `requests.outgoing.remove`}
+     * * {@link PlayerEvents."requests.outgoing.revoked" | `requests.outgoing.revoked`}
+     */
     outgoingRequests?: boolean;
-    /** If profiles should be tracked. You must own the room. Defaults to `true`. */
+    /**
+     * If room profiles should be tracked.
+     * @default true
+     * @fetches {@link RoomProfiles} if the current room is owned.
+     * @requiredForEvents
+     * * {@link ControlledCharacterEvents."roomProfiles.add" | `roomProfiles.add`}
+     * * {@link ControlledCharacterEvents."roomProfiles.remove" | `roomProfiles.remove`}
+     */
     roomProfiles?: boolean;
-    /** If scripts should be tracked. You must own the room. Defaults to `true`. */
+    /**
+     * If room scripts should be tracked.
+     * @default true
+     * @fetches {@link RoomScripts} if the current room is owned.
+     * @requiredForEvents
+     * * {@link ControlledCharacterEvents."roomScripts.add" | `roomScripts.add`}
+     * * {@link ControlledCharacterEvents."roomScripts.remove" | `roomScripts.remove`}
+     */
     roomScripts?: boolean;
-    /** If tag groups should be tracked. Defaults to `true`. */
+    /**
+     * If tag groups should be tracked.
+     * @playerRequired
+     * @default true
+     * @fetches {@link TagGroups}
+     * @requiredForEvents
+     * * {@link MiscEvents."tagGroups.add" | `tagGroups.add`}
+     * * {@link MiscEvents."tagGroups.remove" | `tagGroups.remove`}
+     */
     tagGroups?: boolean;
-    /** If the player's tokens should be tracked. Defaults to `true`. */
+    /**
+     * If the player's tokens should be tracked.
+     * @playerRequired
+     * @default true
+     * @fetches {@link Tokens}
+     * @requiredForEvents
+     * * {@link PlayerEvents."tokens.add" | `tokens.add`}
+     * * {@link PlayerEvents."tokens.remove" | `tokens.remove`}
+     */
     tokens?: boolean;
-    /** If watches should be tracked. Defaults to the same as `trackAwake`. */
+    /**
+     * If the player's watches should be tracked.
+     * @playerRequired
+     * @default true
+     * @fetches {@link Watches}
+     * @requiredForEvents
+     * * {@link PlayerEvents."watches.add" | `watches.add`}
+     * * {@link PlayerEvents."watches.remove" | `watches.remove`}
+     */
     watches?: boolean;
 }
 
@@ -222,7 +382,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
                 roomScripts:      options.track?.roomScripts ?? true,
                 tagGroups:        authRequired(options.track?.tagGroups ?? true, "password"),
                 tokens:           authRequired(options.track?.tokens ?? true, "password"),
-                watches:          authRequired(options.track?.watches ?? options.track?.awake ?? true, "password")
+                watches:          authRequired(options.track?.watches ?? true, "password")
             },
             pingCharacters:   options.pingCharacters ?? true,
             wsFactory:        options.wsFactory ?? ((client: WolferyJS): WebSocket => new WebSocket(client.wsURL, { handshakeTimeout: 5000 })),

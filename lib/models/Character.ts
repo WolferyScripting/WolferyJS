@@ -8,7 +8,7 @@ import type Commands from "../util/commands.js";
 import type { CharacterProperties } from "../generated/models/types.js";
 import { CharacterDefinition } from "../generated/models/definitions.js";
 import { kCharacter } from "../util/Util.js";
-import type { ResModelOptions , ResClient } from "resclient-ts";
+import { type ResModelOptions , type ResClient, Properties } from "resclient-ts";
 
 declare interface Character extends BaseModel, CharacterProperties {}
 // do not edit the first line of the class comment
@@ -19,20 +19,38 @@ declare interface Character extends BaseModel, CharacterProperties {}
 class Character extends BaseModel implements CharacterProperties {
     private _info!: CharacterInfo | null;
     private onChange = this._onChange.bind(this);
+    private onInfoChange = this._onInfoChange.bind(this);
     // eslint-disable-next-line unicorn/no-object-as-default-parameter
     constructor(client: WolferyJS, api: ResClient, rid: string, options: ResModelOptions = { definition: CharacterDefinition }) {
         super(client, api, rid, options);
-        this.p.define("_info", true, false, false, null);
+        Properties.of(this)
+            .writable("_info", null)
+            .readOnly("onChange")
+            .readOnly("onInfoChange");
     }
 
     private async _onChange(data: Partial<this>): Promise<void> {
-        if (data.awake !== undefined && this.awake !== data.awake && this.awake && this.client.options.track.charInfo && this._info === null) {
+        if (data.awake !== undefined && this.awake && this.client.options.track.charInfo && this._info === null) {
             await this.getInfo().then(info => info.keep());
         }
 
 
-        if (data.idle !== undefined && this.idle !== data.idle) {
+        if (data.idle !== undefined) {
             this.client.emit("idleStatusChange", this, this.idle, data.idle);
+        }
+
+        if (data.rp !== undefined) {
+            this.client.emit("lfrp.change", this, this.rp === "lfrp");
+        }
+    }
+
+    private _onInfoChange(data: Partial<CharacterInfo>, info: CharacterInfo): void {
+        if (data.lfrpDesc !== undefined) {
+            this.client.emit("lfrp.descChange", this, info.lfrpDesc, data.lfrpDesc);
+        }
+
+        if (data.about !== undefined) {
+            this.client.emit("aboutChange", this, info.about, data.about);
         }
     }
 
@@ -43,10 +61,10 @@ class Character extends BaseModel implements CharacterProperties {
         if (on) {
             if (this.client.options.track.charInfo && (this.awake || this.client.options.track.charInfoOffline)) {
                 this._info = await this.getInfo();
-                this._info.keep();
+                this._info[m]("change", this.onInfoChange);
             }
         } else {
-            this._info?.unkeep();
+            this._info?.[m]("change", this.onInfoChange);
             this._info = null;
         }
 
