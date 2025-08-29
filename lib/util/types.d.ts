@@ -299,3 +299,15 @@ export interface RealmConfigOverseer extends RealmConfig {
     supporterMaxRoomProfiles: number;
     supporterMaxRoomScripts: number;
 }
+
+export interface PublicPopulationUpdate {
+    public: number;
+    publicOld: number;
+}
+
+export interface PrivatePopulationUpdate {
+    private: number;
+    privateOld: number;
+}
+
+export interface AreaDetailsPopulationUpdate extends PublicPopulationUpdate, PrivatePopulationUpdate {}

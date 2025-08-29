@@ -13,13 +13,18 @@ import type RoomDetails from "./RoomDetails.js";
 import type LookedAt from "./LookedAt.js";
 import type FocusChars from "./FocusChars.js";
 import type HiddenExits from "./HiddenExits.js";
+import type AreaDetails from "./AreaDetails.js";
+import type AreaChild from "./AreaChild.js";
+import type RoomChild from "./RoomChild.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
 import {
     type KeyBasicResponse,
     type BasicCharacterResponse,
     type NameBasicResponse,
     type DeleteNameResponse,
-    type Messages
+    type Messages,
+    type PublicPopulationUpdate,
+    type AreaDetailsPopulationUpdate
 } from "../util/types.js";
 import type WolferyJS from "../WolferyJS.js";
 import type Commands from "../util/commands.js";
@@ -31,7 +36,7 @@ import type RoomProfiles from "../collections/RoomProfiles.js";
 import type RoomScripts from "../collections/RoomScripts.js";
 import { kControlledCharacter } from "../util/Util.js";
 import { fileTypeFromBuffer } from "file-type";
-import type { ResClient } from "resclient-ts";
+import { ResRef, type ResClient } from "resclient-ts";
 
 declare interface ControlledCharacter extends BaseModel, ControlledCharacterProperties {}
 // do not edit the first line of the class comment
@@ -46,9 +51,13 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
     private _pingTimeout!: NodeJS.Timeout | null;
     private _roomProfiles!: RoomProfiles | null;
     private _roomScripts!: RoomScripts | null;
+    private onAreaChildChange = this._onAreaChildChange.bind(this);
+    private onAreaDetailsChange = this._onAreaDetailsChange.bind(this);
     private onChange = this._onChange.bind(this);
     private onExitChange = this._onExitChange.bind(this);
     private onOut = this._onOut.bind(this);
+    private onRoomChildChange = this._onRoomChildChange.bind(this);
+    private onRoomDetailsChange = this._onRoomDetailsChange.bind(this);
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: ControlledCharacterDefinition });
         this.p
@@ -57,9 +66,35 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
             .writable("_pingTimeout", null)
             .writable("_roomProfiles", null)
             .writable("_roomScripts", null)
+            .writable("onAreaChildChange", null)
+            .writable("onAreaDetailsChange")
             .writable("onChange")
             .writable("onExitChange")
-            .writable("onOut");
+            .writable("onOut")
+            .writable("onRoomChildChange", null)
+            .writable("onRoomDetailsChange");
+    }
+
+    private async _onAreaChildChange(data: Partial<AreaChild>, area: AreaChild): Promise<void> {
+        if (data.pop !== undefined) {
+            const update: PublicPopulationUpdate = {
+                public:    area.pop,
+                publicOld: data.pop ?? area.pop
+            };
+            this.client.emit("area.child.populationChange", this, area, update);
+        }
+    }
+
+    private async _onAreaDetailsChange(data: Partial<AreaDetails>, area: AreaDetails): Promise<void> {
+        if (data.pop !== undefined || data.prv !== undefined) {
+            const update: AreaDetailsPopulationUpdate = {
+                private:    area.prv,
+                privateOld: data.prv ?? area.prv,
+                public:     area.pop,
+                publicOld:  data.pop ?? area.pop
+            };
+            this.client.emit("area.details.populationChange", this, area, update);
+        }
     }
 
     private async _onChange(data: Partial<this>): Promise<void> {
@@ -80,7 +115,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
     }
 
     private _onExitChange(data: Partial<Exit>, exit: Exit): void {
-        this.client.emit("exits.change", this, this.inRoom, exit, data);
+        // this.client.emit("exits.change", this, this.inRoom, exit, data);
         if (data.target !== undefined) {
             if (data.target === null) {
                 this._listenExit(false, exit);
@@ -156,6 +191,26 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         }
     }
 
+    private async _onRoomChildChange(data: Partial<RoomChild>, room: RoomChild): Promise<void> {
+        if (data.pop !== undefined) {
+            const update: PublicPopulationUpdate = {
+                public:    room.pop,
+                publicOld: data.pop
+            };
+            this.client.emit("room.child.populationChange", this, room, update);
+        }
+    }
+
+    private async _onRoomDetailsChange(data: Partial<RoomDetails>, room: RoomDetails): Promise<void> {
+        if (data.pop !== undefined) {
+            const update: PublicPopulationUpdate = {
+                public:    room.pop,
+                publicOld: data.pop
+            };
+            this.client.emit("room.details.populationChange", this, room, update);
+        }
+    }
+
     protected override async _listen(on: boolean): Promise<void> {
         await super._listen(on);
         const m = on ? "resourceOn" : "resourceOff";
@@ -178,7 +233,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         this.listeners.addOrRemove(on, this.ownedAreas, data => this.client.emit("ownedAreas.add", this, data.item), data => this.client.emit("ownedAreas.remove", this, data.item), kControlledCharacter(this.id));
         this.listeners.addOrRemove(on, this.ownedRooms, data => this.client.emit("ownedRooms.add", this, data.item), data => this.client.emit("ownedRooms.remove", this, data.item), kControlledCharacter(this.id));
         this.listeners.addOrRemove(on, this.nodes, data => this.client.emit("characterNodes.add", this, data.item), data => this.client.emit("characterNodes.remove", this, data.item), kControlledCharacter(this.id));
-        this.listeners.addOrRemove(on, this.settings.focus, data => this.client.emit("focus.add", this, data.item), data => this.client.emit("focus.remove", this, data.item), kControlledCharacter(this.id));
+        this.listeners.addOrRemove(on, this.settings.focus, data => this.client.emit("focus.add", this, data.item, new ResRef(this.api, ResourceIDs.CHARACTER({ id: data.key }))), data => this.client.emit("focus.remove", this, data.item, new ResRef(this.api, ResourceIDs.CHARACTER({ id: data.key }))), kControlledCharacter(this.id));
         if (this.client.options.track.focusChars && this._focusChars) {
             this.listeners.addOrRemove(on, this._focusChars, data => this.client.emit("focusChars.add", this, data.item, this.settings.focus.props[data.item.id]!), data => this.client.emit("focusChars.remove", this, data.item, this.settings.focus.props[data.item.id]!), kControlledCharacter(this.id));
         }
@@ -209,6 +264,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
     }
 
     protected async _listenRoom(on: boolean, room: RoomDetails): Promise<void> {
+        const m = on ? "resourceOn" : "resourceOff";
         const owner = room.owner.id === this.id;
         if (on) {
             if (this.client.options.track.hiddenExits && owner) this._hiddenExits = await room.getHiddenExits();
@@ -220,6 +276,16 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
             this._listenExit(on, exit);
         }
 
+        room[m]("change", this.onRoomDetailsChange);
+        if (room.area) {
+            room.area[m]("change", this.onAreaDetailsChange);
+            for (const child of room.area.children.areas) {
+                child[m]("change", this.onAreaChildChange);
+            }
+            for (const child of room.area.children.rooms) {
+                child[m]("change", this.onRoomChildChange);
+            }
+        }
         this.listeners.addOrRemove(on, room.exits, data => this.client.emit("exits.add", this, room, data.item), data => this.client.emit("exits.remove", this, room, data.item), kControlledCharacter(this.id));
         this.listeners.addOrRemove(on, room.cmds, data => this.client.emit("roomCommands.add", this, room, data.item), data => this.client.emit("roomCommands.remove", this, room, data.item), kControlledCharacter(this.id));
         if (room.chars) {

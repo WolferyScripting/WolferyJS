@@ -1,5 +1,5 @@
 import type { IdleState } from "./Constants.js";
-import type { Messages } from "./types.js";
+import type { AreaDetailsPopulationUpdate, Messages, PublicPopulationUpdate } from "./types.js";
 import type BotUser from "../models/BotUser.ts";
 import type ControlledCharacter from "../models/ControlledCharacter.js";
 import type Player from "../models/Player.js";
@@ -33,17 +33,27 @@ import type Token from "../models/Token.ts";
 import type Watch from "../models/Watch.ts";
 import type RoomCommand from "../models/RoomCommand.ts";
 import { type FocusOptions } from "../models/Focus.ts";
+import type AreaDetails from "../models/AreaDetails.ts";
+import type AreaChild from "../models/AreaChild.ts";
+import type RoomChild from "../models/RoomChild.ts";
 import type { MessageEvent } from "ws";
-import type { AnyObject } from "resclient-ts";
+import type { AnyObject, ResRef } from "resclient-ts";
 
 export interface ControlledCharacterEvents {
+    /** Emitted when the population changes in an area contained within the immediate area of a controlled character. */
+    "area.child.populationChange": [ctrl: ControlledCharacter, area: AreaChild, update: PublicPopulationUpdate];
+    /** Emitted when the the population changes in the immediate area of a controlled character. */
+    "area.details.populationChange": [ctrl: ControlledCharacter, area: AreaDetails, update: AreaDetailsPopulationUpdate];
+    /** Emitted when a teleport node is added. */
+    "characterNodes.add": [char: ControlledCharacter, node: Node];
+    /** Emitted when a teleport node is removed. */
+    "characterNodes.remove": [char: ControlledCharacter, node: Node];
     "exits.add": [ctrl: ControlledCharacter, room: RoomDetails, exit: Exit];
-    "exits.change": [ctrl: ControlledCharacter, room: RoomDetails, exit: Exit, data: Partial<Exit>];
     "exits.hidden.add": [ctrl: ControlledCharacter, room: RoomDetails, exit: Exit];
     "exits.hidden.remove": [ctrl: ControlledCharacter, room: RoomDetails, exit: Exit];
     "exits.remove": [ctrl: ControlledCharacter, room: RoomDetails, exit: Exit];
-    "focus.add": [ctrl: ControlledCharacter, options: FocusOptions];
-    "focus.remove": [ctrl: ControlledCharacter, options: FocusOptions];
+    "focus.add": [ctrl: ControlledCharacter, options: FocusOptions, ref: ResRef<Character>];
+    "focus.remove": [ctrl: ControlledCharacter, options: FocusOptions, ref: ResRef<Character>];
     "focusChars.add": [ctrl: ControlledCharacter, char: CharacterMin, options: FocusOptions];
     "focusChars.remove": [ctrl: ControlledCharacter, char: CharacterMin, options: FocusOptions];
     /** Emitted when what a controlled character is looking at is changed. */
@@ -52,10 +62,22 @@ export interface ControlledCharacterEvents {
     "lookedAt.add": [ctrl: ControlledCharacter, char: Character];
     /** Emitted when a character stops looking at a controlled character. */
     "lookedAt.remove": [ctrl: ControlledCharacter, char: Character];
+    /** Emitted when an area is created for an owned character. */
+    "ownedAreas.add": [ctrl: ControlledCharacter, area: Area];
+    /** Emitted when an area is deleted for an owned character. */
+    "ownedAreas.remove": [ctrl: ControlledCharacter, area: Area];
+    /** Emitted when a room is created for an owned character. */
+    "ownedRooms.add": [ctrl: ControlledCharacter, room: Room];
+    /** Emitted when a room is deleted for an owned character. */
+    "ownedRooms.remove": [ctrl: ControlledCharacter, room: Room];
     /** Emitted when a profile is created for an owned character. */
     "profiles.add": [ctrl: ControlledCharacter, profile: Profile];
     /** Emitted when a profile is deleted for an owned character. */
     "profiles.remove": [ctrl: ControlledCharacter, profile: Profile];
+    /** Emitted when the population changes in a room contained within the immediate area of a controlled character. */
+    "room.child.populationChange": [ctrl: ControlledCharacter, room: RoomChild, update: PublicPopulationUpdate];
+    /** Emitted when the population changes in the room a controlled character is in. */
+    "room.details.populationChange": [ctrl: ControlledCharacter, room: RoomDetails, update: PublicPopulationUpdate];
     "roomChange.details": [ctrl: ControlledCharacter, room: RoomDetails, oldRoom: RoomDetails];
     /** Emitted when a character enters the room a controlled character is in. */
     "roomCharacters.add": [char: ControlledCharacter, room: RoomDetails, roomChar: RoomCharacter];
@@ -78,20 +100,8 @@ export interface ControlledCharacterEvents {
 }
 
 export interface OwnedCharacterEvents {
-    /** Emitted when a teleport node is added. */
-    "characterNodes.add": [char: ControlledCharacter, node: Node];
-    /** Emitted when a teleport node is removed. */
-    "characterNodes.remove": [char: ControlledCharacter, node: Node];
     /** Emitted when a message is sent or received. */
     "message": AnyMessageEvent;
-    /** Emitted when an area is created for an owned character. */
-    "ownedAreas.add": [ctrl: ControlledCharacter, area: Area];
-    /** Emitted when an area is deleted for an owned character. */
-    "ownedAreas.remove": [ctrl: ControlledCharacter, area: Area];
-    /** Emitted when a room is created for an owned character. */
-    "ownedRooms.add": [ctrl: ControlledCharacter, room: Room];
-    /** Emitted when a room is deleted for an owned character. */
-    "ownedRooms.remove": [ctrl: ControlledCharacter, room: Room];
     /** Emitted when an owned character's room changes (where the character is located, not the details of the room). */
     "roomChange": [char: OwnedCharacter, room: Room, oldRoom: Room];
 }

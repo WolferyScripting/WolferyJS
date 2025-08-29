@@ -19,6 +19,10 @@ class MailUser extends NonResModel implements MailUserProperties {
     get avatarURL(): string | null {
         return this.avatar === "" ? null : `${this.client.fileURL}/core/char/avatar/${this.avatar}`;
     }
+
+    get fullname(): string {
+        return `${this.name} ${this.surname}`;
+    }
 }
 
 export default MailUser;
