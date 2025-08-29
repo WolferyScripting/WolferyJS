@@ -28,9 +28,11 @@ class BotUser extends BaseModel {
 
     /**
      * Control the character associated with this BotUser.
+     * @param force Ignore the character already being controlled.
      * @returns The owned character instance associated with this BotUser.
      */
-    async controlChar(): Promise<ControlledCharacter> {
+    async controlChar(force = true): Promise<ControlledCharacter> {
+        if (force && this.controlled !== null) return this.controlled;
         return this.call<ControlledCharacter>("controlChar");
     }
 
@@ -42,17 +44,18 @@ class BotUser extends BaseModel {
     /**
      * Wake up the character associated with this BotUser.
      * @param hidden If the character should be hidden from the awake list.
+     * @param force Ignore the character already being awake.
      */
-    async wakeup(hidden?: boolean): Promise<ControlledCharacter> {
+    async wakeup(hidden?: boolean, force = true): Promise<ControlledCharacter> {
         if (this.controlled !== null) {
-            if (this.controlled.state === "awake") {
+            if (this.controlled.state === "awake" && force) {
                 return this.controlled;
             }
-            await this.controlled.wakeup(hidden);
+            await this.controlled.wakeup(hidden, force);
             return this.controlled;
         }
-        return this.controlChar()
-            .then(char => char.wakeup(hidden).then(() => char));
+        return this.controlChar(force)
+            .then(char => char.wakeup(hidden, force).then(() => char));
     }
 }
 
