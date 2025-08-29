@@ -33,7 +33,7 @@ class Note extends BaseModel implements NoteProperties {
 
     protected override async _listen(on: boolean): Promise<void> {
         await super._listen(on);
-        if (this.client.options.track.notes) {
+        if (this.client.anyTracked("notes")) {
             const m = on ? "resourceOn" : "resourceOff";
             this[m]("change", this.onChange);
         }

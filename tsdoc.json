@@ -56,6 +56,14 @@
       "syntaxKind": "block"
     },
     {
+      "tagName": "@requiredBy",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@dependsOn",
+      "syntaxKind": "block"
+    },
+    {
       "tagName": "@playerRequired",
       "syntaxKind": "modifier"
     },

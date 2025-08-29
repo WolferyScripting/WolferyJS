@@ -58,24 +58,24 @@ export interface Options {
     clientOptions?: ClientOptions;
     /** If models should use a custom inspect function. The custom inspect function will only show the RID and (if applicable) list of items for any collection or model. Defaults to `true`. */
     customInspect?: boolean;
+    /** Disables most if not all tracking. This will render the vast majority of events unable to be emitted. */
+    disableTracking?: boolean;
     /** If pings should be sent to prevent being released for inactivity. Defaults to `true` */
     pingCharacters?: boolean;
-    /** Set to false to not fetch anything extra on startup. This takes precedent over all of the track options. */
-    startup?: boolean;
     track?: TrackOptions;
     resClientFactory?(this: void, client: WolferyJS): ResClient;
     wsFactory?(this: void, client: WolferyJS): WebSocket;
 }
 
-/** Optional things to track. This only contains things which we must fetch something extra in order to track changes, if we are expected to get objects their tracking cannot be disabled. */
+/** Things that are tracked. If a property says it `fetches` something, then we have to specifically request something from the server to track it. Otherwise, we already have what we need, and disabling the option only prevents setting up listeners and emitting events. */
 export interface TrackOptions {
     /**
      * If awake characters should be tracked.
      * @default true
      * @fetches {@link AwakeCharacters}
      * @requiredForEvents
-     * * {@link CharacterEvents."awakeCharacters.add" | `awakeCharacters.add`}
-     * * {@link CharacterEvents."awakeCharacters.remove" | `awakeCharacters.remove` }
+     * * {@link Events."awakeCharacters.add" | `awakeCharacters.add`}
+     * * {@link Events."awakeCharacters.remove" | `awakeCharacters.remove` }
      */
     awake?: boolean;
     /**
@@ -84,8 +84,8 @@ export interface TrackOptions {
      * @default true
      * @fetches {@link Bots}
      * @requiredForEvents
-     * * {@link PlayerEvents."bots.add" | `bots.add`}
-     * * {@link PlayerEvents."bots.remove" | `bots.remove`}
+     * * {@link Events."bots.add" | `bots.add`}
+     * * {@link Events."bots.remove" | `bots.remove`}
      */
     bots?: boolean;
     /**
@@ -93,17 +93,18 @@ export interface TrackOptions {
      * @default true
      * @fetches {@link CoreInfo}
      * @requiredForEvents
-     * * {@link MiscEvents.broadcast | `broadcast`}
+     * * {@link Events.broadcast | `broadcast`}
      */
     broadcast?: boolean;
     /**
      * If character info should be fetched for {@link Character} models.
      * @default true
      * @fetches {@link CharacterInfo} for all awake characters.
+     * @requiredBy {@link lfrp}
      * @requiredForEvents
-     * * {@link CharacterEvents.aboutChange | `aboutChange`}
-     * * {@link CharacterEvents."lfrp.change" | `lfrp.change`}
-     * * {@link CharacterEvents."lfrp.descChange" | `lfrp.descChange`}
+     * * {@link Events.aboutChange | `aboutChange`}
+     * * {@link Events."lfrp.change" | `lfrp.change`}
+     * * {@link Events."lfrp.descChange" | `lfrp.descChange`}
      */
     charInfo?: boolean;
     /**
@@ -113,12 +114,56 @@ export interface TrackOptions {
      */
     charInfoOffline?: boolean;
     /**
+     * If character nodes should be tracked.
+     * @default true
+     * @requiredForEvents
+     * * {@link Events."characterNodes.add" | `characterNodes.add`}
+     * * {@link Events."characterNodes.remove" | `characterNodes.remove`}
+     */
+    characterNodes?: boolean;
+    /**
+     * If character tags should be tracked.
+     * @default true
+     * @requiredForEvents
+     * * {@link Events."characterTags.add" | `characterTags.add`}
+     * * {@link Events."characterTags.remove" | `characterTags.remove`}
+     */
+    characterTags?: boolean;
+    /**
+     * If characters controlled by the player should be tracked.
+     * @playerRequired
+     * @default true
+     * @requiredForEvents
+     * * {@link Events."controlledCharacters.add" | `controlledCharacters.add`}
+     * * {@link Events."controlledCharacters.remove" | `controlledCharacters.remove`}
+     */
+    controlledCharacters?: boolean;
+    /**
+     * If exits should be tracked.
+     * @default true
+     * @requiredBy {@link hiddenExits}
+     * @requiredForEvents
+     * * {@link Events."exits.add" | `exits.add`}
+     * * {@link Events."exits.remove" | `exits.remove`}
+     */
+    exits?: boolean;
+    /**
+     * If focused should be tracked.
+     * @default true
+     * @requiredBy {@link roomCharactersExit}
+     * @requiredForEvents
+     * * {@link Events."focus.add" | `focus.add`}
+     * * {@link Events."focus.remove" | `focus.remove`}
+     */
+    focus?: boolean;
+    /**
      * If the focused characters should be tracked.
      * @default true
      * @fetches {@link FocusChars} for all controlled characters.
+     * @dependsOn {@link focus}
      * @requiredForEvents
-     * * {@link ControlledCharacterEvents."focusChars.add" | `focusChars.add`}
-     * * {@link ControlledCharacterEvents."focusChars.remove" | `focusChars.remove`}
+     * * {@link Events."focusChars.add" | `focusChars.add`}
+     * * {@link Events."focusChars.remove" | `focusChars.remove`}
      */
     focusChars?: boolean;
     /**
@@ -126,8 +171,8 @@ export interface TrackOptions {
      * @default true
      * @fetches {@link Tags}
      * @requiredForEvents
-     * * {@link MiscEvents."tags.add" | `tags.add`}
-     * * {@link MiscEvents."tags.remove" | `tags.remove`}
+     * * {@link Events."tags.add" | `tags.add`}
+     * * {@link Events."tags.remove" | `tags.remove`}
      */
     globalTags?: boolean;
     /**
@@ -135,8 +180,8 @@ export interface TrackOptions {
      * @default true
      * @fetches {@link GlobalTeleports}
      * @requiredForEvents
-     * * {@link MiscEvents."globalTeleports.add" | `globalTeleports.add`}
-     * * {@link MiscEvents."globalTeleports.remove" | `globalTeleports.remove`}
+     * * {@link Events."globalTeleports.add" | `globalTeleports.add`}
+     * * {@link Events."globalTeleports.remove" | `globalTeleports.remove`}
      */
     globalTeleports?: boolean;
     /**
@@ -144,44 +189,103 @@ export interface TrackOptions {
      * @default true
      * @fetches {@link HiddenExits} for all owned rooms.
      * @requiredForEvents
-     * * {@link ControlledCharacterEvents."exits.hidden.add" | `exits.hidden.add`}
-     * * {@link ControlledCharacterEvents."exits.hidden.remove" | `exits.hidden.remove`}
+     * * {@link Events."exits.hidden.add" | `exits.hidden.add`}
+     * * {@link Events."exits.hidden.remove" | `exits.hidden.remove`}
      */
     hiddenExits?: boolean;
+    /**
+     * If idle changes should be tracked.
+     * @default true
+     * @requiredForEvents
+     * * {@link Events."idleStatusChange" | `idleStatusChange`}
+     */
+    idle?: boolean;
     /**
      * If incoming requests should be tracked.
      * @playerRequired
      * @default true
      * @fetches {@link IncomingRequests}
      * @requiredForEvents
-     * * {@link PlayerEvents."requests.incoming.accepted" | `requests.incoming.accepted`}
-     * * {@link PlayerEvents."requests.incoming.add" | `requests.incoming.add`}
-     * * {@link PlayerEvents."requests.incoming.expired" | `requests.incoming.expired`}
-     * * {@link PlayerEvents."requests.incoming.failed" | `requests.incoming.failed`}
-     * * {@link PlayerEvents."requests.incoming.rejected" | `requests.incoming.rejected`}
-     * * {@link PlayerEvents."requests.incoming.remove" | `requests.incoming.remove`}
-     * * {@link PlayerEvents."requests.incoming.revoked" | `requests.incoming.revoked`}
+     * * {@link Events."requests.incoming.accepted" | `requests.incoming.accepted`}
+     * * {@link Events."requests.incoming.add" | `requests.incoming.add`}
+     * * {@link Events."requests.incoming.expired" | `requests.incoming.expired`}
+     * * {@link Events."requests.incoming.failed" | `requests.incoming.failed`}
+     * * {@link Events."requests.incoming.rejected" | `requests.incoming.rejected`}
+     * * {@link Events."requests.incoming.remove" | `requests.incoming.remove`}
+     * * {@link Events."requests.incoming.revoked" | `requests.incoming.revoked`}
      */
     incomingRequests?: boolean;
+    /**
+     * If LFRP status should be tracked.
+     * @default true
+     * @dependsOn {@link charInfo} for {@link Events."lfrp.descChange" | `lfrp.descChange`}
+     * @requiredForEvents
+     * * {@link Events."lfrp.change" | `lfrp.change`}
+     * * {@link Events."lfrp.descChange" | `lfrp.descChange`}
+     */
+    lfrp?: boolean;
+    /**
+     * If the characters controlled characters are looking at should be tracked.
+     * @default true
+     * @requiredForEvents
+     * * {@link Events."lookAtChange" | `lookAtChange`}
+     */
+    lookAt?: boolean;
+    /**
+     * If characters looking at a controlled character should be tracked.
+     * @default true
+     * @requiredForEvents
+     * * {@link Events."lookedAt.add" | `lookedAt.add`}
+     * * {@link Events."lookedAt.remove" | `lookedAt.remove`}
+     */
+    lookedAt?: boolean;
     /**
      * If mail should be tracked.
      * @playerRequired
      * @default true
      * @fetches {@link UnreadMail} and {@link Inbox}
      * @requiredForEvents
-     * * {@link PlayerEvents."inbox.add" | `inbox.add`}
-     * * {@link PlayerEvents."inbox.remove" | `inbox.remove`}
-     * * {@link PlayerEvents."unreadMail.add" | `unreadMail.add`}
-     * * {@link PlayerEvents."unreadMail.remove" | `unreadMail.remove`}
+     * * {@link Events."inbox.add" | `inbox.add`}
+     * * {@link Events."inbox.remove" | `inbox.remove`}
+     * * {@link Events."unreadMail.add" | `unreadMail.add`}
+     * * {@link Events."unreadMail.remove" | `unreadMail.remove`}
      */
     mail?: boolean;
+    /**
+     * If messages should be tracked.
+     * @default true
+     * @requiredForEvents
+     * * {@link Events."message" | `message`}
+     */
+    messages?: boolean;
+    /**
+     * If missing collections, errors, models, and properties should be tracked. Useful for development.
+     * @default false
+     * @requiredForEvents
+     * * {@link Events.missingCollection | `missingCollection`}
+     * * {@link Events.missingError | `missingError`}
+     * * {@link Events.missingModel | `missingModel`}
+     * * {@link Events.missingProperties | `missingProperties`}
+     */
+    missing?: boolean;
+    /**
+     * If muted characters should be tracked.
+     * @playerRequired
+     * @default true
+     * @requiredForEvents
+     * * {@link Events."mutedCharacters.add" | `mutedCharacters.add`}
+     * * {@link Events."mutedCharacters.remove" | `mutedCharacters.remove`}
+     */
+    mutedCharacters?: boolean;
     /**
      * If note changes should be tracked.
      * @playerRequired
      * @default false
-     * @fetches Each {@link Note} individually, and keeps them cached. This can potentially flood the server on startup.
+     * @fetches
+     * Each {@link Note} individually, and keeps them cached. This can potentially flood the server on startup.
+     * Note however that keeping this disabled will also prevent listening to changes on full notes we receive via other means.
      * @requiredForEvents
-     * * {@link PlayerEvents."notes.textChange" | `notes.textChange`}
+     * * {@link Events."notes.textChange" | `notes.textChange`}
      */
     noteChanges?: boolean;
     /**
@@ -190,8 +294,8 @@ export interface TrackOptions {
      * @default true
      * @fetches {@link Notes}
      * @requiredForEvents
-     * * {@link PlayerEvents."notes.add" | `notes.add`}
-     * * {@link PlayerEvents."notes.remove" | `notes.remove`}
+     * * {@link Events."notes.add" | `notes.add`}
+     * * {@link Events."notes.remove" | `notes.remove`}
      */
     notes?: boolean;
     /**
@@ -200,10 +304,10 @@ export interface TrackOptions {
      * @default true
      * @fetches {@link AuthNotices} and {@link IdentityNotices}
      * @requiredForEvents
-     * * {@link PlayerEvents."notices.auth.add" | `notices.auth.add`}
-     * * {@link PlayerEvents."notices.auth.remove" | `notices.auth.remove`}
-     * * {@link PlayerEvents."notices.identity.add" | `notices.identity.add`}
-     * * {@link PlayerEvents."notices.identity.remove" | `notices.identity.remove`}
+     * * {@link Events."notices.auth.add" | `notices.auth.add`}
+     * * {@link Events."notices.auth.remove" | `notices.auth.remove`}
+     * * {@link Events."notices.identity.add" | `notices.identity.add`}
+     * * {@link Events."notices.identity.remove" | `notices.identity.remove`}
      */
     notices?: boolean;
     /**
@@ -212,31 +316,116 @@ export interface TrackOptions {
      * @default true
      * @fetches {@link OutgoingRequests}
      * @requiredForEvents
-     * * {@link PlayerEvents."requests.outgoing.accepted" | `requests.outgoing.accepted`}
-     * * {@link PlayerEvents."requests.outgoing.add" | `requests.outgoing.add`}
-     * * {@link PlayerEvents."requests.outgoing.expired" | `requests.outgoing.expired`}
-     * * {@link PlayerEvents."requests.outgoing.failed" | `requests.outgoing.failed`}
-     * * {@link PlayerEvents."requests.outgoing.rejected" | `requests.outgoing.rejected`}
-     * * {@link PlayerEvents."requests.outgoing.remove" | `requests.outgoing.remove`}
-     * * {@link PlayerEvents."requests.outgoing.revoked" | `requests.outgoing.revoked`}
+     * * {@link Events."requests.outgoing.accepted" | `requests.outgoing.accepted`}
+     * * {@link Events."requests.outgoing.add" | `requests.outgoing.add`}
+     * * {@link Events."requests.outgoing.expired" | `requests.outgoing.expired`}
+     * * {@link Events."requests.outgoing.failed" | `requests.outgoing.failed`}
+     * * {@link Events."requests.outgoing.rejected" | `requests.outgoing.rejected`}
+     * * {@link Events."requests.outgoing.remove" | `requests.outgoing.remove`}
+     * * {@link Events."requests.outgoing.revoked" | `requests.outgoing.revoked`}
      */
     outgoingRequests?: boolean;
     /**
-     * If room profiles should be tracked.
+     * If areas owned by controlled characters should be tracked.
+     * @default true
+     * @requiredForEvents
+     * * {@link Events."ownedAreas.add" | `ownedAreas.add`}
+     * * {@link Events."ownedAreas.remove" | `ownedAreas.remove`}
+     */
+    ownedAreas?: boolean;
+    /**
+     * If characters owned by the player should be tracked.
+     * @playerRequired
+     * @default true
+     * @requiredForEvents
+     * * {@link Events."ownedCharacters.add" | `ownedCharacters.add`}
+     * * {@link Events."ownedCharacters.remove" | `ownedCharacters.remove`}
+     */
+    ownedCharacters?: boolean;
+    /**
+     * If rooms owned by controlled characters should be tracked.
+     * @default true
+     * @requiredForEvents
+     * * {@link Events."ownedRooms.add" | `ownedRooms.add`}
+     * * {@link Events."ownedRooms.remove" | `ownedRooms.remove`}
+     */
+    ownedRooms?: boolean;
+    /**
+     * If population changes should be tracked.
+     * @default true
+     * @requiredForEvents
+     * {@link Events."area.child.populationChange" | `area.child.populationChange`}
+     * {@link Events."area.details.populationChange" | `area.details.populationChange`}
+     * {@link Events."room.child.populationChange" | `room.child.populationChange`}
+     * {@link Events."room.details.populationChange" | `room.details.populationChange`}
+     */
+    population?: boolean;
+    /**
+     * If the profiles of controlled characters should be tracked.
+     * @default true
+     * @requiredForEvents
+     * * {@link Events."profiles.add" | `profiles.add`}
+     * * {@link Events."profiles.remove" | `profiles.remove`}
+     */
+    profiles?: boolean;
+    /**
+     * If puppets should be tracked.
+     * @playerRequired
+     * @default true
+     * @requiredForEvents
+     * * {@link Events."puppets.add" | `puppets.add`}
+     * * {@link Events."puppets.remove" | `puppets.remove`}
+     */
+    puppets?: boolean;
+    /**
+     * If the controlled & owned character's current room changes should be tracked.
+     * @default true
+     * @requiredForEvents
+     * * {@link Events."roomChange.details" | `roomChange.details`}
+     * * {@link Events.roomChange | `roomChange`}
+     */
+    roomChange?: boolean;
+    /**
+     * If characters in the current room should be tracked.
+     * @default true
+     * @requiredForEvents
+     * * {@link Events."roomCharacters.add" | `roomCharacters.add`}
+     * * {@link Events."roomCharacters.remove" | `roomCharacters.remove`}
+     */
+    roomCharacters?: boolean;
+    /**
+     * If characters in rooms adjacent to the current room should be tracked.
+     * @default true
+     * @dependsOn {@link exits}
+     * @requiredForEvents
+     * * {@link Events."roomCharacters.exit.add" | `roomCharacters.exit.add`}
+     * * {@link Events."roomCharacters.exit.remove" | `roomCharacters.exit.remove`}
+     */
+    roomCharactersExit?: boolean;
+    /**
+     * If commands in the current room should be tracked.
+     * @default true
+     * @requiredForEvents
+     * * {@link Events."roomCommands.add" | `roomCommands.add`}
+     * * {@link Events."roomCommands.remove" | `roomCommands.remove`}
+     */
+    roomCommands?: boolean;
+    /**
+     * If profiles in the current room should be tracked.
      * @default true
      * @fetches {@link RoomProfiles} if the current room is owned.
      * @requiredForEvents
-     * * {@link ControlledCharacterEvents."roomProfiles.add" | `roomProfiles.add`}
-     * * {@link ControlledCharacterEvents."roomProfiles.remove" | `roomProfiles.remove`}
+     * * {@link Events."roomProfiles.add" | `roomProfiles.add`}
+     * * {@link Events."roomProfiles.remove" | `roomProfiles.remove`}
      */
     roomProfiles?: boolean;
     /**
-     * If room scripts should be tracked.
+     * If scripts in the current room should be tracked.
      * @default true
      * @fetches {@link RoomScripts} if the current room is owned.
      * @requiredForEvents
-     * * {@link ControlledCharacterEvents."roomScripts.add" | `roomScripts.add`}
-     * * {@link ControlledCharacterEvents."roomScripts.remove" | `roomScripts.remove`}
+     * * {@link Events."roomScripts.add" | `roomScripts.add`}
+     * * {@link Events."roomScripts.remove" | `roomScripts.remove`}
      */
     roomScripts?: boolean;
     /**
@@ -245,8 +434,8 @@ export interface TrackOptions {
      * @default true
      * @fetches {@link TagGroups}
      * @requiredForEvents
-     * * {@link MiscEvents."tagGroups.add" | `tagGroups.add`}
-     * * {@link MiscEvents."tagGroups.remove" | `tagGroups.remove`}
+     * * {@link Events."tagGroups.add" | `tagGroups.add`}
+     * * {@link Events."tagGroups.remove" | `tagGroups.remove`}
      */
     tagGroups?: boolean;
     /**
@@ -255,8 +444,8 @@ export interface TrackOptions {
      * @default true
      * @fetches {@link Tokens}
      * @requiredForEvents
-     * * {@link PlayerEvents."tokens.add" | `tokens.add`}
-     * * {@link PlayerEvents."tokens.remove" | `tokens.remove`}
+     * * {@link Events."tokens.add" | `tokens.add`}
+     * * {@link Events."tokens.remove" | `tokens.remove`}
      */
     tokens?: boolean;
     /**
@@ -265,8 +454,8 @@ export interface TrackOptions {
      * @default true
      * @fetches {@link Watches}
      * @requiredForEvents
-     * * {@link PlayerEvents."watches.add" | `watches.add`}
-     * * {@link PlayerEvents."watches.remove" | `watches.remove`}
+     * * {@link Events."watches.add" | `watches.add`}
+     * * {@link Events."watches.remove" | `watches.remove`}
      */
     watches?: boolean;
 }
@@ -275,36 +464,18 @@ export interface InstanceOptions {
     authentication: PasswordAuthentication | BotAuthentication | TokenAuthentication;
     clientOptions: ClientOptions;
     customInspect: boolean;
+    disableTracking: boolean;
     domain: string;
     pingCharacters: boolean;
-    startup: boolean;
-    track: {
-        awake: boolean;
-        bots: boolean;
-        broadcast: boolean;
-        charInfo: boolean;
-        charInfoOffline: boolean;
-        focusChars: boolean;
-        globalTags: boolean;
-        globalTeleports: boolean;
-        hiddenExits: boolean;
-        incomingRequests: boolean;
-        mail: boolean;
-        noteChanges: boolean;
-        notes: boolean;
-        notices: boolean;
-        outgoingRequests: boolean;
-        roomProfiles: boolean;
-        roomScripts: boolean;
-        tagGroups: boolean;
-        tokens: boolean;
-        watches: boolean;
-    };
+    track: Required<TrackOptions>;
     resClientFactory(this: void, client: WolferyJS): ResClient;
     wsFactory(this: void, client: WolferyJS): WebSocket;
 }
 
 export type AnyUser = User | TokenUser | BotUser;
+/**
+ * The main client. For the client options, see {@link Options}. For the events that can be listened to, see {@link Events}.
+ */
 export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter<Events> {
     private _player!: Player | null;
     private _res!: ResClient | null;
@@ -359,30 +530,52 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
                 defaultErrorFactory:      (api, rid): ResError => this._missingRes("error", api, rid, options.clientOptions?.defaultErrorFactory),
                 defaultModelFactory:      (api, rid): ResModel => this._missingRes("model", api, rid, options.clientOptions?.defaultModelFactory)
             },
-            customInspect: options.customInspect ?? true,
-            domain:        options.apiDomain ?? "wolfery.com",
-            startup:       options.startup ?? false,
-            track:         {
-                awake:            options.track?.awake ?? true,
-                bots:             authRequired(options.track?.bots ?? true, "password"),
-                broadcast:        options.track?.broadcast ?? true,
-                charInfo:         options.track?.charInfo ?? true,
-                charInfoOffline:  options.track?.charInfoOffline ?? false,
-                focusChars:       options.track?.focusChars ?? true,
-                globalTags:       options.track?.globalTags ?? true,
-                globalTeleports:  options.track?.globalTeleports ?? true,
-                hiddenExits:      options.track?.hiddenExits ?? true,
-                incomingRequests: authRequired(options.track?.incomingRequests ?? true, "password"),
-                mail:             authRequired(options.track?.mail ?? true, "password"),
-                noteChanges:      authRequired(options.track?.noteChanges ?? false, "password"),
-                notes:            authRequired(options.track?.notes ?? true, "password"),
-                notices:          authRequired(options.track?.notices ?? true, "password"),
-                outgoingRequests: authRequired(options.track?.outgoingRequests ?? true, "password"),
-                roomProfiles:     options.track?.roomProfiles ?? true,
-                roomScripts:      options.track?.roomScripts ?? true,
-                tagGroups:        authRequired(options.track?.tagGroups ?? true, "password"),
-                tokens:           authRequired(options.track?.tokens ?? true, "password"),
-                watches:          authRequired(options.track?.watches ?? true, "password")
+            customInspect:   options.customInspect ?? true,
+            disableTracking: options.disableTracking ?? false,
+            domain:          options.apiDomain ?? "wolfery.com",
+            track:           {
+                awake:                options.disableTracking ? false : options.track?.awake ?? true,
+                bots:                 options.disableTracking ? false : authRequired(options.track?.bots ?? true, "password"),
+                broadcast:            options.disableTracking ? false : options.track?.broadcast ?? true,
+                charInfo:             options.disableTracking ? false : options.track?.charInfo ?? true,
+                charInfoOffline:      options.disableTracking ? false : options.track?.charInfoOffline ?? false,
+                characterNodes:       options.disableTracking ? false : options.track?.characterNodes ?? true,
+                characterTags:        options.disableTracking ? false : options.track?.characterTags ?? true,
+                controlledCharacters: options.disableTracking ? false : authRequired(options.track?.controlledCharacters ?? true, "password"),
+                exits:                options.disableTracking ? false : options.track?.exits ?? true,
+                focus:                options.disableTracking ? false : options.track?.focus ?? true,
+                focusChars:           options.disableTracking ? false : options.track?.focusChars ?? true,
+                globalTags:           options.disableTracking ? false : options.track?.globalTags ?? true,
+                globalTeleports:      options.disableTracking ? false : options.track?.globalTeleports ?? true,
+                hiddenExits:          options.disableTracking ? false : options.track?.hiddenExits ?? true,
+                idle:                 options.disableTracking ? false : options.track?.idle ?? true,
+                incomingRequests:     options.disableTracking ? false : authRequired(options.track?.incomingRequests ?? true, "password"),
+                lfrp:                 options.disableTracking ? false : options.track?.lfrp ?? true,
+                lookAt:               options.disableTracking ? false : options.track?.lookAt ?? true,
+                lookedAt:             options.disableTracking ? false : options.track?.lookedAt ?? true,
+                mail:                 options.disableTracking ? false : authRequired(options.track?.mail ?? true, "password"),
+                messages:             options.disableTracking ? false : options.track?.messages ?? true,
+                missing:              options.disableTracking ? false : options.track?.missing ?? false,
+                mutedCharacters:      options.disableTracking ? false : authRequired(options.track?.mutedCharacters ?? true, "password"),
+                noteChanges:          options.disableTracking ? false : authRequired(options.track?.noteChanges ?? false, "password"),
+                notes:                options.disableTracking ? false : authRequired(options.track?.notes ?? true, "password"),
+                notices:              options.disableTracking ? false : authRequired(options.track?.notices ?? true, "password"),
+                outgoingRequests:     options.disableTracking ? false : authRequired(options.track?.outgoingRequests ?? true, "password"),
+                ownedAreas:           options.disableTracking ? false : options.track?.ownedAreas ?? true,
+                ownedCharacters:      options.disableTracking ? false : authRequired(options.track?.ownedCharacters ?? true, "password"),
+                ownedRooms:           options.disableTracking ? false : options.track?.ownedRooms ?? true,
+                population:           options.disableTracking ? false : options.track?.population ?? true,
+                profiles:             options.disableTracking ? false : options.track?.profiles ?? true,
+                puppets:              options.disableTracking ? false : authRequired(options.track?.puppets ?? true, "password"),
+                roomChange:           options.disableTracking ? false : options.track?.roomChange ?? true,
+                roomCharacters:       options.disableTracking ? false : options.track?.roomCharacters ?? true,
+                roomCharactersExit:   options.disableTracking ? false : options.track?.roomCharactersExit ?? true,
+                roomCommands:         options.disableTracking ? false : options.track?.roomCommands ?? true,
+                roomProfiles:         options.disableTracking ? false : options.track?.roomProfiles ?? true,
+                roomScripts:          options.disableTracking ? false : options.track?.roomScripts ?? true,
+                tagGroups:            options.disableTracking ? false : authRequired(options.track?.tagGroups ?? true, "password"),
+                tokens:               options.disableTracking ? false : authRequired(options.track?.tokens ?? true, "password"),
+                watches:              options.disableTracking ? false : authRequired(options.track?.watches ?? true, "password")
             },
             pingCharacters:   options.pingCharacters ?? true,
             wsFactory:        options.wsFactory ?? ((client: WolferyJS): WebSocket => new WebSocket(client.wsURL, { handshakeTimeout: 5000 })),
@@ -406,29 +599,27 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
 
     private async _afterAuthenticate(type: "password" | "token" | "bot"): Promise<void> {
         const promises: Array<Promise<unknown>> = [];
-        if (this.options.startup) {
-            const player = type === "password" ? await this.modules.core.getPlayer() : null;
-            if (this.options.track.awake) promises.push(this.api.subscribe(ResourceIDs.AWAKE_CHARACTERS, true));
-            if (this.options.track.broadcast) promises.push(this.api.subscribe(ResourceIDs.CORE_INFO, true));
-            if (this.options.track.globalTags) promises.push(this.api.subscribe(ResourceIDs.TAGS, true));
-            if (this.options.track.globalTeleports) promises.push(this.api.subscribe(ResourceIDs.NODES, true));
-            if (this.options.track.tagGroups) promises.push(this.api.subscribe(ResourceIDs.TAG_GROUPS, true));
-            if (this.options.track.watches && player) promises.push(this.api.subscribe(ResourceIDs.WATCHES({ id: player.id }), true));
-            if (this.options.track.mail && player) promises.push(this.api.subscribe(ResourceIDs.UNREAD_MAIL({ id: player.id }), true));
-            if (this.options.track.incomingRequests && player) promises.push(this.api.subscribe(ResourceIDs.INCOMING_REQUESTS({ id: player.id }), true));
-            if (this.options.track.outgoingRequests && player) promises.push(this.api.subscribe(ResourceIDs.OUTGOING_REQUESTS({ id: player.id }), true));
-            if (this.options.track.bots && player) promises.push(this.api.subscribe(ResourceIDs.BOTS({ id: player.id }), true));
-            if (this.options.track.tokens && player) promises.push(this.api.subscribe(ResourceIDs.TOKENS({ id: player.id }), true));
-            if (this.options.track.notices && player) promises.push(this.api.subscribe(ResourceIDs.AUTH_NOTICES({ id: player.id }), true), this.api.subscribe(ResourceIDs.IDENTITY_NOTICES({ id: player.id }), true));
-            if (this.options.track.notes && player) {
-                if (this.options.track.noteChanges) {
-                    const notes = await this.api.get<Notes>(ResourceIDs.NOTES({ id: player.id }), true);
-                    for (const note of notes.list) {
-                        promises.push(this.api.get(note.rid, true));
-                    }
-                } else {
-                    promises.push(this.api.get(ResourceIDs.NOTES({ id: player.id }), true));
+        const player = type === "password" ? await this.modules.core.getPlayer() : null;
+        if (this.anyTracked("awake")) promises.push(this.api.subscribe(ResourceIDs.AWAKE_CHARACTERS, true));
+        if (this.anyTracked("broadcast")) promises.push(this.api.subscribe(ResourceIDs.CORE_INFO, true));
+        if (this.anyTracked("globalTags")) promises.push(this.api.subscribe(ResourceIDs.TAGS, true));
+        if (this.anyTracked("globalTeleports")) promises.push(this.api.subscribe(ResourceIDs.NODES, true));
+        if (this.anyTracked("tagGroups")) promises.push(this.api.subscribe(ResourceIDs.TAG_GROUPS, true));
+        if (this.anyTracked("watches") && player) promises.push(this.api.subscribe(ResourceIDs.WATCHES({ id: player.id }), true));
+        if (this.anyTracked("mail") && player) promises.push(this.api.subscribe(ResourceIDs.UNREAD_MAIL({ id: player.id }), true));
+        if (this.anyTracked("incomingRequests") && player) promises.push(this.api.subscribe(ResourceIDs.INCOMING_REQUESTS({ id: player.id }), true));
+        if (this.anyTracked("outgoingRequests") && player) promises.push(this.api.subscribe(ResourceIDs.OUTGOING_REQUESTS({ id: player.id }), true));
+        if (this.anyTracked("bots") && player) promises.push(this.api.subscribe(ResourceIDs.BOTS({ id: player.id }), true));
+        if (this.anyTracked("tokens") && player) promises.push(this.api.subscribe(ResourceIDs.TOKENS({ id: player.id }), true));
+        if (this.anyTracked("notices") && player) promises.push(this.api.subscribe(ResourceIDs.AUTH_NOTICES({ id: player.id }), true), this.api.subscribe(ResourceIDs.IDENTITY_NOTICES({ id: player.id }), true));
+        if (this.anyTracked("notes") && player) {
+            if (this.anyTracked("noteChanges")) {
+                const notes = await this.api.get<Notes>(ResourceIDs.NOTES({ id: player.id }), true);
+                for (const note of notes.list) {
+                    promises.push(this.api.get(note.rid, true));
                 }
+            } else {
+                promises.push(this.api.get(ResourceIDs.NOTES({ id: player.id }), true));
             }
         }
 
@@ -465,7 +656,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             hash: this.options.authentication.hmac
         })
             .then(async() => {
-                const user = await this.modules.core.getFullUser();
+                const user = await this.modules.core.getPlayerUser();
                 const player = await this.modules.core.getPlayer();
                 this.emit("authenticated");
                 this.emit("authenticated.player", user, player);
@@ -525,17 +716,17 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
     private _missingRes<T = unknown>(type: ResourceType, api: ResClient, rid: string, factory?: ItemFactory<T>): T {
         switch (type) {
             case "collection": {
-                this.emit("missingCollection", rid);
+                if (this.anyTracked("missing")) this.emit("missingCollection", rid);
                 return factory ? factory(api, rid) : new ResCollection(api, rid) as T;
             }
 
             case "error": {
-                this.emit("missingError", rid);
+                if (this.anyTracked("missing")) this.emit("missingError", rid);
                 return factory ? factory(api, rid) : new ResError(api, rid) as T;
             }
 
             case "model": {
-                this.emit("missingModel", rid);
+                if (this.anyTracked("missing")) this.emit("missingModel", rid);
                 return factory ? factory(api, rid) : new ResModel(api, rid) as T;
             }
         }
@@ -585,6 +776,10 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
 
     get wsURL(): string {
         return `wss://api.${this.options.domain}`;
+    }
+
+    anyTracked(...types: Array<keyof TrackOptions>): boolean {
+        return types.some(type => this.options.track?.[type] ?? false);
     }
 
     async connect(force = false): Promise<void> {
@@ -645,6 +840,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         this._player = null;
         this._user = null;
         this._res = null;
+        await this.modules.core._track(false);
         this.emit("disconnected");
     }
 
@@ -662,16 +858,6 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         }
 
         return results;
-    }
-
-    async getCharacterInRoom(roomId: string): Promise<ControlledCharacter | null> {
-        if (this.isBot()) {
-            if (this._user?.char.inRoom.id === roomId) return this._user.controlled;
-        } else if (this.isPlayer()) {
-            const char = this._player?.controlled.find(c => c.state === "awake" && c.inRoom.id === roomId);
-            if (char) return char;
-        }
-        return null;
     }
 
     /** If the authentication used was for a {@link BotUser}. */

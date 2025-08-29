@@ -97,30 +97,32 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         }
     }
 
+    // make sure to update trackChanges in _listen if anything is added here
     private async _onChange(data: Partial<this>): Promise<void> {
-        if (data.lookingAt !== undefined) {
+        if (this.client.anyTracked("lookAt") && data.lookingAt !== undefined) {
             this.client.emit("lookAtChange", this, this.lookingAt?.char ?? null, data.lookingAt?.char ?? null);
         }
 
-        if (data.lookedAt !== undefined) {
+        if (this.client.anyTracked("lookedAt") && data.lookedAt !== undefined) {
             this._listenLookedAt(false, data.lookedAt);
             this._listenLookedAt(true, this.lookedAt);
         }
 
-        if (data.inRoom !== undefined) {
+        if (this.client.anyTracked("roomChange") && data.inRoom !== undefined) {
             await this._listenRoom(false, data.inRoom);
             await this._listenRoom(true, this.inRoom);
             this.client.emit("roomChange.details", this, this.inRoom, data.inRoom);
         }
     }
 
+    // make sure to update trackRoomChanges in _listen if anything changes here
     private _onExitChange(data: Partial<Exit>, exit: Exit): void {
         // this.client.emit("exits.change", this, this.inRoom, exit, data);
         if (data.target !== undefined) {
             if (data.target === null) {
                 this._listenExit(false, exit);
                 this._listenExit(true, exit);
-            } else if (data.target.awake) {
+            } else if (this.client.anyTracked("roomCharactersExit") && data.target.awake) {
                 this.listeners.remove(data.target.awake, kControlledCharacter(this.id));
             }
         }
@@ -214,8 +216,11 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
     protected override async _listen(on: boolean): Promise<void> {
         await super._listen(on);
         const m = on ? "resourceOn" : "resourceOff";
-        this[m]("change", this.onChange);
-        this[m]("out", this.onOut);
+        // don't listen to changes if we aren't looking for anything
+        const trackChanges = this.client.anyTracked("lookAt", "lookedAt", "roomChange");
+        const trackRoomChanges = this.client.anyTracked("hiddenExits", "roomProfiles", "roomScripts", "exits", "population", "roomCommands", "roomCharacters", "roomCharactersExit", "roomProfiles", "roomScripts");
+        if (trackChanges) this[m]("change", this.onChange);
+        if (this.client.anyTracked("messages")) this[m]("out", this.onOut);
         if (this.client.options.pingCharacters) {
             if (on) {
                 this._pingTimeout = setInterval(() => this.ping(),  PING_DURATION);
@@ -226,30 +231,41 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
 
         if (on) {
             // eslint-disable-next-line unicorn/no-lonely-if
-            if (this.client.options.track.focusChars) this._focusChars = await this.settings.focus.getChars();
+            if (this.client.anyTracked("focusChars") && this.client.anyTracked("focus")) this._focusChars = await this.settings.focus.getChars();
         }
 
-        this.listeners.addOrRemove(on, this.profiles, data => this.client.emit("profiles.add", this, data.item), data => this.client.emit("profiles.remove", this, data.item), kControlledCharacter(this.id));
-        this.listeners.addOrRemove(on, this.ownedAreas, data => this.client.emit("ownedAreas.add", this, data.item), data => this.client.emit("ownedAreas.remove", this, data.item), kControlledCharacter(this.id));
-        this.listeners.addOrRemove(on, this.ownedRooms, data => this.client.emit("ownedRooms.add", this, data.item), data => this.client.emit("ownedRooms.remove", this, data.item), kControlledCharacter(this.id));
-        this.listeners.addOrRemove(on, this.nodes, data => this.client.emit("characterNodes.add", this, data.item), data => this.client.emit("characterNodes.remove", this, data.item), kControlledCharacter(this.id));
-        this.listeners.addOrRemove(on, this.settings.focus, data => this.client.emit("focus.add", this, data.item, new ResRef(this.api, ResourceIDs.CHARACTER({ id: data.key }))), data => this.client.emit("focus.remove", this, data.item, new ResRef(this.api, ResourceIDs.CHARACTER({ id: data.key }))), kControlledCharacter(this.id));
-        if (this.client.options.track.focusChars && this._focusChars) {
-            this.listeners.addOrRemove(on, this._focusChars, data => this.client.emit("focusChars.add", this, data.item, this.settings.focus.props[data.item.id]!), data => this.client.emit("focusChars.remove", this, data.item, this.settings.focus.props[data.item.id]!), kControlledCharacter(this.id));
+        if (this.client.anyTracked("profiles")) {
+            this.listeners.addOrRemove(on, this.profiles, data => this.client.emit("profiles.add", this, data.item), data => this.client.emit("profiles.remove", this, data.item), kControlledCharacter(this.id));
+        }
+        if (this.client.anyTracked("ownedAreas")) {
+            this.listeners.addOrRemove(on, this.ownedAreas, data => this.client.emit("ownedAreas.add", this, data.item), data => this.client.emit("ownedAreas.remove", this, data.item), kControlledCharacter(this.id));
+        }
+        if (this.client.anyTracked("ownedRooms")) {
+            this.listeners.addOrRemove(on, this.ownedRooms, data => this.client.emit("ownedRooms.add", this, data.item), data => this.client.emit("ownedRooms.remove", this, data.item), kControlledCharacter(this.id));
+        }
+        if (this.client.anyTracked("characterNodes")) {
+            this.listeners.addOrRemove(on, this.nodes, data => this.client.emit("characterNodes.add", this, data.item), data => this.client.emit("characterNodes.remove", this, data.item), kControlledCharacter(this.id));
+        }
+        if (this.client.anyTracked("focus")) {
+            this.listeners.addOrRemove(on, this.settings.focus, data => this.client.emit("focus.add", this, data.item, new ResRef(this.api, ResourceIDs.CHARACTER({ id: data.key }))), data => this.client.emit("focus.remove", this, data.item, new ResRef(this.api, ResourceIDs.CHARACTER({ id: data.key }))), kControlledCharacter(this.id));
+            if (this.client.anyTracked("focusChars") && this._focusChars) {
+                this.listeners.addOrRemove(on, this._focusChars, data => this.client.emit("focusChars.add", this, data.item, this.settings.focus.props[data.item.id]!), data => this.client.emit("focusChars.remove", this, data.item, this.settings.focus.props[data.item.id]!), kControlledCharacter(this.id));
+            }
         }
 
         if (!on) {
             this._focusChars = null;
         }
 
-        this._listenLookedAt(on, this.lookedAt);
-        await this._listenRoom(on, this.inRoom);
+        if (this.client.anyTracked("lookedAt")) this._listenLookedAt(on, this.lookedAt);
+        if (trackRoomChanges) await this._listenRoom(on, this.inRoom);
     }
 
+    // make sure to update trackRoomChanges in _listen if anything changes here
     protected _listenExit(on: boolean, exit: Exit): void {
         const m = on ? "resourceOn" : "resourceOff";
         exit[m]("change", this.onExitChange);
-        if (!exit.target?.awake) return;
+        if (!exit.target?.awake || !this.client.anyTracked("roomCharactersExit")) return;
         this.listeners.addOrRemove(on, exit.target.awake, data => this.client.emit("roomCharacters.exit.add", this, exit.target!, exit, data.item), data => this.client.emit("roomCharacters.exit.remove", this, exit.target!, exit, data.item), kControlledCharacter(this.id));
     }
 
@@ -263,44 +279,53 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
         }, kControlledCharacter(this.id));
     }
 
+    // make sure to update trackRoomChanges in _listen if anything changes here
     protected async _listenRoom(on: boolean, room: RoomDetails): Promise<void> {
         const m = on ? "resourceOn" : "resourceOff";
         const owner = room.owner.id === this.id;
         if (on) {
-            if (this.client.options.track.hiddenExits && owner) this._hiddenExits = await room.getHiddenExits();
-            if (this.client.options.track.roomProfiles && owner) this._roomProfiles = await room.getProfiles();
-            if (this.client.options.track.roomScripts && owner) this._roomScripts = await room.getScripts();
+            if (this.client.anyTracked("hiddenExits") && owner) this._hiddenExits = await room.getHiddenExits();
+            if (this.client.anyTracked("roomProfiles") && owner) this._roomProfiles = await room.getProfiles();
+            if (this.client.anyTracked("roomScripts") && owner) this._roomScripts = await room.getScripts();
         }
 
-        for (const exit of room.exits) {
-            this._listenExit(on, exit);
+        if (this.client.anyTracked("exits")) {
+            for (const exit of room.exits) {
+                this._listenExit(on, exit);
+            }
         }
 
-        room[m]("change", this.onRoomDetailsChange);
-        if (room.area) {
-            room.area[m]("change", this.onAreaDetailsChange);
-            for (const child of room.area.children.areas) {
-                child[m]("change", this.onAreaChildChange);
-            }
-            for (const child of room.area.children.rooms) {
-                child[m]("change", this.onRoomChildChange);
+        if (this.client.anyTracked("population")) {
+            room[m]("change", this.onRoomDetailsChange);
+            if (room.area) {
+                room.area[m]("change", this.onAreaDetailsChange);
+                for (const child of room.area.children.areas) {
+                    child[m]("change", this.onAreaChildChange);
+                }
+                for (const child of room.area.children.rooms) {
+                    child[m]("change", this.onRoomChildChange);
+                }
             }
         }
-        this.listeners.addOrRemove(on, room.exits, data => this.client.emit("exits.add", this, room, data.item), data => this.client.emit("exits.remove", this, room, data.item), kControlledCharacter(this.id));
-        this.listeners.addOrRemove(on, room.cmds, data => this.client.emit("roomCommands.add", this, room, data.item), data => this.client.emit("roomCommands.remove", this, room, data.item), kControlledCharacter(this.id));
-        if (room.chars) {
+        if (this.client.anyTracked("exits")) {
+            this.listeners.addOrRemove(on, room.exits, data => this.client.emit("exits.add", this, room, data.item), data => this.client.emit("exits.remove", this, room, data.item), kControlledCharacter(this.id));
+        }
+        if (this.client.anyTracked("roomCommands")) {
+            this.listeners.addOrRemove(on, room.cmds, data => this.client.emit("roomCommands.add", this, room, data.item), data => this.client.emit("roomCommands.remove", this, room, data.item), kControlledCharacter(this.id));
+        }
+        if (this.client.anyTracked("roomCharacters") && room.chars) {
             this.listeners.addOrRemove(on, room.chars, data => this.client.emit("roomCharacters.add", this, room, data.item), data => this.client.emit("roomCharacters.remove", this, room, data.item), kControlledCharacter(this.id));
         }
-        if (this.client.options.track.hiddenExits && owner && this._hiddenExits) {
+        if (this.client.anyTracked("hiddenExits") && owner && this._hiddenExits) {
             this.listeners.addOrRemove(on, this._hiddenExits, data => this.client.emit("exits.hidden.add", this, room, data.item), data => this.client.emit("exits.hidden.remove", this, room, data.item), kControlledCharacter(this.id));
             for (const exit of this._hiddenExits) {
                 this._listenExit(on, exit);
             }
         }
-        if (this.client.options.track.roomProfiles && owner && this._roomProfiles) {
+        if (this.client.anyTracked("roomProfiles") && owner && this._roomProfiles) {
             this.listeners.addOrRemove(on, this._roomProfiles, data => this.client.emit("roomProfiles.add", this, room, data.item), data => this.client.emit("roomProfiles.remove", this, room, data.item), kControlledCharacter(this.id));
         }
-        if (this.client.options.track.roomScripts && owner && this._roomScripts) {
+        if (this.client.anyTracked("roomScripts") && owner && this._roomScripts) {
             this.listeners.addOrRemove(on, this._roomScripts, data => this.client.emit("roomScripts.add", this, room, data.item), data => this.client.emit("roomScripts.remove", this, room, data.item), kControlledCharacter(this.id));
         }
 

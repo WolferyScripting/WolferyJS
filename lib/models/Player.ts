@@ -59,20 +59,20 @@ class Player extends BaseModel implements PlayerProperties {
         const m = on ? "resourceOn" : "resourceOff";
         this[m]("unsubscribe", this.client.onUnsubscribe);
         if (on) {
-            if (this.client.options.track.notices) {
+            if (this.client.anyTracked("notices")) {
                 this._authNotices = await this.getAuthNotices();
                 this._identityNotices = await this.getIdentityNotices();
             }
-            if (this.client.options.track.bots) this._bots = await this.getBots();
-            if (this.client.options.track.mail) {
+            if (this.client.anyTracked("bots")) this._bots = await this.getBots();
+            if (this.client.anyTracked("mail")) {
                 this._inbox = await this.getInbox();
                 this._unreadMail = await this.getUnreadMail();
             }
-            if (this.client.options.track.notes) this._notes = await this.getNotes();
-            if (this.client.options.track.incomingRequests) this._incomingRequests = await this.getIncomingRequests();
-            if (this.client.options.track.outgoingRequests) this._outgoingRequests = await this.getOutgoingRequests();
-            if (this.client.options.track.tokens) this._tokens = await this.getTokens();
-            if (this.client.options.track.watches) this._watches = await this.getWatches();
+            if (this.client.anyTracked("notes")) this._notes = await this.getNotes();
+            if (this.client.anyTracked("incomingRequests")) this._incomingRequests = await this.getIncomingRequests();
+            if (this.client.anyTracked("outgoingRequests")) this._outgoingRequests = await this.getOutgoingRequests();
+            if (this.client.anyTracked("tokens")) this._tokens = await this.getTokens();
+            if (this.client.anyTracked("watches")) this._watches = await this.getWatches();
         } else {
             if (this._notes) {
                 for (const ref of this._notes.list) {
@@ -92,11 +92,19 @@ class Player extends BaseModel implements PlayerProperties {
             }
         }
 
-        this.listeners.addOrRemove(on, this.puppets, data => this.client.emit("puppets.add", this, data.item), data => this.client.emit("puppets.remove", this, data.item), kPlayer(this.id));
-        this.listeners.addOrRemove(on, this.chars, data => this.client.emit("ownedCharacters.add", this, data.item), data => this.client.emit("ownedCharacters.remove", this, data.item), kPlayer(this.id));
-        this.listeners.addOrRemove(on, this.controlled, data => this.client.emit("controlledCharacters.add", this, data.item), data => this.client.emit("controlledCharacters.remove", this, data.item), kPlayer(this.id));
-        this.listeners.addOrRemove(on, this.mutedChars, data => this.client.emit("mutedCharacters.add", this, data.item), data => this.client.emit("mutedCharacters.remove", this, data.item), kPlayer(this.id));
-        if (this.client.options.track.notices) {
+        if (this.client.anyTracked("puppets")) {
+            this.listeners.addOrRemove(on, this.puppets, data => this.client.emit("puppets.add", this, data.item), data => this.client.emit("puppets.remove", this, data.item), kPlayer(this.id));
+        }
+        if (this.client.anyTracked("ownedCharacters")) {
+            this.listeners.addOrRemove(on, this.chars, data => this.client.emit("ownedCharacters.add", this, data.item), data => this.client.emit("ownedCharacters.remove", this, data.item), kPlayer(this.id));
+        }
+        if (this.client.anyTracked("controlledCharacters")) {
+            this.listeners.addOrRemove(on, this.controlled, data => this.client.emit("controlledCharacters.add", this, data.item), data => this.client.emit("controlledCharacters.remove", this, data.item), kPlayer(this.id));
+        }
+        if (this.client.anyTracked("mutedCharacters")) {
+            this.listeners.addOrRemove(on, this.mutedChars, data => this.client.emit("mutedCharacters.add", this, data.item), data => this.client.emit("mutedCharacters.remove", this, data.item), kPlayer(this.id));
+        }
+        if (this.client.anyTracked("notices")) {
             if (this._authNotices) {
                 this.listeners.addOrRemove(on, this._authNotices, data => this.client.emit("notices.auth.add", this, data.item), data => this.client.emit("notices.auth.remove", this, data.item), kPlayer(this.id));
             }
@@ -104,10 +112,10 @@ class Player extends BaseModel implements PlayerProperties {
                 this.listeners.addOrRemove(on, this._identityNotices, data => this.client.emit("notices.identity.add", this, data.item), data => this.client.emit("notices.identity.remove", this, data.item), kPlayer(this.id));
             }
         }
-        if (this.client.options.track.bots && this._bots) {
+        if (this.client.anyTracked("bots") && this._bots) {
             this.listeners.addOrRemove(on, this._bots, data => this.client.emit("bots.add", this, data.item), data => this.client.emit("bots.remove", this, data.item), kPlayer(this.id));
         }
-        if (this.client.options.track.mail) {
+        if (this.client.anyTracked("mail")) {
             if (this._unreadMail) {
                 this.listeners.addOrRemove(on, this._unreadMail, async data => {
                     const mail = await data.item.get();
@@ -121,7 +129,7 @@ class Player extends BaseModel implements PlayerProperties {
                 this.listeners.addOrRemove(on, this._inbox, data => this.client.emit("inbox.add", this, data.item), data => this.client.emit("inbox.remove", this, data.item), kPlayer(this.id));
             }
         }
-        if (this.client.options.track.incomingRequests && this._incomingRequests) {
+        if (this.client.anyTracked("incomingRequests") && this._incomingRequests) {
             this.listeners.addOrRemove(on, this._incomingRequests, data => {
                 this._listenRequest(data.item, true, true);
                 this.client.emit("requests.incoming.add", this, data.item);
@@ -130,20 +138,20 @@ class Player extends BaseModel implements PlayerProperties {
                 this.client.emit("requests.incoming.remove", this, data.item);
             }, kPlayer(this.id));
         }
-        if (this.client.options.track.notes && this._notes) {
+        if (this.client.anyTracked("notes") && this._notes) {
             this.listeners.addOrRemove(on, this._notes, async data => {
                 const note = await data.item.get();
-                this._listenNote(note, true);
+                if (this.client.anyTracked("noteChanges")) this._listenNote(note, true);
                 const char = await note.char.get();
                 this.client.emit("notes.add", this, note, char);
             }, async data => {
                 const note = await data.item.get();
-                this._listenNote(note, false);
+                if (this.client.anyTracked("noteChanges")) this._listenNote(note, false);
                 const char = await note.char.get();
                 this.client.emit("notes.remove", this, note, char);
             }, kPlayer(this.id));
         }
-        if (this.client.options.track.outgoingRequests && this._outgoingRequests) {
+        if (this.client.anyTracked("outgoingRequests") && this._outgoingRequests) {
             this.listeners.addOrRemove(on, this._outgoingRequests, data => {
                 this._listenRequest(data.item, false, true);
                 this.client.emit("requests.outgoing.add", this, data.item);
@@ -152,10 +160,10 @@ class Player extends BaseModel implements PlayerProperties {
                 this.client.emit("requests.outgoing.remove", this, data.item);
             }, kPlayer(this.id));
         }
-        if (this.client.options.track.tokens && this._tokens) {
+        if (this.client.anyTracked("tokens") && this._tokens) {
             this.listeners.addOrRemove(on, this._tokens, data => this.client.emit("tokens.add", this, data.item), data => this.client.emit("tokens.remove", this, data.item), kPlayer(this.id));
         }
-        if (this.client.options.track.watches && this._watches) {
+        if (this.client.anyTracked("watches") && this._watches) {
             this.listeners.addOrRemove(on, this._watches, async data => {
                 const watch = await data.item.get();
                 this.client.emit("watches.add", this, watch);

@@ -5,7 +5,7 @@ import type Commands from "../util/commands.js";
 import type { OwnedCharacterProperties } from "../generated/models/types.js";
 import { OwnedCharacterDefinition } from "../generated/models/definitions.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
-import type { ResClient } from "resclient-ts";
+import { Properties, type ResClient } from "resclient-ts";
 
 declare interface OwnedCharacter extends BaseModel, OwnedCharacterProperties {}
 // do not edit the first line of the class comment
@@ -17,11 +17,13 @@ class OwnedCharacter extends BaseModel implements OwnedCharacterProperties {
     private onChange = this._onChange.bind(this);
     constructor(client: WolferyJS, api: ResClient, rid: string) {
         super(client, api, rid, { definition: OwnedCharacterDefinition });
-        this.p.writable("inRoomWas");
+        Properties.of(this)
+            .readOnly("onChange");
     }
 
+    // make sure to update trackChanges in _listen if anything changes here
     private _onChange(data: Partial<OwnedCharacterProperties>): void {
-        if (data.inRoom !== undefined) {
+        if (this.client.anyTracked("roomChange") && data.inRoom !== undefined) {
             this.client.emit("roomChange", this, this.inRoom, data.inRoom);
         }
     }
@@ -29,7 +31,8 @@ class OwnedCharacter extends BaseModel implements OwnedCharacterProperties {
     protected override async _listen(on: boolean): Promise<void> {
         await super._listen(on);
         const m = on ? "resourceOn" : "resourceOff";
-        this[m]("change", this.onChange);
+        const trackChanges = this.client.anyTracked("roomChange");
+        if (trackChanges) this[m]("change", this.onChange);
     }
 
     get avatarURL(): string | null {

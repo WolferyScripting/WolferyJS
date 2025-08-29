@@ -29,23 +29,24 @@ class Character extends BaseModel implements CharacterProperties {
             .readOnly("onInfoChange");
     }
 
+    // make sure to update trackChanges in _listen if anything changes here
     private async _onChange(data: Partial<this>): Promise<void> {
-        if (data.awake !== undefined && this.awake && this.client.options.track.charInfo && this._info === null) {
+        if (data.awake !== undefined && this.awake && this.client.anyTracked("charInfo") && this._info === null) {
             await this.getInfo().then(info => info.keep());
         }
 
 
-        if (data.idle !== undefined) {
+        if (this.client.anyTracked("idle") && data.idle !== undefined) {
             this.client.emit("idleStatusChange", this, this.idle, data.idle);
         }
 
-        if (data.rp !== undefined) {
+        if (this.client.anyTracked("lfrp") && data.rp !== undefined) {
             this.client.emit("lfrp.change", this, this.rp === "lfrp");
         }
     }
 
     private _onInfoChange(data: Partial<CharacterInfo>, info: CharacterInfo): void {
-        if (data.lfrpDesc !== undefined) {
+        if (this.client.anyTracked("lfrp") && data.lfrpDesc !== undefined) {
             this.client.emit("lfrp.descChange", this, info.lfrpDesc, data.lfrpDesc);
         }
 
@@ -56,10 +57,12 @@ class Character extends BaseModel implements CharacterProperties {
 
     protected override async _listen(on: boolean): Promise<void> {
         await super._listen(on);
+        // don't listen to changes if we aren't looking for anything
+        const trackChanges = this.client.anyTracked("charInfo", "idle", "lfrp");
         const m = on ? "resourceOn" : "resourceOff";
-        this[m]("change", this.onChange);
+        if (trackChanges) this[m]("change", this.onChange);
         if (on) {
-            if (this.client.options.track.charInfo && (this.awake || this.client.options.track.charInfoOffline)) {
+            if (this.client.anyTracked("charInfo") && (this.awake || this.client.anyTracked("charInfoOffline"))) {
                 this._info = await this.getInfo();
                 this._info[m]("change", this.onInfoChange);
             }
@@ -68,7 +71,9 @@ class Character extends BaseModel implements CharacterProperties {
             this._info = null;
         }
 
-        this.listeners.addOrRemove(on, this.tags, data => this.client.emit("characterTags.add", this, data.item, data.key.slice(data.key.indexOf("_") + 1) as TagPref), data => this.client.emit("characterTags.remove", this, data.item, data.key.slice(data.key.indexOf("_") + 1) as TagPref), kCharacter(this.id));
+        if (this.client.anyTracked("characterTags")) {
+            this.listeners.addOrRemove(on, this.tags, data => this.client.emit("characterTags.add", this, data.item, data.key.slice(data.key.indexOf("_") + 1) as TagPref), data => this.client.emit("characterTags.remove", this, data.item, data.key.slice(data.key.indexOf("_") + 1) as TagPref), kCharacter(this.id));
+        }
     }
 
     get avatarURL(): string | null {

@@ -23,19 +23,29 @@ import { Properties } from "resclient-ts";
 /** Core classes/calls that don't require any id input */
 export default class Core extends Base {
     private _awakeCharacters!: AwakeCharacters | null;
+    private _botUser!: BotUser | null;
     private _coreInfo!: CoreInfo | null;
     private _globalTeleports!: GlobalTeleports | null;
+    private _player!: Player | null;
+    private _playerUser!: User | null;
     private _tagGroups!: TagGroups | null;
     private _tags!: Tags | null;
+    private _tokenUser!: TokenUser | null;
+    private _user!: User | TokenUser | null;
     private onCoreInfoOut = this._onCoreInfoOut.bind(this);
     constructor(client: WolferyJS) {
         super(client);
         Properties.of(this)
             .writable("_awakeCharacters", null)
+            .writable("_botUser", null)
             .writable("_coreInfo", null)
             .writable("_globalTeleports", null)
+            .writable("_player", null)
+            .writable("_playerUser", null)
             .writable("_tagGroups", null)
             .writable("_tags", null)
+            .writable("_tokenUser", null)
+            .writable("_user", null)
             .readOnly("onCoreInfoOut");
     }
 
@@ -47,34 +57,39 @@ export default class Core extends Base {
     async _track(on: boolean): Promise<void> {
         const m = on ? "resourceOn" : "resourceOff";
         if (on) {
-            if (this.client.options.track.awake) this._awakeCharacters = await this.getAwakeCharacters();
-            if (this.client.options.track.globalTeleports) this._globalTeleports = await this.getGlobalTeleports();
-            if (this.client.options.track.tagGroups) this._tagGroups = await this.getTagGroups();
-            if (this.client.options.track.globalTags) this._tags = await this.getTags();
-            if (this.client.options.track.broadcast) this._coreInfo = await this.getCoreInfo();
+            if (this.client.anyTracked("awake")) this._awakeCharacters = await this.getAwakeCharacters();
+            if (this.client.anyTracked("globalTeleports")) this._globalTeleports = await this.getGlobalTeleports();
+            if (this.client.anyTracked("tagGroups")) this._tagGroups = await this.getTagGroups();
+            if (this.client.anyTracked("globalTags")) this._tags = await this.getTags();
+            if (this.client.anyTracked("broadcast")) this._coreInfo = await this.getCoreInfo();
         }
 
-        if (this.client.options.track.awake && this._awakeCharacters) {
+        if (this.client.anyTracked("awake") && this._awakeCharacters) {
             this._awakeCharacters.listeners.listenOrUnlisten(on, data => this.client.emit("awakeCharacters.add", data.item), data => this.client.emit("awakeCharacters.remove", data.item), kEvents);
         }
-        if (this.client.options.track.globalTeleports && this._globalTeleports) {
+        if (this.client.anyTracked("globalTeleports") && this._globalTeleports) {
             this._globalTeleports.listeners.listenOrUnlisten(on, data => this.client.emit("globalTeleports.add", data.item), data => this.client.emit("globalTeleports.remove", data.item), kEvents);
         }
-        if (this.client.options.track.tagGroups && this._tagGroups) {
+        if (this.client.anyTracked("tagGroups") && this._tagGroups) {
             this._tagGroups.listeners.listenOrUnlisten(on, data => this.client.emit("tagGroups.add", data.item), data => this.client.emit("tagGroups.remove", data.item), kEvents);
         }
-        if (this.client.options.track.globalTags && this._tags) {
+        if (this.client.anyTracked("globalTags") && this._tags) {
             this._tags.listeners.listenOrUnlisten(on, data => this.client.emit("tags.add", data.item), data => this.client.emit("tags.remove", data.item), kEvents);
         }
-        if (this.client.options.track.broadcast && this._coreInfo) {
+        if (this.client.anyTracked("broadcast") && this._coreInfo) {
             this._coreInfo[m]("out", this.onCoreInfoOut);
         }
 
         if (!on) {
             this._awakeCharacters = null;
+            this._botUser = null;
             this._globalTeleports = null;
+            this._player = null;
+            this._playerUser = null;
             this._tagGroups = null;
             this._tags = null;
+            this._tokenUser = null;
+            this._user = null;
         }
     }
 
@@ -83,22 +98,11 @@ export default class Core extends Base {
     }
 
     async getBotUser(): Promise<BotUser> {
-        return this.client.api.call<BotUser>("core", "getBot");
+        return (this._botUser ??= await this.client.api.call<BotUser>("core", "getBot"));
     }
 
     async getCoreInfo(): Promise<CoreInfo> {
         return this.client.api.get<CoreInfo>(ResourceIDs.CORE_INFO);
-    }
-
-    /**
-     * Get the authenticated user.
-     * @returns The authenticated user.
-     * @note This is an alias for {@link getUser} which throws if the result is not an instance of `User`.
-     */
-    async getFullUser(): Promise<User> {
-        const user = await this.getUser();
-        if (!(user instanceof TokenUser)) return user;
-        throw new Error(`Expected to get User, got ${user.constructor.name}`);
     }
 
     async getGlobalTeleports(): Promise<GlobalTeleports> {
@@ -126,7 +130,19 @@ export default class Core extends Base {
     }
 
     async getPlayer(): Promise<Player> {
-        return this.client.api.call<Player>("core", "getPlayer");
+        return (this._player ??= await this.client.api.call<Player>("core", "getPlayer"));
+    }
+
+    /**
+     * Get the authenticated user.
+     * @returns The authenticated user.
+     * @note This is an alias for {@link getUser} which throws if the result is not an instance of `User`.
+     */
+    async getPlayerUser(): Promise<User> {
+        if (this._playerUser) return this._playerUser;
+        const user = await this.getUser();
+        if (!(user instanceof TokenUser)) return this._playerUser ??= user;
+        throw new Error(`Expected to get User, got ${user.constructor.name}`);
     }
 
     async getReportInfo(): Promise<ReportInfo> {
@@ -159,8 +175,9 @@ export default class Core extends Base {
      * @note This is an alias for {@link getUser} which throws if the result is not an instance of `TokenUser`.
      */
     async getTokenUser(): Promise<TokenUser> {
+        if (this._tokenUser) return this._tokenUser;
         const user = await this.getUser();
-        if (user instanceof TokenUser) return user;
+        if (user instanceof TokenUser) return this._tokenUser = user;
         throw new Error(`Expected to get TokenUser, got ${user.constructor.name}`);
     }
 
@@ -169,7 +186,7 @@ export default class Core extends Base {
      * @returns The authenticated user.
      */
     async getUser(): Promise<User | TokenUser> {
-        return this.client.api.call<User | TokenUser>("auth", "getUser");
+        return (this._user ??= await this.client.api.call<User | TokenUser>("auth", "getUser"));
     }
 
     async getWebClientInfo(): Promise<WebClientInfo> {

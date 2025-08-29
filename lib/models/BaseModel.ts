@@ -31,7 +31,7 @@ export default class BaseModel extends ResModel {
             return null;
         }
 
-        if (this._definition) {
+        if (this.client.anyTracked("missing") && this._definition) {
             const missing: Array<string> = [];
             for (const prop in props) {
                 if (!(prop in this._definition)) {
