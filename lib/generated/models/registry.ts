@@ -50,7 +50,8 @@ import TokenUser from "../../models/TokenUser.js";
 import ScriptBinary from "../../models/ScriptBinary.js";
 import ScriptLog from "../../models/ScriptLog.js";
 import Settings from "../../models/Settings.js";
-import Tag from "../../models/Tag.js";
+import GlobalTag from "../../models/GlobalTag.js";
+import CustomTag from "../../models/CustomTag.js";
 import CharacterTags from "../../models/CharacterTags.js";
 import UnreadMail from "../../models/UnreadMail.js";
 import User from "../../models/User.js";
@@ -127,7 +128,12 @@ export default function registerModels(client: WolferyJS, res: ResClient): void 
     res.registerModelType(ResourceIDs.SCRIPT_LOG({ id: "*" }), (api, rid) => new ScriptLog(client, api, rid));
     res.registerModelType(ResourceIDs.CHARACTER_SETTINGS({ id: "*" }), (api, rid) => new Settings(client, api, rid));
     res.registerModelType(ResourceIDs.PUPPET_SETTINGS({ ctrl: "*", puppet: "*" }), (api, rid) => new Settings(client, api, rid));
-    res.registerModelType(ResourceIDs.TAG({ id: "*" }), (api, rid) => new Tag(client, api, rid));
+    res.registerModelType(ResourceIDs.TAG({ id: "*" }), (api, rid, data) => {
+        const d = data as Record<"custom", boolean>;
+        if (d.custom === false) return new GlobalTag(client, api, rid);
+        if (d.custom === true) return new CustomTag(client, api, rid);
+        return client.options.clientOptions.defaultModelFactory!(api, rid, data);
+    });
     res.registerModelType(ResourceIDs.CHARACTER_TAGS({ id: "*" }), (api, rid) => new CharacterTags(client, api, rid));
     res.registerModelType(ResourceIDs.UNREAD_MAIL({ id: "*" }), (api, rid) => new UnreadMail(client, api, rid));
     res.registerModelType(ResourceIDs.USER({ id: "*" }), (api, rid) => new User(client, api, rid));

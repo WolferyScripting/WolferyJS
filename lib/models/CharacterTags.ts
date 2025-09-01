@@ -1,9 +1,11 @@
-import Tag from "./Tag.js";
 import BaseCollectionModel from "./BaseCollectionModel.js";
 import type Character from "./Character.js";
+import CustomTag from "./CustomTag.js";
+import GlobalTag from "./GlobalTag.js";
 import type WolferyJS from "../WolferyJS.js";
 import type Commands from "../util/commands.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
+import { type Tag } from "../generated/models/types.js";
 import type { ResClient } from "resclient-ts";
 
 export type TagPref = "like" | "dislike";
@@ -14,7 +16,7 @@ export type TagPref = "like" | "dislike";
  */
 class CharacterTags extends BaseCollectionModel<Tag> {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
-        super(client, api, rid, item => item instanceof Tag);
+        super(client, api, rid, item => item instanceof CustomTag || item instanceof GlobalTag);
     }
 
     protected override async _listen(on: boolean): Promise<void> {

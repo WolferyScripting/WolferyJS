@@ -526,9 +526,9 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             authentication: authOptions,
             clientOptions:  {
                 ...options.clientOptions,
-                defaultCollectionFactory: (api, rid): ResCollection => this._missingRes("collection", api, rid, options.clientOptions?.defaultCollectionFactory),
-                defaultErrorFactory:      (api, rid): ResError => this._missingRes("error", api, rid, options.clientOptions?.defaultErrorFactory),
-                defaultModelFactory:      (api, rid): ResModel => this._missingRes("model", api, rid, options.clientOptions?.defaultModelFactory)
+                defaultCollectionFactory: (api, rid, data): ResCollection => this._missingRes("collection", api, rid, data, options.clientOptions?.defaultCollectionFactory),
+                defaultErrorFactory:      (api, rid, data): ResError => this._missingRes("error", api, rid, data, options.clientOptions?.defaultErrorFactory),
+                defaultModelFactory:      (api, rid, data): ResModel => this._missingRes("model", api, rid, data, options.clientOptions?.defaultModelFactory)
             },
             customInspect:   options.customInspect ?? true,
             disableTracking: options.disableTracking ?? false,
@@ -713,21 +713,21 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         });
     }
 
-    private _missingRes<T = unknown>(type: ResourceType, api: ResClient, rid: string, factory?: ItemFactory<T>): T {
+    private _missingRes<T = unknown>(type: ResourceType, api: ResClient, rid: string, data: Record<string, unknown> | undefined, factory?: ItemFactory<T>): T {
         switch (type) {
             case "collection": {
                 if (this.anyTracked("missing")) this.emit("missingCollection", rid);
-                return factory ? factory(api, rid) : new ResCollection(api, rid) as T;
+                return factory ? factory(api, rid, data) : new ResCollection(api, rid) as T;
             }
 
             case "error": {
                 if (this.anyTracked("missing")) this.emit("missingError", rid);
-                return factory ? factory(api, rid) : new ResError(api, rid) as T;
+                return factory ? factory(api, rid, data) : new ResError(api, rid) as T;
             }
 
             case "model": {
                 if (this.anyTracked("missing")) this.emit("missingModel", rid);
-                return factory ? factory(api, rid) : new ResModel(api, rid) as T;
+                return factory ? factory(api, rid, data) : new ResModel(api, rid) as T;
             }
         }
     }

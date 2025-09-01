@@ -47,6 +47,7 @@ export async function getModels(): Promise<{ resources: Array<Resource<"model">>
     const resources: Array<Resource<"model">> = [];
 
     for (const model of models) {
+        if ("child" in model) continue;
         resources.push(...idsToResources(Array.from(model.id), model.name, "model"));
     }
 

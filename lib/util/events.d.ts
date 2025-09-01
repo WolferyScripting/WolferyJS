@@ -20,7 +20,6 @@ import type Exit from "../models/Exit.ts";
 import type Request from "../models/Request.ts";
 import type RoomProfile from "../models/RoomProfile.ts";
 import type Note from "../models/Note.ts";
-import type Tag from "../models/Tag.ts";
 import type TagGroup from "../models/TagGroup.ts";
 import type RoomScript from "../models/RoomScript.ts";
 import type Notice from "../models/Notice.ts";
@@ -36,6 +35,7 @@ import { type FocusOptions } from "../models/Focus.ts";
 import type AreaDetails from "../models/AreaDetails.ts";
 import type AreaChild from "../models/AreaChild.ts";
 import type RoomChild from "../models/RoomChild.ts";
+import { type Tag } from "../generated/models/types.js";
 import type { MessageEvent } from "ws";
 import type { AnyObject, ResRef } from "resclient-ts";
 

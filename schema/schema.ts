@@ -63,6 +63,26 @@ export const ModelSchema = Type.Object({
     name:        Type.String(),
     props:       Type.Record(Type.String(), PropertySchema)
 });
+export const ParentModelSchema = Type.Composite([
+    ModelSchema,
+    Type.Object({
+        parent:      Type.Literal(true),
+        regDataType: Type.String()
+    })
+]);
+export const ChildModelConditionSchema = Type.Object({
+    type: Type.Union([
+        Type.Literal("eq")
+    ]),
+    value: Type.Any()
+});
+export const ChildModelSchema = Type.Object({
+    child:       Type.Literal(true),
+    parent:      Type.String(),
+    conditions:  Type.Record(Type.String(), ChildModelConditionSchema),
+    name:        Type.String(),
+    description: Type.Optional(Type.String())
+});
 const BaseModelCollectionSchema = Type.Object({
     collection:  Type.Literal(true),
     description: Type.String(),
@@ -76,9 +96,12 @@ export const ModelCollectionSchema = Type.Union([
     Type.Composite([BaseModelCollectionSchema, Type.Object({ ref: Type.String() })])
 ]);
 
-export const ModelsSchema = Type.Array(Type.Union([ModelSchema, ModelCollectionSchema]));
+export const ModelsSchema = Type.Array(Type.Union([ModelSchema, ParentModelSchema, ChildModelSchema, ModelCollectionSchema]));
 
 export type Model = Static<typeof ModelSchema>;
+export type ChildModel = Static<typeof ChildModelSchema>;
+export type ChildModelCondition = Static<typeof ChildModelConditionSchema>;
+export type ParentModel = Static<typeof ParentModelSchema>;
 export type Models = Static<typeof ModelsSchema>;
 
 export const CollectionSchema = Type.Object({

@@ -1512,6 +1512,8 @@
     "description": "A tag.",
     "id": ["TAG(tag.tag.{id})"],
     "name": "Tag",
+    "parent": true,
+    "regDataType": "Record<\"custom\", boolean>",
     "props": {
       "custom": {
         "type": "boolean",
@@ -1538,6 +1540,30 @@
         "oneOf": ["builder", "helper", "moderator", "admin"],
         "ts": "Roles",
         "description": "The role associated with the tag."
+      }
+    }
+  },
+  {
+    "child": true,
+    "parent": "Tag",
+    "name": "GlobalTag",
+    "description": "A global tag.",
+    "conditions": {
+      "custom": {
+        "type": "eq",
+        "value": false
+      }
+    }
+  },
+  {
+    "child": true,
+    "parent": "Tag",
+    "name": "CustomTag",
+    "description": "A custom tag.",
+    "conditions": {
+      "custom": {
+        "type": "eq",
+        "value": true
       }
     }
   },

@@ -35,6 +35,8 @@ import type ScriptBinary from "../../models/ScriptBinary.js";
 import type ScriptLogs from "../../collections/ScriptLogs.js";
 import type Focus from "../../models/Focus.js";
 import type Triggers from "../../collections/Triggers.js";
+import type GlobalTag from "../../models/GlobalTag.js";
+import type CustomTag from "../../models/CustomTag.js";
 import type Identity from "../../models/Identity.js";
 import type { IdleState } from "../../util/Constants.js";
 import type { CharacterState, CharacterType, NavIcons, NavDirections, Titles, Roles, MailCharacterType } from "../../util/types.js";
@@ -974,6 +976,9 @@ export interface TagProperties {
     /** The role associated with the tag. */
     role: Roles | null;
 }
+
+/** One of: {@link GlobalTag}, {@link CustomTag} */
+export type Tag = GlobalTag | CustomTag;
 
 /**
  * The tags of a character.

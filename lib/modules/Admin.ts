@@ -1,7 +1,6 @@
 import Base from "./Base.js";
 import type Commands from "../util/commands.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
-import type Tag from "../models/Tag.js";
 import type TagGroup from "../models/TagGroup.js";
 import type ControlledCharacter from "../models/ControlledCharacter.js";
 import {
@@ -14,6 +13,7 @@ import {
 import type Room from "../models/Room.js";
 import type OwnedCharacters from "../collections/OwnedCharacters.js";
 import type Character from "../models/Character.js";
+import { type Tag } from "../generated/models/types.js";
 
 export default class Admin extends Base {
     /**

@@ -6,6 +6,7 @@ import {
     pathTo,
     type Resource
 } from "./common.js";
+import { type ChildModelCondition, type ChildModel, type ParentModel } from "./schema.js";
 import { DefToType } from "../lib/util/Util.js";
 import { parseTSConfigJSON  } from "types-tsconfig";
 import { mkdir, readFile, writeFile, access } from "node:fs/promises";
@@ -97,6 +98,7 @@ class Builder<T extends BuilderType = BuilderType> {
         const imports = new Set<string>(), definitions: Array<string> = [];
 
         for (const resource of this.data.schema) {
+            if ("child" in resource && resource.child) continue;
             if ("collection" in resource && resource.collection || (!("props" in resource) || Object.keys(resource.props).length === 0)) {
                 definitions.push(`export const ${resource.name}Definition: Record<string, PropertyDefinition> = {};`, "");
             } else {
@@ -153,6 +155,7 @@ class Builder<T extends BuilderType = BuilderType> {
         ];
 
         for (const resource of this.data.schema) {
+            if ("parent" in resource && resource.parent === true) continue;
             const f = resolve(fileURLToPath(new URL(`../lib/${this.type}/${resource.name}.js`, import.meta.url)));
             exports.push(`export { default as ${resource.name} } from "${relative(this.generatedDir, f)}";`);
         }
@@ -180,9 +183,28 @@ class Builder<T extends BuilderType = BuilderType> {
         } else if (this.type === "models") {
             const r = this.data.resources as Array<Resource<"model">>;
             for (const resource of r) {
-                imports.add(`model:${resource.model}`);
+                const model = this.data.schema.find(m => m.name === resource.model);
                 const args = resource.args.length === 0 ? "" : `({ ${resource.args.map(a => `${a}: "*"`).join(", ")} })`;
-                registrations.push(`res.registerModelType(ResourceIDs.${resource.name}${args}, (api, rid) => new ${resource.model}(client, api, rid));`);
+                let reg = `res.registerModelType(ResourceIDs.${resource.name}${args}`;
+                if (model && "parent" in model && model.parent) {
+                    reg += `, (api, rid, data) => {\nconst d = data as ${(model as ParentModel).regDataType};`;
+                    const children = this.data.schema.filter(m => "child" in m && m.child && m.parent === model.name) as Array<ChildModel>;
+                    const format = (prop: string, c: ChildModelCondition): string => c.type === "eq" ? `d.${prop} === ${typeof c.value === "string" ? `"${c.value}"` : c.value}` : "";
+                    for (const child of children) {
+                        imports.add(`model:${child.name}`);
+                        reg += "\nif (";
+                        for (const [prop, condition] of Object.entries(child.conditions)) {
+                            reg += `${format(prop, condition)} &&`;
+                        }
+                        reg = reg.slice(0, -3);
+                        reg += `) return new ${child.name}(client, api, rid);`;
+                    }
+                    reg += "\nreturn client.options.clientOptions.defaultModelFactory!(api, rid, data);\n});";
+                } else {
+                    reg += `, (api, rid) => new ${resource.model}(client, api, rid));`;
+                    imports.add(`model:${resource.model}`);
+                }
+                registrations.push(reg);
             }
         }
 
@@ -202,6 +224,7 @@ class Builder<T extends BuilderType = BuilderType> {
         const imports = new Set<string>(), types: Array<string> = [];
 
         for (const resource of this.data.schema) {
+            if ("child" in resource && resource.child) continue;
             if ("collection" in resource && resource.collection || (!("props" in resource) || Object.keys(resource.props).length === 0)) {
                 types.push("/**", ` * ${resource.description}`, " */", `export interface ${resource.name}Properties {}`, "");
             } else {
@@ -256,6 +279,13 @@ class Builder<T extends BuilderType = BuilderType> {
                 }
 
                 types.push("}", "");
+
+                if ("parent" in resource && resource.parent === true) {
+                    const children = this.data.schema.filter(m => "child" in m && m.child && m.parent === resource.name) as Array<ChildModel>;
+
+                    types.push(`/** One of: ${children.map(c => `{@link ${c.name}}`).join(", ")} */`, `export type ${resource.name} = ${children.map(c => c.name).join(" | ")};`, "");
+                    for (const child of children) imports.add(`model:${child.name}`);
+                }
             }
         }
 
@@ -270,7 +300,16 @@ class Builder<T extends BuilderType = BuilderType> {
 
     async insertClassComments(): Promise<void> {
         if (!this.data) throw new Error("Builder not loaded");
-        for (const resource of this.data.schema) {
+        for (let resource of this.data.schema) {
+            if ("parent" in resource) {
+                if (resource.parent === true) continue;
+                const parent = this.data.schema.find(r => "parent" in r && r.parent === true && r.name === (resource as ChildModel).parent) as ParentModel | undefined;
+                if (!parent) throw new Error(`Parent model ${resource.parent} for ${resource.name} not found`);
+                const child = resource;
+                resource = structuredClone(parent);
+                resource.name = child.name;
+                if (child.description) resource.description = child.description;
+            }
             const path = resolve(dirname(fileURLToPath(import.meta.url)), pathTo(resource.name, this.type.slice(0, -1) as "model" | "collection", "ts"));
             if (!await exists(path)) {
                 console.log(`insertClassComments: File for ${this.type.slice(0, -1)} ${resource.name} seems to not exist, skipping..`);
@@ -369,22 +408,24 @@ class Template {
         if (!this.content) throw new Error("Template not loaded");
         let output = this.content;
         for (const [key, value] of Object.entries(inputs)) {
-            const r = new RegExp(`/\\* =${key}(\\(.*\\))? \\*/`, "g");
-            const regex = r;
-            const includedSpacing = this.content.split("\n").find(line => r.test(line))?.match(/^(\s*)/)?.[1]?.length ?? 0;
+            const regex = new RegExp(`/\\* =${key}(\\(.*\\))? \\*/`, "g");
+            const ln = this.content.split("\n").find(line => regex.test(line));
+            const includedSpacing = ln?.match(/^(\s*)/)?.[1]?.length ?? 0;
             let v =  value, brace = false;
             if (includedSpacing > 0) {
                 v = value.split("\n").map((line, index) => {
                     if (index === 0) return line;
-                    if (line.endsWith("{")) brace = true;
                     if (line.startsWith("}")) brace = false;
-                    return " ".repeat(brace ? includedSpacing * 2 : includedSpacing) + line;
+                    const newLine = " ".repeat(brace ? includedSpacing * 2 : includedSpacing) + line;
+                    if (line.endsWith("{")) brace = true;
+                    return newLine;
                 }).join("\n");
             } else {
                 v = value.split("\n").map(line => {
-                    if (line.endsWith("{")) brace = true;
                     if (line.startsWith("}")) brace = false;
-                    return " ".repeat(brace && !line.endsWith("{") ? defaultSpacing : 0) + line;
+                    const newLine = " ".repeat(brace ? defaultSpacing : 0) + line;
+                    if (line.endsWith("{")) brace = true;
+                    return newLine;
                 }).join("\n");
             }
             output = output.replace(regex, v);
