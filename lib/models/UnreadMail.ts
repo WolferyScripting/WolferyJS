@@ -18,10 +18,8 @@ class UnreadMail extends BaseCollectionModel<ResRef<PlayerMailMessage>> {
         await super._listen(on, this.client.anyTracked("mail"));
     }
 
-    async fetchAll(): Promise<void> {
-        for (const ref of this.list) {
-            await ref.get();
-        }
+    async fetchAll(): Promise<Array<PlayerMailMessage>> {
+        return Promise.all(this.map(r => r.get()));
     }
 }
 

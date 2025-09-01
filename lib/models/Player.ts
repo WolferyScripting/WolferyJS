@@ -7,6 +7,8 @@ import type Notes from "./Notes.js";
 import type UnreadMail from "./UnreadMail.js";
 import type Bots from "./Bots.js";
 import type Request from "./Request.js";
+import type OwnedCharacter from "./OwnedCharacter.js";
+import type Watch from "./Watch.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
 import type { BasicCharacterResponse, LookupCharacter, OptionalBasicCharacterResponse } from "../util/types.js";
 import type WolferyJS from "../WolferyJS.js";
@@ -216,18 +218,17 @@ class Player extends BaseModel implements PlayerProperties {
      * @param requestId The ID of the request to accept.
      */
     async acceptRequest(requestId: string): Promise<null> {
-        return this.call<null>("acceptRequest", { requestId });
+        return this.client.commands.player.acceptRequest(this, requestId);
     }
 
     /**
      * Append to the note for a character. The text will be added on a new line.
      * @param charId The ID of the character to append the note for.
      * @param text The text to append to the note.
-     * @returns The character.
      */
     async appendNote(charId: string, text: string): Promise<Character> {
-        return this.api.call<BasicCharacterResponse<"char">>(ResourceIDs.NOTE({ player: this.id, char: charId }), "append", { text })
-            .then(r => this.basicChar(r, "char"));
+        return this.client.commands.player.appendNote(this, charId, text)
+            .then(r => this.api.get<Character>(ResourceIDs.CHARACTER({ id: r.id })));
     }
 
     /**
@@ -251,7 +252,7 @@ class Player extends BaseModel implements PlayerProperties {
         if (force && this.controlled.list.some(c => c.id === charId)) {
             return this.controlled.get(charId)!;
         }
-        return this.call<ControlledCharacter>("controlChar", { charId });
+        return this.client.commands.player.controlChar(this, charId);
     }
 
     /**
@@ -265,7 +266,15 @@ class Player extends BaseModel implements PlayerProperties {
         if (force && this.controlled.list.some(p => p.id === puppetId && p.type === "puppet")) {
             return this.controlled.get(puppetId)!;
         }
-        return this.call<ControlledCharacter>("controlPuppet", { charId, puppetId });
+        return this.client.commands.player.controlPuppet(this, charId, puppetId);
+    }
+
+    /**
+     * Create a new character.
+     * @param options The options for creating the character.
+     */
+    async createChar(options: Commands.Player.CreateCharOptions): Promise<OwnedCharacter> {
+        return this.client.commands.player.createChar(this, options);
     }
 
     /**
@@ -274,23 +283,41 @@ class Player extends BaseModel implements PlayerProperties {
      * @param heir The ID of the character to inherit any rooms or items of the deleted character.
      */
     async deleteChar(charId: string, heir: string): Promise<null> {
-        return this.call<null>("deleteChar", { charId, heir });
+        return this.client.commands.player.deleteChar(this, charId, heir);
+    }
+
+    /**
+     * Delete a mail message.
+     * @param messageId The ID of the message to delete.
+     */
+    async deleteMail(messageId: string): Promise<null> {
+        return this.client.commands.player.deleteMail(this, messageId);
+    }
+
+    /**
+     * Delete a note. This is the same as setting the text as empty.
+     * @param charId The ID of the character to delete the note for.
+     */
+    async deleteNote(charId: string): Promise<Character> {
+        return this.client.commands.player.deleteNote(this, charId)
+            .then(r => this.client.getChar(r.id));
     }
 
     /**
      * Focus a character.
-     * @param charId The ID of the character to focus.
+     * @param charId The ID of the character to focus with.
+     * @param targetId The ID of the character to focus.
      * @param options The options for focusing the character.
      * @returns The focused character.
      */
-    async focusChar(charId: string, options: Commands.Player.FocusCharOptions): Promise<Character> {
-        return this.call<BasicCharacterResponse<"char">>("focusChar", { charId, ...options })
-            .then(r => this.basicChar(r, "char"));
+    async focusChar(charId: string, targetId: string, options?: Commands.Player.FocusCharOptions): Promise<Character> {
+        return this.client.commands.player.focusChar(this, charId, targetId, options)
+            .then(r => this.client.getChar(r.id));
     }
 
     /** Get the auth notices for the player. */
     async getAuthNotices(): Promise<AuthNotices> {
-        return this.api.get<AuthNotices>(ResourceIDs.AUTH_NOTICES({ id: this.id }));
+        return this.client.commands.player.getAuthNotices(this);
     }
 
     /**
@@ -298,7 +325,7 @@ class Player extends BaseModel implements PlayerProperties {
      * @returns The bots for the player.
      */
     async getBots(): Promise<Bots> {
-        return this.api.get<Bots>(ResourceIDs.BOTS({ id: this.id }));
+        return this.client.commands.player.getBots(this);
     }
 
     /**
@@ -311,7 +338,7 @@ class Player extends BaseModel implements PlayerProperties {
         const rid = ResourceIDs.CHARACTER({ id: charId });
         const cached = this.api.getCached<Character>(rid);
         if (cached) return cached;
-        return this.call<Character>("getChar", { charId });
+        return this.client.commands.player.getChar(this, { charId });
     }
 
     /**
@@ -319,7 +346,7 @@ class Player extends BaseModel implements PlayerProperties {
      * @returns The identity notices for the player.
      */
     async getIdentityNotices(): Promise<IdentityNotices> {
-        return this.api.get<IdentityNotices>(ResourceIDs.IDENTITY_NOTICES({ id: this.id }));
+        return this.client.commands.player.getIdentityNotices(this);
     }
 
     /**
@@ -327,59 +354,57 @@ class Player extends BaseModel implements PlayerProperties {
      * @returns The inbox for the player.
      */
     async getInbox(): Promise<Inbox> {
-        return this.api.get<Inbox>(ResourceIDs.INBOX({ id: this.id }));
+        return this.client.commands.player.getInbox(this);
     }
 
     /**
      * Get the incoming requests.
      */
     async getIncomingRequests(): Promise<IncomingRequests> {
-        return this.api.get<IncomingRequests>(ResourceIDs.INCOMING_REQUESTS({ id: this.id }));
+        return this.client.commands.player.getIncomingRequests(this);
     }
 
     /**
      * Get the note for a character.
      * @param charId The ID of the character to get the note for.
-     * @returns The note for the character.
      */
     async getNote(charId: string): Promise<Note> {
-        return this.api.get<Note>(ResourceIDs.NOTE({ player: this.id, char: charId }));
+        return this.client.commands.player.getNote(this, charId);
     }
 
     /**
      * Get the notes for characters.
      */
     async getNotes(): Promise<Notes> {
-        return this.api.get<Notes>(ResourceIDs.NOTES({ id: this.id }));
+        return this.client.commands.player.getNotes(this);
     }
 
     /**
      * Get the outgoing requests.
      */
     async getOutgoingRequests(): Promise<OutgoingRequests> {
-        return this.api.get<OutgoingRequests>(ResourceIDs.OUTGOING_REQUESTS({ id: this.id }));
+        return this.client.commands.player.getOutgoingRequests(this);
     }
 
     /**
      * Get the management tokens for the player.
-     * @returns The management tokens for the player.
      */
     async getTokens(): Promise<Tokens> {
-        return this.api.get<Tokens>(ResourceIDs.TOKENS({ id: this.id }));
+        return this.client.commands.player.getTokens(this);
     }
 
     /**
      * Get the unread mail for the player.
      */
     async getUnreadMail(): Promise<UnreadMail> {
-        return this.api.get<UnreadMail>(ResourceIDs.UNREAD_MAIL({ id: this.id }));
+        return this.client.commands.player.getUnreadMail(this);
     }
 
     /**
      * Get the characters being watched.
      */
     async getWatches(): Promise<Watches> {
-        return this.api.get<Watches>(ResourceIDs.WATCHES({ id: this.id }));
+        return this.client.commands.player.getWatches(this);
     }
 
     /**
@@ -388,8 +413,7 @@ class Player extends BaseModel implements PlayerProperties {
      * @returns An array of matching characters.
      */
     async lookupChars(name: string): Promise<Array<LookupCharacter>> {
-        return this.call<Record<"chars", Array<LookupCharacter>>>("lookupChars", { name, extended: true })
-            .then(r => r.chars);
+        return this.client.commands.player.lookupChars(this, name);
     }
 
     /**
@@ -405,7 +429,15 @@ class Player extends BaseModel implements PlayerProperties {
      * @param chars
      */
     async muteChars(chars: Record<string, boolean>): Promise<null> {
-        return this.call<Record<string, boolean>>("muteChars", { chars }).then(() => null);
+        return this.client.commands.player.muteChars(this, chars);
+    }
+
+    /**
+     * Read a mail message.
+     * @param messageId The ID of the message to read.
+     */
+    async readMail(messageId: string): Promise<null> {
+        return this.client.commands.player.readMail(this, messageId);
     }
 
     /**
@@ -413,7 +445,7 @@ class Player extends BaseModel implements PlayerProperties {
      * @param requestId The ID of the request to reject.
      */
     async rejectRequest(requestId: string): Promise<null> {
-        return this.call<null>("rejectRequest", { requestId });
+        return this.client.commands.player.rejectRequest(this, requestId);
     }
 
     /**
@@ -421,7 +453,7 @@ class Player extends BaseModel implements PlayerProperties {
      * @param requestId The ID of the request to revoke.
      */
     async revokeRequest(requestId: string): Promise<null> {
-        return this.call<null>("revokeRequest", { requestId });
+        return this.client.commands.player.revokeRequest(this, requestId);
     }
 
     /**
@@ -431,18 +463,28 @@ class Player extends BaseModel implements PlayerProperties {
      * @param options The settings to apply.
      */
     async setCharSettings(charId: string, options: Commands.Player.SetCharSettingsOptions): Promise<null> {
-        return this.call<null>("setCharSettings", { charId, ...options });
+        return this.client.commands.player.setCharSettings(this, charId, options);
     }
 
     /**
      * Set the note for a character.
      * @param charId The ID of the character to set the note for.
-     * @param text The text to set the note to. Provide an empty string to clear.
-     * @returns null if cleared
+     * @param options The options for setting the note.
      */
-    async setNote(charId: string, text: string): Promise<Character | null> {
-        return this.api.call<BasicCharacterResponse<"char"> | null>(ResourceIDs.NOTE({ player: this.id, char: charId }), "set", { text })
-            .then(r => this.basicChar(r, "char"));
+    async setNote(charId: string, options: Commands.Player.SetNoteOptions): Promise<Character> {
+        return this.client.commands.player.setNote(this, charId, options)
+            .then(r => this.api.get<Character>(ResourceIDs.CHARACTER({ id: r.id })));
+    }
+
+    /**
+     * Unfocus a character.
+     * @param charId The ID of the character to unfocus with.
+     * @param targetId The ID of the character to unfocus.
+     * @param puppeteerId The ID of the puppeteer character, if applicable.
+     */
+    async unfocusChar(charId: string, targetId: string, puppeteerId?: string): Promise<Character> {
+        return this.client.commands.player.unfocusChar(this, charId, targetId, puppeteerId)
+            .then(r => this.client.getChar(r.id));
     }
 
     /**
@@ -458,17 +500,17 @@ class Player extends BaseModel implements PlayerProperties {
      * @param charId The ID of the character to unwatch.
      */
     async unwatchChar(charId: string): Promise<Character> {
-        return this.api.call<BasicCharacterResponse<"char">>(ResourceIDs.WATCH({ player: this.id, char: charId }), "delete")
-            .then(r => this.basicChar(r, "char"));
+        return this.client.commands.player.unwatchChar(this, charId)
+            .then(r => this.client.getChar(r.id));
     }
 
     /**
      * Add a character to your watch list.
      * @param charId The ID of the character to watch.
      */
-    async watchChar(charId: string): Promise<Character> {
-        return this.api.call<BasicCharacterResponse<"char">>(ResourceIDs.WATCH({ player: this.id, char: charId }), "addWatcher", { charId })
-            .then(r => this.basicChar(r, "char"));
+    async watchChar(charId: string): Promise<Watch> {
+        return this.client.commands.player.watchChar(this, charId)
+            .then(() => this.api.get<Watch>(ResourceIDs.WATCH({ player: this.id, char: charId })));
     }
 }
 

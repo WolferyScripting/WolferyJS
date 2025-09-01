@@ -2,6 +2,7 @@ import BaseCollection from "./BaseCollection.js";
 import type RoomCharacter from "../models/RoomCharacter.js";
 import type WolferyJS from "../WolferyJS.js";
 import { toID } from "../util/Util.js";
+import ResourceIDs from "../generated/ResourceIDs.js";
 import type { ResClient } from "resclient-ts";
 
 // do not edit the first line of the class comment
@@ -10,8 +11,11 @@ import type { ResClient } from "resclient-ts";
  * @resourceID {@link ResourceIDs.ROOM_CHARACTERS | ROOM_CHARACTERS}
  * @resourceID {@link ResourceIDs.ROOM_INSTANCE_CHARACTERS | ROOM_INSTANCE_CHARACTERS}
  */
-export default class RoomCharacters extends BaseCollection<RoomCharacter> {
+export default class RoomCharacters extends BaseCollection<RoomCharacter, typeof ResourceIDs.ROOM_CHARACTER> {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
-        super(client, api, rid, { idCallback: toID });
+        super(client, api, rid, {
+            idCallback:     toID,
+            ridConstructor: ResourceIDs.ROOM_CHARACTER
+        });
     }
 }

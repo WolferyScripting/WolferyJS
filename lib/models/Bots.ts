@@ -1,6 +1,7 @@
 import Bot from "./Bot.js";
 import BaseCollectionModel from "./BaseCollectionModel.js";
 import type WolferyJS from "../WolferyJS.js";
+import ResourceIDs from "../generated/ResourceIDs.js";
 import type { ResClient } from "resclient-ts";
 
 // do not edit the first line of the class comment
@@ -8,9 +9,11 @@ import type { ResClient } from "resclient-ts";
  * The authenticated user's bots.
  * @resourceID {@link ResourceIDs.BOTS | BOTS}
  */
-class Bots extends BaseCollectionModel<Bot> {
+class Bots extends BaseCollectionModel<Bot, typeof ResourceIDs.BOT> {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
-        super(client, api, rid, item => item instanceof Bot);
+        super(client, api, rid, item => item instanceof Bot, {
+            ridConstructor: ResourceIDs.BOT
+        });
     }
 
     protected override async _listen(on: boolean): Promise<void> {
@@ -22,7 +25,8 @@ class Bots extends BaseCollectionModel<Bot> {
      * @param charId The ID of the character the bot is for.
      */
     async create(charId: string): Promise<Bot> {
-        return this.call<Bot>("create", { charId });
+        const playerId = ResourceIDs.BOTS.parts(this.rid).id;
+        return this.client.commands.player.createBot(playerId, charId);
     }
 }
 

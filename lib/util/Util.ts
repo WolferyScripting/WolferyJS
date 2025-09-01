@@ -1,7 +1,7 @@
 import { createDebug } from "./Debug.js";
 import type { Messages } from "./types.js";
 import type WolferyJS from "../WolferyJS.js";
-import type { AnyClass, AnyObject, AnyRes, ResModel } from "resclient-ts";
+import { type AnyClass, type AnyObject, type AnyRes, ResModel } from "resclient-ts";
 import { setTimeout } from "node:timers/promises";
 
 export function assign(target: object, ...sources: Array<object>): void {
@@ -189,3 +189,4 @@ export const kEvents = Symbol.for("wolferyjs.events");
 export const kControlledCharacter = (id: string): symbol => Symbol.for(`wolferyjs.controlledCharacter.${id}`);
 export const kCharacter = (id: string): symbol => Symbol.for(`wolferyjs.character.${id}`);
 export const kPlayer = (id: string): symbol => Symbol.for(`wolferyjs.player.${id}`);
+export const modelId = (v: string | ResModel & { id: string; }): string => v instanceof ResModel ? v.id : v;

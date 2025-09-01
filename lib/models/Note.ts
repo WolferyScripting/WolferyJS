@@ -2,9 +2,9 @@ import type Character from "./Character.js";
 import BaseModel from "./BaseModel.js";
 import type WolferyJS from "../WolferyJS.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
-import type { BasicCharacterResponse } from "../util/types.js";
 import type { NoteProperties } from "../generated/models/types.js";
 import { NoteDefinition } from "../generated/models/definitions.js";
+import type Commands from "../util/commands.js";
 import { Properties, type ResClient } from "resclient-ts";
 
 export type OnTextChangeFunction = (note: Note, char: Character, text: string, oldText: string) => void;
@@ -39,37 +39,56 @@ class Note extends BaseModel implements NoteProperties {
         }
     }
 
+    get charId(): string {
+        return ResourceIDs.NOTE.parts(this.rid).char;
+    }
+
     get id(): string {
-        return this.rid.slice(this.rid.lastIndexOf(".") + 1);
+        // no individual id
+        return this.charId;
+    }
+
+    get playerId(): string {
+        return ResourceIDs.NOTE.parts(this.rid).player;
     }
 
     /**
      * Append text to the note for this character. The text will be added on a new line.
      * @param text The text to append to the note.
+     * @playerRequired
      */
     async appendText(text: string): Promise<Character> {
-        return this.client.modules.core.getPlayer().then(player => player.appendNote(this.id, text));
+        return this.client.commands.core.getPlayer().then(player => player.appendNote(this.id, text));
     }
 
     /**
      * Clear the note for this character.
+     * @playerRequired
      */
-    async clearText(): Promise<null> {
-        await this.setText("");
-        return null;
+    async clearText(): Promise<Character> {
+        return this.set({ text: "" });
     }
 
     /**
      * Delete this note.
+     * @playerRequired
      */
     async delete(): Promise<Character> {
-        return this.call<BasicCharacterResponse<"char">>("delete")
-            .then(r => this.api.get<Character>(ResourceIDs.CHARACTER({ id: r.char.id })));
+        return this.client.commands.core.getPlayer().then(player => player.deleteNote(this.id));
     }
 
     /** @internal */
     getOnTextChange(): OnTextChangeFunction | null {
         return this.onTextChange;
+    }
+
+    /**
+     * Set the note for this character.
+     * @param options The options to set.
+     * @playerRequired
+     */
+    async set(options: Commands.Player.SetNoteOptions): Promise<Character> {
+        return this.client.commands.core.getPlayer().then(player => player.setNote(this.id, options));
     }
 
     /** @internal */
@@ -78,14 +97,6 @@ class Note extends BaseModel implements NoteProperties {
             throw new Error(`Attempted to overwrite onTextChange for ${this.rid}`);
         }
         this.onTextChange = cb;
-    }
-
-    /**
-     * Set the note for this character.
-     * @param text The text to set the note to. Provide an empty string to clear.
-     */
-    async setText(text: string): Promise<Character| null> {
-        return this.client.modules.core.getPlayer().then(player => player.setNote(this.id, text));
     }
 }
 

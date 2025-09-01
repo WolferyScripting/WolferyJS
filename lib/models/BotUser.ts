@@ -3,6 +3,7 @@ import type ControlledCharacter from "./ControlledCharacter.js";
 import type WolferyJS from "../WolferyJS.js";
 import type { BotUserProperties } from "../generated/models/types.js";
 import { BotUserDefinition } from "../generated/models/definitions.js";
+import ResourceIDs from "../generated/ResourceIDs.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface BotUser extends BaseModel, BotUserProperties {}
@@ -22,8 +23,14 @@ class BotUser extends BaseModel {
         this[m]("unsubscribe", this.client.onUnsubscribe);
     }
 
-    get id(): string {
+    /** The character id. */
+    get charId(): string {
         return this.char.id;
+    }
+
+    /** The user id. */
+    get id(): string {
+        return ResourceIDs.BOT_USER.parts(this.rid).id;
     }
 
     /**
@@ -33,7 +40,7 @@ class BotUser extends BaseModel {
      */
     async controlChar(force = true): Promise<ControlledCharacter> {
         if (force && this.controlled !== null) return this.controlled;
-        return this.call<ControlledCharacter>("controlChar");
+        return this.client.commands.misc.controlCharBot(this);
     }
 
     async release(): Promise<ControlledCharacter | null> {

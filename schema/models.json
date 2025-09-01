@@ -58,7 +58,8 @@
       },
       "type": {
         "type": "string",
-        "literal": "\"area\"",
+        "oneOf": ["area", "room"],
+        "ts": "LocationType",
         "description": "The type of the area child."
       }
     }
@@ -170,7 +171,7 @@
         "description": "The idle state of the character."
       },
       "lastAwake": {
-        "type": "number",
+        "type": "?number",
         "description": "The last awake timestamp of the character."
       },
       "name": { "type": "string", "description": "The name of the character." },
@@ -769,7 +770,7 @@
         "description": "The room the character is currently in."
       },
       "lastAwake": {
-        "type": "number",
+        "type": "?number",
         "description": "The timestamp when the character was last awake."
       },
       "name": { "type": "string", "description": "The name of the character." },
@@ -1342,7 +1343,7 @@
   },
   {
     "description": "A room script.",
-    "id": ["ROOMSCRIPT(core.roomscript.{id})"],
+    "id": ["ROOM_SCRIPT(core.roomscript.{id})"],
     "name": "RoomScript",
     "props": {
       "active": {
@@ -1370,7 +1371,7 @@
   },
   {
     "description": "A detailed room script.",
-    "id": ["ROOMSCRIPT_DETAILS(core.roomscript.{id}.details)"],
+    "id": ["ROOM_SCRIPT_DETAILS(core.roomscript.{id}.details)"],
     "name": "RoomScriptDetails",
     "props": {
       "active": {
@@ -1759,7 +1760,7 @@
   },
   {
     "description": "A notice. @TODO Have not been able to inspect a notice, so the rid and full properties are not known",
-    "id": ["NOTICE(notice)"],
+    "id": ["NOTICE(notice.notice.{id}.notice)"],
     "name": "Notice",
     "props": {
       "id": { "type": "string", "description": "The ID of the notice." },

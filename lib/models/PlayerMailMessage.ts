@@ -3,6 +3,7 @@ import MailUser from "./MailUser.js";
 import type WolferyJS from "../WolferyJS.js";
 import type { MailUserProperties, PlayerMailMessageProperties } from "../generated/models/types.js";
 import { PlayerMailMessageDefinition } from "../generated/models/definitions.js";
+import ResourceIDs from "../generated/ResourceIDs.js";
 import type { AnyObject, ResClient } from "resclient-ts";
 
 declare interface PlayerMailMessage extends BaseModel, PlayerMailMessageProperties {}
@@ -18,9 +19,24 @@ class PlayerMailMessage extends BaseModel implements PlayerMailMessageProperties
         super(client, api, rid, { definition: PlayerMailMessageDefinition });
     }
 
-    /** Delete this message. */
+    get id(): string {
+        return ResourceIDs.PLAYER_MAIL_MESSAGE.parts(this.rid).message;
+    }
+
+    /**
+     * Delete this message.
+     * @playerRequired
+     */
     async delete(): Promise<null> {
-        return this.call<null>("delete");
+        return this.client.commands.core.getPlayer().then(player => player.deleteMail(this.id));
+    }
+
+    /**
+     * Mark this message as read.
+     * @playerRequired
+     */
+    async markRead(): Promise<null> {
+        return this.client.commands.core.getPlayer().then(player => player.readMail(this.id));
     }
 
     override update(props: AnyObject, reset?: boolean): AnyObject | null {

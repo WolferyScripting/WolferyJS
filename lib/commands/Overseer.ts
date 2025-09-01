@@ -7,7 +7,7 @@ import { PublicPepper } from "../util/Constants.js";
 import type Character from "../models/Character.js";
 import { createHash, createHmac } from "node:crypto";
 
-export default class Overseer extends Base {
+export default class OverseerCommands extends Base {
     /**
      * Add a title to a user.
      * @param userId The ID of the user to add the title to.
@@ -134,7 +134,7 @@ export default class Overseer extends Base {
      * @overseerRoleRequired
      */
     async setConfig(options: Commands.Overseer.SetConfigOptions): Promise<unknown> {
-        return this.client.modules.core.getPlayer().then(player => player.call("setConfig", options));
+        return this.client.commands.core.getPlayer().then(player => player.call("setConfig", options));
     }
 
     /**
@@ -154,7 +154,7 @@ export default class Overseer extends Base {
      * @overseerRoleRequired
      */
     async transferChar(playerId: string, charId: string): Promise<Character> {
-        return this.client.modules.core.getPlayer().then(player => player.call<BasicCharacterResponse<"char">>("transferChar", { playerId, charId })
+        return this.client.commands.core.getPlayer().then(player => player.call<BasicCharacterResponse<"char">>("transferChar", { playerId, charId })
             .then(r => player.basicChar(r, "char")));
     }
 

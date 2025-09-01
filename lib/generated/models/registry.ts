@@ -121,8 +121,8 @@ export default function registerModels(client: WolferyJS, res: ResClient): void 
     res.registerModelType(ResourceIDs.ROOM_DETAILS({ id: "*" }), (api, rid) => new RoomDetails(client, api, rid));
     res.registerModelType(ResourceIDs.ROOM_INSTANCE_DETAILS({ instance: "*", room: "*" }), (api, rid) => new RoomInstanceDetails(client, api, rid));
     res.registerModelType(ResourceIDs.ROOM_PROFILE({ id: "*" }), (api, rid) => new RoomProfile(client, api, rid));
-    res.registerModelType(ResourceIDs.ROOMSCRIPT({ id: "*" }), (api, rid) => new RoomScript(client, api, rid));
-    res.registerModelType(ResourceIDs.ROOMSCRIPT_DETAILS({ id: "*" }), (api, rid) => new RoomScriptDetails(client, api, rid));
+    res.registerModelType(ResourceIDs.ROOM_SCRIPT({ id: "*" }), (api, rid) => new RoomScript(client, api, rid));
+    res.registerModelType(ResourceIDs.ROOM_SCRIPT_DETAILS({ id: "*" }), (api, rid) => new RoomScriptDetails(client, api, rid));
     res.registerModelType(ResourceIDs.TOKEN_USER({ id: "*" }), (api, rid) => new TokenUser(client, api, rid));
     res.registerModelType(ResourceIDs.SCRIPT_BINARY({ script: "*", binary: "*" }), (api, rid) => new ScriptBinary(client, api, rid));
     res.registerModelType(ResourceIDs.SCRIPT_LOG({ id: "*" }), (api, rid) => new ScriptLog(client, api, rid));
@@ -149,7 +149,7 @@ export default function registerModels(client: WolferyJS, res: ResClient): void 
     res.registerModelType(ResourceIDs.REPORT_INFO, (api, rid) => new ReportInfo(client, api, rid));
     res.registerModelType(ResourceIDs.SUPPORT_INFO, (api, rid) => new SupportInfo(client, api, rid));
     res.registerModelType(ResourceIDs.WEB_CLIENT_INFO, (api, rid) => new WebClientInfo(client, api, rid));
-    res.registerModelType(ResourceIDs.NOTICE, (api, rid) => new Notice(client, api, rid));
+    res.registerModelType(ResourceIDs.NOTICE({ id: "*" }), (api, rid) => new Notice(client, api, rid));
     res.registerModelType(ResourceIDs.TOKEN({ id: "*" }), (api, rid) => new Token(client, api, rid));
     res.registerModelType(ResourceIDs.BOT({ user: "*", bot: "*" }), (api, rid) => new Bot(client, api, rid));
     res.registerModelType(ResourceIDs.BOTS({ id: "*" }), (api, rid) => new Bots(client, api, rid));

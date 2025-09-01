@@ -68,11 +68,15 @@
       "syntaxKind": "modifier"
     },
     {
-      "tagName": "@BotRequired",
+      "tagName": "@playerRequired",
       "syntaxKind": "modifier"
     },
     {
-      "tagName": "@TokenRequired",
+      "tagName": "@botRequired",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@tokenRequired",
       "syntaxKind": "modifier"
     }
   ]

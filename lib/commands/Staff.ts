@@ -1,7 +1,7 @@
 import Base from "./Base.js";
 import type ControlledCharacter from "../models/ControlledCharacter.js";
 
-export default class Staff extends Base {
+export default class StaffCommands extends Base {
     /**
      * Force join a character.
      * @param ctrl The character to join with.
@@ -41,10 +41,10 @@ export default class Staff extends Base {
      * @staffRoleRequired
      */
     async setHelperChannel(ctrl: ControlledCharacter, flag: boolean): Promise<null> {
-        return this.client.modules.core.getPlayer().then(player => player.setCharSettings(ctrl.id, { puppeteerId: ctrl.puppeteer?.id, ishelping: flag }));
+        return this.client.commands.core.getPlayer().then(player => player.setCharSettings(ctrl.id, { puppeteerId: ctrl.puppeteer?.id, ishelping: flag }));
     }
 
     async setMain(charId: string | null): Promise<null> {
-        return this.client.modules.core.getPlayer().then(player => player.call("setPreference", { mainChar: charId ?? "" }));
+        return this.client.commands.core.getPlayer().then(player => player.call("setPreference", { mainChar: charId ?? "" }));
     }
 }

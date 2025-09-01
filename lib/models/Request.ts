@@ -35,7 +35,7 @@ class Request extends BaseModel implements RequestProperties {
 
     /** Accept this request. */
     async accept(): Promise<null> {
-        return this.client.modules.core.getPlayer().then(player => player.acceptRequest(this.id));
+        return this.client.commands.core.getPlayer().then(player => player.acceptRequest(this.id));
     }
 
     /** @internal */
@@ -45,12 +45,12 @@ class Request extends BaseModel implements RequestProperties {
 
     /** Reject this request. */
     async reject(): Promise<null> {
-        return this.client.modules.core.getPlayer().then(player => player.rejectRequest(this.id));
+        return this.client.commands.core.getPlayer().then(player => player.rejectRequest(this.id));
     }
 
     /** Revoke this request. */
     async revoke(): Promise<null> {
-        return this.client.modules.core.getPlayer().then(player => player.revokeRequest(this.id));
+        return this.client.commands.core.getPlayer().then(player => player.revokeRequest(this.id));
     }
 
     /** @internal */

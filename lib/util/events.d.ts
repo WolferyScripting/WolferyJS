@@ -23,7 +23,7 @@ import type Note from "../models/Note.ts";
 import type TagGroup from "../models/TagGroup.ts";
 import type RoomScript from "../models/RoomScript.ts";
 import type Notice from "../models/Notice.ts";
-import { type TagPref } from "../models/CharacterTags.ts";
+import type { TagPref } from "../util/types.ts";
 import type RoomDetails from "../models/RoomDetails.ts";
 import type AfarRoom from "../models/AfarRoom.ts";
 import type PlayerMailMessage from "../models/PlayerMailMessage.ts";

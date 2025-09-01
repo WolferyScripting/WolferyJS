@@ -5,7 +5,7 @@ import type OwnedRooms from "../collections/OwnedRooms.js";
 import { type BasicCharacterResponse, type CharacterType } from "../util/types.js";
 import type Character from "../models/Character.js";
 
-export default class Builder extends Base {
+export default class BuilderCommands extends Base {
     /**
      * Get a character's owned areas. Requires the builder role if you do not own the character.
      * @param charId The ID of the character to get the owned areas of.
@@ -31,7 +31,7 @@ export default class Builder extends Base {
      * @builderRoleRequired
      */
     async setCharType(charId: string, type: CharacterType): Promise<Character> {
-        return this.client.modules.core.getPlayer().then(player => player.call<BasicCharacterResponse<"char">>("setChar", { charId, type }).then(r => player.basicChar(r, "char")));
+        return this.client.commands.core.getPlayer().then(player => player.call<BasicCharacterResponse<"char">>("setChar", { charId, type }).then(r => player.basicChar(r, "char")));
     }
 
     /**
@@ -41,7 +41,7 @@ export default class Builder extends Base {
      * @builderRoleRequired
      */
     async undeleteArea(areaId: string, ownerId?: string): Promise<unknown> {
-        return this.client.modules.core.getPlayer().then(player => player.call("undeleteArea", { areaId, ownerId }));
+        return this.client.commands.core.getPlayer().then(player => player.call("undeleteArea", { areaId, ownerId }));
     }
 
     /**
@@ -52,7 +52,7 @@ export default class Builder extends Base {
      * @builderRoleRequired
      */
     async undeleteExit(exitId: string, keys?: Array<string>, ownerId?: string): Promise<unknown> {
-        return this.client.modules.core.getPlayer().then(player => player.call("undeleteExit", { exitId, keys, ownerId }));
+        return this.client.commands.core.getPlayer().then(player => player.call("undeleteExit", { exitId, keys, ownerId }));
     }
 
     /**
@@ -62,7 +62,7 @@ export default class Builder extends Base {
      * @builderRoleRequired
      */
     async undeleteRoom(roomId: string, ownerId?: string): Promise<unknown> {
-        return this.client.modules.core.getPlayer().then(player => player.call("undeleteRoom", { roomId, ownerId }));
+        return this.client.commands.core.getPlayer().then(player => player.call("undeleteRoom", { roomId, ownerId }));
     }
 
     // @TODO getDeletedAreaRooms, getDeletedCharAreas, getDeletedCharRooms, getDeletedRoomExits

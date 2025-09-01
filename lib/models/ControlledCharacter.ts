@@ -5,7 +5,6 @@ import BaseModel from "./BaseModel.js";
 import type Character from "./Character.js";
 import type Exit from "./Exit.js";
 import type RoomProfile from "./RoomProfile.js";
-import type RoomScript from "./RoomScript.js";
 import type OwnedCharacter from "./OwnedCharacter.js";
 import type Puppet from "./Puppet.js";
 import type RoomCharacter from "./RoomCharacter.js";
@@ -16,26 +15,26 @@ import type HiddenExits from "./HiddenExits.js";
 import type AreaDetails from "./AreaDetails.js";
 import type AreaChild from "./AreaChild.js";
 import type RoomChild from "./RoomChild.js";
+import type RoomScriptDetails from "./RoomScriptDetails.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
-import {
-    type KeyBasicResponse,
-    type BasicCharacterResponse,
-    type NameBasicResponse,
-    type DeleteNameResponse,
-    type Messages,
-    type PublicPopulationUpdate,
-    type AreaDetailsPopulationUpdate
+import type {
+    KeyBasicResponse,
+    NameBasicResponse,
+    DeleteNameResponse,
+    Messages,
+    PublicPopulationUpdate,
+    AreaDetailsPopulationUpdate,
+    LocationType,
+    TagPref
 } from "../util/types.js";
 import type WolferyJS from "../WolferyJS.js";
 import type Commands from "../util/commands.js";
-import ResEventObserver from "../util/ResEventObserver.js";
-import type { ControlledCharacterProperties } from "../generated/models/types.js";
+import type { ControlledCharacterProperties, Tag } from "../generated/models/types.js";
 import { ControlledCharacterDefinition } from "../generated/models/definitions.js";
 import { PING_DURATION } from "../util/Constants.js";
 import type RoomProfiles from "../collections/RoomProfiles.js";
 import type RoomScripts from "../collections/RoomScripts.js";
 import { kControlledCharacter } from "../util/Util.js";
-import { fileTypeFromBuffer } from "file-type";
 import { ResRef, type ResClient } from "resclient-ts";
 
 declare interface ControlledCharacter extends BaseModel, ControlledCharacterProperties {}
@@ -352,8 +351,8 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * Accept a control request for a character.
      * @param charId The ID of the character to accept control for.
      */
-    async acceptControl(charId: string): Promise<null> {
-        return this.call<null>("controlRequestAccept", { charId });
+    async acceptControlRequest(charId: string): Promise<null> {
+        return this.client.commands.controlled.controlRequestAccept(this, charId);
     }
 
     /**
@@ -361,16 +360,17 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param tagId The ID of the tag to add.
      * @param pref The preference for the tag.
      */
-    async addTag(tagId: string, pref: "like" | "dislike"): Promise<null> {
-        return this.tags.add(tagId, pref);
+    async addTag(tagId: string, pref: TagPref): Promise<null> {
+        return this.setTags({ [tagId]: pref });
     }
 
     /**
      * Add a new teleport node.
      * @param options The options for the teleport node.
+     * @roomOwnershipRequired
      */
-    async addTeleport(options: Commands.ControlledCharacter.AddTeleportOptions): Promise<null> {
-        return this.call<null>("addTeleport", options);
+    async addTeleport(options: Commands.Controlled.AddTeleportOptions): Promise<null> {
+        return this.client.commands.controlled.addTeleport(this, options);
     }
 
     /**
@@ -378,13 +378,13 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param charId The ID of the character to address.
      * @param options The options for addressing the character.
      */
-    async address(charId: string, options: Commands.ControlledCharacter.AddressOptions): Promise<null> {
-        return this.call<null>("address", { charId, ...options });
+    async address(charId: string, options: Commands.Controlled.AddressOptions): Promise<null> {
+        return this.client.commands.controlled.address(this, charId, options);
     }
 
     /** Set this character as away (afk). */
     async away(status?: string): Promise<null> {
-        return this.call<null>("away", { status });
+        return this.client.commands.controlled.away(this, status);
     }
 
     /**
@@ -393,8 +393,8 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @returns The profile.
      */
     async copyProfileAvatar(profileId: string): Promise<Profile> {
-        return this.call<Record<"profile", NameBasicResponse>>("copyProfileAvatar", { profileId })
-            .then(r => this.api.get<Profile>(ResourceIDs.PROFILE({ id: r.profile.id })));
+        return this.client.commands.controlled.copyProfileAvatar(this, profileId)
+            .then(r => this.profiles.getOrThrow(r.id));
     }
 
     /**
@@ -403,8 +403,8 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @returns The profile.
      */
     async copyProfileImage(profileId: string): Promise<Profile> {
-        return this.call<Record<"profile", NameBasicResponse>>("copyProfileImage", { profileId })
-            .then(r => this.api.get<Profile>(ResourceIDs.PROFILE({ id: r.profile.id })));
+        return this.client.commands.controlled.copyProfileImage(this, profileId)
+            .then(r => this.profiles.getOrThrow(r.id));
     }
 
     /**
@@ -412,7 +412,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param name The name of the area.
      */
     async createArea(name: string): Promise<Area> {
-        return this.call<NameBasicResponse>("createArea", { name })
+        return this.client.commands.controlled.createArea(this, name)
             .then(r => this.client.waitForCached<Area>(ResourceIDs.AREA({ id: r.id })));
     }
 
@@ -421,9 +421,10 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param name The name of the exit.
      * @param keys The keys to use to go through the exit.
      * @param targetRoom The ID of the room to go to. Provide `null` to create a new room.
+     * @roomOwnershipRequired
      */
     async createExit(name: string, keys: Array<string>, targetRoom: string | null): Promise<{ exit: Exit; targetRoom: Room; }> {
-        return this.call<Record<"exit" | "targetRoom", NameBasicResponse>>("createExit", { name, keys, targetRoom }).then(async r => {
+        return this.client.commands.controlled.createExit(this, name, keys, targetRoom).then(async r => {
             const [exit, room] = await Promise.all([this.client.waitForCached<Exit>(ResourceIDs.EXIT({ id: r.exit.id })), this.client.waitForCached<Room>(ResourceIDs.ROOM({ id: r.targetRoom.id }))]);
             return { exit, targetRoom: room };
         });
@@ -435,7 +436,8 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param key The key of the profile.
      */
     async createProfile(name: string, key: string): Promise<Profile> {
-        return this.call<Record<"profile", NameBasicResponse>>("createProfile", { name, key }).then(r => this.client.waitForCached<Profile>(ResourceIDs.PROFILE({ id: r.profile.id })));
+        return this.client.commands.controlled.createProfile(this, name, key)
+            .then(r => this.client.waitForCached<Profile>(ResourceIDs.PROFILE({ id: r.id })));
     }
 
     /**
@@ -443,100 +445,94 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param name The name of the room.
      */
     async createRoom(name: string): Promise<Room> {
-        return this.call<NameBasicResponse>("createRoom", { name }).then(r => this.client.waitForCached<Room>(ResourceIDs.ROOM({ id: r.id })));
+        return this.client.commands.controlled.createRoom(this, name)
+            .then(r => this.client.waitForCached<Room>(ResourceIDs.ROOM({ id: r.id })));
     }
 
     /**
-     * Create a room profile. You must own the room, and be present in it.
+     * Create a room profile. You must be present in the room.
      * @param name The name of the room profile.
      * @param key The key of the room profile.
+     * @roomOwnershipRequired
      */
     async createRoomProfile(name: string, key: string): Promise<RoomProfile> {
-        return this.call<Record<"profile", NameBasicResponse>>("createRoomProfile", { name, key }).then(r => this.client.waitForCached<RoomProfile>(ResourceIDs.ROOM_PROFILE({ id: r.profile.id })));
+        return this.client.commands.controlled.createRoomProfile(this, name, key)
+            .then(r => this.client.waitForCached<RoomProfile>(ResourceIDs.ROOM_PROFILE({ id: r.id })));
     }
 
     /**
      * Create a room script. It will be created in the room the character is located in.
      * @param key The key of the room script.
      * @param options The options for the room script.
+     * @roomOwnershipRequired
      */
-    async createRoomScript(key: string, options?: Commands.ControlledCharacter.CreateRoomScriptOptions): Promise<{ room: Room; script: RoomScript; }> {
-        return this.call<{ room: NameBasicResponse; script: KeyBasicResponse; }>("createRoomScript", { key, ...options }).then(async r => {
-            const [room, script] = await Promise.all([
-                this.api.get<Room>(ResourceIDs.ROOM({ id: r.room.id })),
-                this.api.get<RoomScript>(ResourceIDs.ROOMSCRIPT({ id: r.script.id }))
-            ]);
-            return { room, script };
-        });
+    async createRoomScript(key: string, options?: Commands.Controlled.CreateRoomScriptOptions): Promise<RoomScriptDetails> {
+        return this.client.commands.controlled.createRoomScript(this, key, options)
+            .then(async r => this.api.get<RoomScriptDetails>(ResourceIDs.ROOM_SCRIPT_DETAILS({ id: r.script.id })));
+    }
+
+    /**
+     * Create a custom tag.
+     * @param options The options for creating the tag.
+     */
+    async createTag(options: Commands.Controlled.CreateTagOptions): Promise<Tag> {
+        return this.client.commands.controlled.createTag(this, options);
     }
 
     /**
      * Delete an area.
      * @param areaId The ID of the area to delete.
+     * @areaOwnershipRequired
      */
-    async deleteArea(areaId: string): Promise<{ area: Area; response: DeleteNameResponse; }> {
-        const area = await this.api.get<Area>(ResourceIDs.AREA({ id: areaId }));
-        return this.call<DeleteNameResponse>("deleteArea", { areaId })
-            .then(r => ({ area, response: r }));
+    async deleteArea(areaId: string): Promise<DeleteNameResponse> {
+        return this.client.commands.controlled.deleteArea(this, areaId);
     }
 
     /**
      * Delete an exit.
      * @param exitId The ID of the exit to delete.
+     * @roomOwnershipRequired
      */
     async deleteExit(exitId: string): Promise<Exit> {
-        const exit = this.api.get<Exit>(ResourceIDs.EXIT({ id: exitId }));
-        return this.call<null>("deleteExit", { exitId }).then(() => exit);
-    }
-
-    /**
-     * Delete a mail message. You must be using the username/password authentication method to use this.
-     * @param messageId The ID of the message to delete.
-     */
-    async deleteMail(messageId: string): Promise<null> {
-        return this.client.modules.core.getPlayer().then(player =>
-            this.api.call<null>(ResourceIDs.PLAYER_MAIL_MESSAGE({ player: player.id, message: messageId }), "delete")
-        );
+        const exit = await this.getExit({ exitId });
+        return this.client.commands.controlled.deleteExit(this, exitId)
+            .then(() => exit);
     }
 
     /**
      * Delete a profile.
      * @param profileId The ID of the profile to delete.
      */
-    async deleteProfile(profileId: string): Promise<Profile> {
-        const profile = await this.api.get<Profile>(ResourceIDs.PROFILE({ id: profileId }));
-        return this.call<Record<"profile", NameBasicResponse>>("deleteProfile", { profileId })
-            .then(() => profile);
+    async deleteProfile(profileId: string): Promise<NameBasicResponse> {
+        return this.client.commands.controlled.deleteProfile(this, profileId);
     }
 
     /**
-     * Delete a room.
+     * Delete a room. You must be in the room.
      * @param roomId The ID of the room to delete.
+     * @roomOwnershipRequired
      */
-    async deleteRoom(roomId: string): Promise<Room> {
-        const room = await this.api.get<Room>(ResourceIDs.ROOM({ id: roomId }));
-        return this.call<null>("deleteRoom", { roomId })
-            .then(() => room);
+    async deleteRoom(roomId: string): Promise<null> {
+        return this.client.commands.controlled.deleteRoom(this, roomId);
     }
 
     /**
      * Delete a room profile. You must own the room, and be present in it.
      * @param profileId The ID of the room profile to delete.
+     * @roomOwnershipRequired
      */
-    async deleteRoomProfile(profileId: string): Promise<Record<"profile", NameBasicResponse>> {
-        return this.call<Record<"profile", NameBasicResponse>>("deleteRoomProfile", { profileId });
+    async deleteRoomProfile(profileId: string): Promise<NameBasicResponse> {
+        return this.client.commands.controlled.deleteRoomProfile(this, profileId);
     }
 
     /**
      * Delete a room script. You must own the room, and be present in it.
      * @param scriptId The ID of the room script to delete.
+     * @roomOwnershipRequired
      */
-    async deleteRoomScript(scriptId: string): Promise<{ room: Room; script: RoomScript | KeyBasicResponse; }> {
-        return this.call<{ room: NameBasicResponse; script: KeyBasicResponse; }>("deleteRoomScript", { scriptId }).then(async r => {
-            const room = await this.api.get<Room>(ResourceIDs.ROOM({ id: r.room.id }));
-            const script = this.api.getCached<RoomScript>(ResourceIDs.ROOMSCRIPT({ id: r.script.id })) ?? r.script;
-            return { room, script };
-        });
+    async deleteRoomScript(scriptId: string): Promise<KeyBasicResponse> {
+        return this.client.commands.controlled.deleteRoomScript(this, scriptId)
+            .then(r => r.script);
     }
 
     /**
@@ -544,27 +540,29 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param msg The message.
      */
     async describe(msg: string): Promise<null> {
-        return this.call<null>("describe", { msg });
+        return this.client.commands.controlled.describe(this, msg);
     }
 
     /**
      * Evict a character from their teleport nodes or home for the current room.
      * @param charId The ID of the character to evict.
      * @returns The evicted character.
+     * @roomOwnershipRequired
      */
     async evict(charId: string): Promise<Character> {
-        return this.call<BasicCharacterResponse<"targetChar">>("evict", { charId })
-            .then(r => this.api.get<Character>(ResourceIDs.CHARACTER({ id: r.targetChar.id })));
+        return this.client.commands.controlled.evict(this, charId)
+            .then(r => this.api.get<Character>(ResourceIDs.CHARACTER({ id: r.id })));
     }
 
     /**
      * Evict a character from their home in the current room.
      * @param charId The ID of the character to evict.
      * @returns The evicted character.
+     * @roomOwnershipRequired
      */
     async evictHome(charId: string): Promise<Character> {
-        return this.call<BasicCharacterResponse<"char">>("evictHome", { charId })
-            .then(r => this.api.get<Character>(ResourceIDs.CHARACTER({ id: r.char.id })));
+        return this.client.commands.controlled.evictHome(this, charId)
+            .then(r => this.api.get<Character>(ResourceIDs.CHARACTER({ id: r.id })));
     }
 
     /**
@@ -574,7 +572,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @returns The evicted character and puppet.
      */
     async evictPuppeteer(charId: string, puppetId: string): Promise<{ char: Character; puppet: Character; }> {
-        return this.call<BasicCharacterResponse<"char"> & BasicCharacterResponse<"puppet">>("evictPuppeteer", { charId, puppetId })
+        return this.client.commands.controlled.evictPuppeteer(this, charId, puppetId)
             .then(async r => {
                 const [char, puppet] = await Promise.all([
                     this.api.get<Character>(ResourceIDs.CHARACTER({ id: r.char.id })),
@@ -588,23 +586,11 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * Evict a character from their teleport node.
      * @param charId The ID of the character to evict.
      * @returns The evicted character.
+     * @roomOwnershipRequired
      */
     async evictTeleport(charId: string): Promise<Character> {
-        return this.call<BasicCharacterResponse<"char">>("evictTeleport", { charId })
-            .then(r => this.api.get<Character>(ResourceIDs.CHARACTER({ id: r.char.id })));
-    }
-
-    /**
-     * Focus a character.
-     * Focus a character.
-     * @param targetId The ID of the character to focus.
-     * @param options The options for focusing the character.
-     * @returns The focused character.
-     */
-    async focusChar(targetId: string, options: Omit<Commands.Player.FocusCharOptions, "targetId">): Promise<Character> {
-        return this.client.modules.core.getPlayer().then(player =>
-            player.focusChar(this.id, { targetId, ...options })
-        );
+        return this.client.commands.controlled.evictTeleport(this, charId)
+            .then(r => this.api.get<Character>(ResourceIDs.CHARACTER({ id: r.id })));
     }
 
     /**
@@ -612,7 +598,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param charId The ID of the character to follow.
      */
     async follow(charId: string): Promise<null> {
-        return this.call<null>("follow", { charId });
+        return this.client.commands.controlled.follow(this, charId);
     }
 
     /**
@@ -620,7 +606,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @returns The character.
      */
     async getChar(): Promise<Character> {
-        return this.api.get<Character>(ResourceIDs.CHARACTER({ id: this.id }));
+        return this.client.commands.misc.getChar(this.id);
     }
 
     /**
@@ -628,12 +614,17 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param options The options for getting the exit.
      * @returns The exit.
      */
-    async getExit(options: Commands.ControlledCharacter.GetExitOptions): Promise<Exit> {
-        return this.call<Exit>("getExit", options);
+    async getExit(options: Commands.Controlled.GetExitOptions): Promise<Exit> {
+        return this.client.commands.controlled.getExit(this, options);
     }
 
+    /**
+     * Get the log events for this character.
+     * @param startTime The timestamp to get log events after
+     * @returns The log events.
+     */
     async getLogEvents(startTime?: number): Promise<Commands.LogEvents> {
-        return this.api.call<Commands.LogEvents>("log.events", "get", { charId: this.id, startTime });
+        return this.client.commands.controlled.getLogEvents(this, startTime);
     }
 
     /**
@@ -646,19 +637,19 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
 
     /**
      * Get the puppet for this controlled character. If the character is not a puppet, use {@link getOwnedChar} instead.
-     * @returns The controlled puppet.
+     * @returns The puppet.
+     * @playerRequired
      */
     async getPuppet(): Promise<Puppet> {
-        const { char, puppet } = ResourceIDs.CONTROLLED_PUPPET.parts(this.rid);
-        return this.api.get<Puppet>(ResourceIDs.PUPPET({ char, puppet }));
+        return this.client.commands.core.getPlayer().then(player => player.puppets.fetch(this.puppeteer!.id, this.id));
     }
 
     /**
      * Get the room character for this controlled character.
-     * @returns The room character.
+     * @returns The room character, or null if the room is dark.
      */
-    async getRoomChar(): Promise<RoomCharacter> {
-        return this.api.get<RoomCharacter>(ResourceIDs.ROOM_CHARACTER({ id: this.id }));
+    getRoomChar(): RoomCharacter | null {
+        return this.inRoom.chars?.get(this.id) ?? null;
     }
 
     /**
@@ -666,7 +657,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param msg The message.
      */
     async helpme(msg: string): Promise<null> {
-        return this.call<null>("helpme", { msg });
+        return this.client.commands.controlled.helpme(this, msg);
     }
 
     /**
@@ -674,7 +665,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param charId The ID of the character to join.
      */
     async join(charId: string): Promise<null> {
-        return this.call<null>("join", { charId });
+        return this.client.commands.controlled.join(this, charId);
     }
 
     /**
@@ -682,7 +673,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param charId The ID of the character to lead.
      */
     async lead(charId: string): Promise<null> {
-        return this.call<null>("lead", { charId });
+        return this.client.commands.controlled.lead(this, charId);
     }
 
     /**
@@ -691,10 +682,10 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      */
     async lfrp(msg?: string): Promise<null> {
         if (msg) {
-            await this.client.modules.core.getPlayer().then(player => player.setCharSettings(this.id, { lfrpDesc: msg }));
+            await this.client.commands.core.getPlayer().then(player => player.setCharSettings(this.id, { lfrpDesc: msg }));
         }
 
-        return this.call<null>("set", { rp: "lfrp" });
+        return this.set({ rp: "lfrp" });
     }
 
 
@@ -703,16 +694,19 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param charId The ID of the character to look at.
      */
     async look(charId: string): Promise<null> {
-        return this.call<null>("look", { charId });
+        return this.client.commands.controlled.look(this, charId);
     }
 
     /**
-     * Send a mail to a character. You must be using the username/password authentication method to use this.
+     * Send a mail to a character.
      * @param toCharId The ID of the character to send the mail to.
      * @param options The options for the mail.
+     * @playerRequired
      */
-    async mail(toCharId: string, options: Commands.Inbox.SendOptions): Promise<Character> {
-        return this.client.modules.core.getPlayer().then(player => player.getInbox()).then(inbox => inbox.send(this.id, toCharId, options));
+    async mail(toCharId: string, options: Commands.Player.MailOptions): Promise<Character> {
+        return this.client.commands.core.getPlayer()
+            .then(player => this.client.commands.player.mail(player.id, this.id, toCharId, options))
+            .then(r => this.api.get<Character>(ResourceIDs.CHARACTER({ id: r.id })));
     }
 
     /**
@@ -720,8 +714,8 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param charId The ID of the character to send the message to.
      * @param options The options for sending the message.
      */
-    async message(charId: string, options: Commands.ControlledCharacter.MessageOptions): Promise<null> {
-        return this.call<null>("message", { charId, ...options });
+    async message(charId: string, options: Commands.Controlled.MessageOptions): Promise<null> {
+        return this.client.commands.controlled.message(this, charId, options);
     }
 
     /**
@@ -736,30 +730,21 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * Send an OOC message.
      * @param options The options for the OOC message.
      */
-    async ooc(options: Commands.ControlledCharacter.OOCOptions): Promise<null> {
-        return this.call<null>("ooc", options);
+    async ooc(options: Commands.Controlled.OOCOptions): Promise<null> {
+        return this.client.commands.controlled.ooc(this, options);
     }
 
     /** Send a ping to avoid being released for inactivity. */
     async ping(): Promise<null> {
-        return this.call<null>("ping");
+        return this.client.commands.controlled.ping(this);
     }
 
     /**
      * Send a pose message.
-     * @param msg The message to send.
+     * @param options The options for the pose message.
      */
-    async pose(msg: string): Promise<null> {
-        return this.call<null>("pose", { msg });
-    }
-
-    /**
-     * Mark a mail message as read. You must be using the username/password authentication method to use this.
-     */
-    async readMail(message: string): Promise<null> {
-        return this.client.modules.core.getPlayer().then(player =>
-            this.api.call<null>(ResourceIDs.PLAYER_MAIL_MESSAGE({ player: player.id, message }), "read")
-        );
+    async pose(options: Commands.Controlled.PoseOptions): Promise<null> {
+        return this.client.commands.controlled.pose(this, options);
     }
 
     /**
@@ -767,7 +752,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param charId The ID of the character to register as a puppet.
      */
     async registerPuppet(charId: string): Promise<null> {
-        return this.call<null>("registerPuppet", { charId });
+        return this.client.commands.controlled.registerPuppet(this, charId);
     }
 
     /**
@@ -775,8 +760,8 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param charId The ID of the character to reject control of.
      * @param msg An optional message to include with the rejection.
      */
-    async rejectControl(charId: string, msg?: string): Promise<null> {
-        return this.call<null>("controlRequestReject", { charId, msg });
+    async rejectControlRequest(charId: string, msg?: string): Promise<null> {
+        return this.client.commands.controlled.controlRequestReject(this, charId, msg);
     }
 
     /**
@@ -784,7 +769,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param msg A release message to show.
      */
     async release(msg?: string): Promise<null> {
-        return this.call<null>("release", { msg });
+        return this.client.commands.controlled.release(this, msg);
     }
 
     /**
@@ -792,8 +777,8 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param locationId The ID of the location to remove.
      * @param type The type of the location.
      */
-    async removeLocation(locationId: string, type: "area" | "room"): Promise<null> {
-        return this.call<null>("removeLocation", { locationId, type });
+    async removeLocation(locationId: string, type: LocationType): Promise<null> {
+        return this.client.commands.controlled.removeLocation(this, locationId, type);
     }
 
     /**
@@ -801,7 +786,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param tagId The ID of the tag to remove.
      */
     async removeTag(tagId: string): Promise<null> {
-        return this.tags.remove(tagId);
+        return this.setTags({ [tagId]: null });
     }
 
     /**
@@ -809,7 +794,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param nodeId The ID of the node to remove.
      */
     async removeTeleport(nodeId: string): Promise<null> {
-        return this.call<null>("removeTeleport", { nodeId });
+        return this.client.commands.controlled.removeTeleport(this, nodeId);
     }
 
     /**
@@ -817,9 +802,18 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param name The name of the exit.
      * @param keys The keys to use for the exit.
      * @param targetRoom The ID of the room the exit leads to
+     * @roomOwnershipRequired
      */
-    async requestCreateExit(name: string, keys: Array<string>, targetRoom: string): Promise<Record<"exit" | "targetRoom", NameBasicResponse>> {
-        return this.call<Record<"exit" | "targetRoom", NameBasicResponse>>("requestCreateExit", { name, keys, targetRoom });
+    async requestCreateExit(name: string, keys: Array<string>, targetRoom: string): Promise<{ exit: Exit; room: Room; }> {
+        return this.client.commands.controlled.requestCreateExit(this, { name, keys, targetRoom })
+            .then(async r => {
+                const [exit, room] = await Promise.all([
+                    this.api.get<Exit>(ResourceIDs.EXIT({ id: r.exit.id })),
+                    this.api.get<Room>(ResourceIDs.ROOM({ id: r.targetRoom.id }))
+                ]);
+
+                return { exit, room };
+            });
     }
 
     /**
@@ -827,43 +821,53 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param areaId The ID of the area to change ownership of.
      * @param charId The ID of the character to set as the new owner.
      * @returns The new owner character.
+     * @areaOwnershipRequired
      */
     async requestSetAreaOwner(areaId: string, charId: string): Promise<Character> {
-        return this.call<BasicCharacterResponse<"newOwner">>("requestSetAreaOwner", { areaId, charId })
-            .then(r => this.api.get<Character>(ResourceIDs.CHARACTER({ id: r.newOwner.id })));
+        return this.client.commands.controlled.requestSetAreaOwner(this, areaId, charId)
+            .then(r => this.api.get<Character>(ResourceIDs.CHARACTER({ id: r.id })));
     }
 
     /**
      * Request to set the parent of an area.
      * @param areaId The ID of the area to change the parent of.
      * @param parentId The ID of the area to set as the new parent.
+     * @areaOwnershipRequired
      */
     async requestSetAreaParent(areaId: string, parentId: string): Promise<null> {
-        return this.call<null>("requestSetAreaParent", { areaId, parentId });
+        return this.client.commands.controlled.requestSetAreaParent(this, areaId, parentId);
     }
 
     /**
      * Request to set a room.
      * @param roomId The ID of the room to set.
      * @param options The options to set.
-     * @returns The updated room.
+     * @roomOwnershipRequired
      */
-    async requestSetRoom(roomId: string, options: Commands.ControlledCharacter.RequestSetRoomOptions): Promise<null> {
-        return this.call<null>("requestSetRoom", { roomId, ...options });
+    async requestSetRoom(roomId: string, options: Commands.Controlled.RequestSetRoomOptions): Promise<null> {
+        return this.client.commands.controlled.requestSetRoom(this, roomId, options);
     }
 
     /**
      * Request to set the area of a room.
      * @param roomId The ID of the room to set.
      * @param areaId The ID of the area to set.
+     * @roomOwnershipRequired
      */
     async requestSetRoomArea(roomId: string, areaId: string): Promise<null> {
         return this.requestSetRoom(roomId, { areaId });
     }
 
+    /**
+     * Request to the the owner of a room.
+     * @param roomId The ID of the room.
+     * @param charId The ID of the new owner.
+     * @returns The new owner.
+     * @roomOwnershipRequired
+     */
     async requestSetRoomOwner(roomId: string, charId: string): Promise<Character> {
-        return this.call<BasicCharacterResponse<"newOwner">>("requestSetRoomOwner", { roomId, charId })
-            .then(r => this.api.get<Character>(ResourceIDs.CHARACTER({ id: r.newOwner.id })));
+        return this.client.commands.controlled.requestSetRoomOwner(this, roomId, charId)
+            .then(r => this.api.get<Character>(ResourceIDs.CHARACTER({ id: r.id })));
     }
 
     /**
@@ -872,24 +876,13 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param quiet If true, the roll will not be announced in the room.
      */
     async roll(roll: number | [amount: number, sides: number] | string, quiet = false): Promise<Messages.Roll> {
-        const observer = new ResEventObserver<Messages.Roll>(this.client, this.rid, "out", { once: true, filter: (data): boolean => data.type === "roll" && data.char.id === this.id });
-        if (typeof roll === "number") {
-            roll = `1d${roll}`;
-        } else if (Array.isArray(roll)) {
-            roll = `${roll[0]}d${roll[1]}`;
-        }
-        const now = Date.now();
-        return this.api.call<null>(ResourceIDs.ROLLER({ id: this.id }), "roll", { roll, quiet })
-            .then(() => observer.get(500).catch(async() => {
-                observer.end();
-                const logs = await this.getLogEvents(now);
-                return logs.events.find(l => l.type === "roll" && l.char.id === this.id) as Messages.Roll;
-            }));
+        return this.client.commands.controlled.roll(this, roll, quiet);
     }
 
     /**
      * Teleport to a room. You must own the room.
      * @param roomId The ID of the room to teleport to.
+     * @roomOwnershipRequired
      */
     async roomTeleport(roomId: string): Promise<null> {
         return this.teleport({ roomId });
@@ -900,15 +893,15 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param msg The message to send.
      */
     async say(msg: string): Promise<null> {
-        return this.call<null>("say", { msg });
+        return this.client.commands.controlled.say(this, msg);
     }
 
     /**
      * Set options for this character.
      * @param options The options to set.
      */
-    async set(options: Commands.ControlledCharacter.SetOptions): Promise<null> {
-        return this.call<null>("set", options);
+    async set(options: Commands.Controlled.SetCharacterOptions): Promise<null> {
+        return this.client.commands.controlled.setCharacter(this, options);
     }
 
     /**
@@ -916,14 +909,15 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param areaId The ID of the area to set.
      * @param options The options to set.
      * @returns The area.
+     * @areaOwnershipRequired
      */
-    async setArea(areaId: string, options: Commands.ControlledCharacter.SetAreaOptions): Promise<null> {
+    async setArea(areaId: string, options: Commands.Controlled.SetAreaOptions): Promise<null> {
         // https://github.com/mucklet/mucklet-client/blob/8a0bc7c8e6b8e56c731ba0229116cfbfc1eae824/src/client/modules/main/commands/setArea/SetArea.js#L163-L164
         if (options.parentId === null) {
             delete options.parentId;
             await this.removeLocation(areaId, "area");
         }
-        return this.call<null>("setArea", { areaId, ...options });
+        return this.client.commands.controlled.setArea(this, areaId, options);
     }
 
     /**
@@ -931,35 +925,39 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param areaId The ID of the area to.
      * @param charId The ID of the character to set as owner.
      * @returns The new owner character.
+     * @areaOwnershipRequired
+     * @builderRoleRequired Unless you own the target character.
      */
     async setAreaOwner(areaId: string, charId: string): Promise<Character> {
-        return this.call<BasicCharacterResponse<"newOwner">>("setAreaOwner", { areaId, charId })
-            .then(r => this.api.get<Character>(ResourceIDs.CHARACTER({ id: r.newOwner.id })));
+        return this.client.commands.controlled.setAreaOwner(this, areaId, charId)
+            .then(r => this.api.get<Character>(ResourceIDs.CHARACTER({ id: r.id })));
     }
 
     /**
      * Set options for an exit. You must own the room, and be present in it.
      * @param exitId The ID of the exit.
      * @param options The options to set.
+     * @roomOwnershipRequired
      */
-    async setExit(exitId: string, options: Commands.ControlledCharacter.SetExitOptions): Promise<null> {
-        return this.call<null>("setExit", { exitId, ...options });
+    async setExit(exitId: string, options: Commands.Controlled.SetExitOptions): Promise<null> {
+        return this.client.commands.controlled.setExit(this, exitId, options);
     }
 
     /**
      * Set the order of an exit.
      * @param exitId The ID of the exit.
      * @param order The new order of the exit.
+     * @roomOwnershipRequired
      */
     async setExitOrder(exitId: string, order: number): Promise<null> {
-        return this.call<null>("setExitOrder", { exitId, order });
+        return this.client.commands.controlled.setExitOrder(this, exitId, order);
     }
 
     /**
      * Set your home to your current room.
      */
     async setHome(): Promise<null> {
-        return this.call<null>("setHome");
+        return this.client.commands.controlled.setHome(this);
     }
 
     /**
@@ -968,8 +966,8 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param type The type of the location.
      * @param options The options to set.
      */
-    async setLocation(locationId: string, type: "area" | "room", options: Commands.ControlledCharacter.SetLocation): Promise<null> {
-        return this.call<null>("setLocation", { locationId, type, ...options });
+    async setLocation(locationId: string, type: LocationType, options: Commands.Controlled.SetLocation): Promise<null> {
+        return this.client.commands.controlled.setLocation(this, locationId, type, options);
     }
 
     /**
@@ -978,34 +976,34 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param options The options to set.
      * @returns The profile.
      */
-    async setProfile(profileId: string, options: Commands.ControlledCharacter.SetProfileOptions): Promise<Profile> {
-        return this.call<Record<"profile", NameBasicResponse>>("setProfile", { profileId, ...options })
-            .then(r => this.api.get<Profile>(ResourceIDs.PROFILE({ id: r.profile.id })));
+    async setProfile(profileId: string, options: Commands.Controlled.SetProfileOptions): Promise<Profile> {
+        return this.client.commands.controlled.setProfile(this, profileId, options)
+            .then(r => this.profiles.fetch(r.id));
     }
 
     /**
-     * Copy this character's image to the puppet.
-     * @param puppetId The ID of the puppet to copy the image to.
+     * Set options for a puppet.
+     * @param puppetId The ID of the puppet.
      * @param options The options to set.
      * @returns The puppet.
      */
-    async setPuppet(puppetId: string, options: Commands.ControlledCharacter.SetPuppetOptions): Promise<null> {
-        // response unconfirmed
-        return this.call<null>("setPuppet", { puppetId, ...options });
+    async setPuppet(puppetId: string, options: Commands.Controlled.SetPuppetOptions): Promise<null> {
+        return this.client.commands.controlled.setPuppet(this, puppetId, options);
     }
 
     /**
      * Set options for a room.
      * @param roomId The ID of the room to set.
      * @param options The options to set.
+     * @roomOwnershipRequired
      */
-    async setRoom(roomId: string, options: Commands.ControlledCharacter.SetRoomOptions): Promise<null> {
+    async setRoom(roomId: string, options: Commands.Controlled.SetRoomOptions): Promise<null> {
         // https://github.com/mucklet/mucklet-client/blob/8a0bc7c8e6b8e56c731ba0229116cfbfc1eae824/src/client/modules/main/commands/setRoom/SetRoom.js#L183-L184
         if (options.areaId === null) {
             delete options.areaId;
             await this.removeLocation(roomId, "room");
         }
-        return this.call<null>("setRoom", { roomId, ...options });
+        return this.client.commands.controlled.setRoom(this, roomId, options);
     }
 
     /**
@@ -1013,46 +1011,49 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param roomId The ID of the room to set.
      * @param charId The ID of the character to set as owner.
      * @returns The new owner character.
+     * @roomOwnershipRequired
+     * @builderRoleRequired Unless you own the target character.
      */
     async setRoomOwner(roomId: string, charId: string): Promise<Character> {
-        return this.call<BasicCharacterResponse<"newOwner">>("setRoomOwner", { roomId, charId })
-            .then(r => this.api.get<Character>(ResourceIDs.CHARACTER({ id: r.newOwner.id })));
+        return this.client.commands.controlled.setRoomOwner(this, roomId, charId)
+            .then(r => this.api.get<Character>(ResourceIDs.CHARACTER({ id: r.id })));
     }
 
     /**
      * Set options for a room profile.
      * @param profileId The ID of the room profile.
      * @param options The options to set.
+     * @roomOwnershipRequired
      */
-    async setRoomProfile(profileId: string, options: Commands.ControlledCharacter.SetRoomProfileOptions): Promise<Record<"profile", NameBasicResponse>>  {
-        return this.call<Record<"profile", NameBasicResponse>>("setRoomProfile", { profileId, ...options });
+    async setRoomProfile(profileId: string, options: Commands.Controlled.SetRoomProfileOptions): Promise<NameBasicResponse>  {
+        return this.client.commands.controlled.setRoomProfile(this, profileId, options);
     }
 
     /**
      * Set a room profile image.
      * @param profileId The ID of the room profile.
      * @param image The image to set. Either a fully qualified base64 url, or a buffer.
+     * @roomOwnershipRequired
      */
     async setRoomProfileImage(profileId: string, image: string | Buffer): Promise<null> {
-        if (Buffer.isBuffer(image)) {
-            image = `data:${(await fileTypeFromBuffer(image))?.mime ?? "application/octet-stream"};base64,${image.toString("base64")}`;
-        }
-        return this.call<null>("setRoomProfileImage", { profileId, dataUrl: image });
+        return this.client.commands.controlled.setRoomProfileImage(this, profileId, image);
     }
 
     /**
      * Set options for a room script.
      * @param scriptId The ID of the script to set.
      * @param options The options to set.
+     * @roomOwnershipRequired
      */
-    async setRoomScript(scriptId: string, options?: Commands.ControlledCharacter.SetRoomScriptOptions): Promise<{ room: Room; script: RoomScript; }> {
-        return this.call<{ room: NameBasicResponse; script: KeyBasicResponse; }>("setRoomScript", { scriptId, ...options }).then(async r => {
-            const [room, script] = await Promise.all([
-                this.api.get<Room>(ResourceIDs.ROOM({ id: r.room.id })),
-                this.api.get<RoomScript>(ResourceIDs.ROOMSCRIPT({ id: r.script.id }))
-            ]);
-            return { room, script };
-        });
+    async setRoomScript(scriptId: string, options: Commands.Controlled.SetRoomScriptOptions): Promise<{ room: Room; script: RoomScriptDetails; }> {
+        return this.client.commands.controlled.setRoomScript(this, scriptId, options)
+            .then(async r => {
+                const [room, script] = await Promise.all([
+                    this.api.get<Room>(ResourceIDs.ROOM({ id: r.room.id })),
+                    this.api.get<RoomScriptDetails>(ResourceIDs.ROOM_SCRIPT_DETAILS({ id: r.script.id }))
+                ]);
+                return { room, script };
+            });
     }
 
     /**
@@ -1060,16 +1061,24 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param status The status message.
      */
     async setStatus(status: string): Promise<null> {
-        return this.call<null>("set", { status });
+        return this.set({ status });
     }
 
     /**
-     * Set a teleport node key.
+     * Set tags for this character.
+     * @param tags A key-value object of id to preference or null.
+     */
+    async setTags(tags: Record<string, TagPref | null>): Promise<null> {
+        return this.client.commands.controlled.setTags(this, tags);
+    }
+
+    /**
+     * Set a teleport node.
      * @param nodeId The ID of the node.
      * @param options The options for the teleport node.
      */
-    async setTeleport(nodeId: string, options: Commands.ControlledCharacter.SetTeleportOptions): Promise<null> {
-        return this.call<null>("setTeleport", { nodeId, ...options });
+    async setTeleport(nodeId: string, options: Commands.Controlled.SetTeleportOptions): Promise<null> {
+        return this.client.commands.controlled.setTeleport(this, nodeId, options);
     }
 
     /**
@@ -1085,20 +1094,20 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * Stop following a character.
      */
     async stopFollow(): Promise<null> {
-        return this.call<null>("stopFollow");
+        return this.client.commands.controlled.stopFollow(this);
     }
 
     /**
      * Stop leading a character.
-     * @param charID The ID of the character to stop leading. If not provided, stops leading all characters.
+     * @param charId The ID of the character to stop leading. If not provided, stops leading all characters.
      */
-    async stopLead(charID?: string): Promise<null> {
-        return this.call<null>("stopLead", { charID });
+    async stopLead(charId?: string): Promise<null> {
+        return this.client.commands.controlled.stopLead(this, charId);
     }
 
     /** Stop LFRP status. */
     async stopLfrp(): Promise<null> {
-        return this.call<null>("set", { rp: "" });
+        return this.set({ rp: "" });
     }
 
     /**
@@ -1106,7 +1115,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param charId The ID of the character to summon.
      */
     async summon(charId: string): Promise<null> {
-        return this.call<null>("summon", { charId });
+        return this.client.commands.controlled.summon(this, charId);
     }
 
     /**
@@ -1114,7 +1123,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param charId The ID of a specific character to sweep. You must own the room.
      */
     async sweep(charId?: string): Promise<null> {
-        return this.call<null>("sweep", { charId });
+        return this.client.commands.controlled.sweep(this, charId);
     }
 
     /**
@@ -1130,6 +1139,7 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * Sync a room with its current details.
      * @note Alias of {@link updateRoomProfile}
      * @param profileId The ID of the room to sync.
+     * @roomOwnershipRequired
      */
     async syncRoomProfile(profileId: string): Promise<null> {
         return this.updateRoomProfile(profileId);
@@ -1139,15 +1149,15 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * Teleport.
      * @param options The options for teleporting.
      */
-    async teleport(options: Commands.ControlledCharacter.TeleportOptions): Promise<null> {
-        return this.call<null>("teleport", options);
+    async teleport(options: Commands.Controlled.TeleportOptions): Promise<null> {
+        return this.client.commands.controlled.teleport(this, options);
     }
 
     /**
      * Teleport to your home.
      */
     async teleportHome(): Promise<null> {
-        return this.call<null>("teleportHome");
+        return this.client.commands.controlled.teleportHome(this);
     }
 
     /**
@@ -1162,41 +1172,45 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      * @param profileId The ID of the profile to sync.
      */
     async updateProfile(profileId: string): Promise<null> {
-        return this.call<null>("updateProfile", { profileId });
+        return this.client.commands.controlled.updateProfile(this, profileId);
     }
 
     /**
      * Sync a room with its current details.
      * @param profileId The ID of the room to sync.
+     * @roomOwnershipRequired
      */
     async updateRoomProfile(profileId: string): Promise<null> {
-        return this.call<null>("updateRoomProfile", { profileId });
+        return this.client.commands.controlled.updateRoomProfile(this, profileId);
     }
 
     /**
      * Use an exit.
-     * @param exitId The ID of the exit to use.
+     * @param options The options for the exit to use.
      */
-    async useExit(exitId: string): Promise<null> {
-        return this.call<null>("useExit", { exitId });
+    async useExit(options: Commands.Controlled.UseExitOptions): Promise<null> {
+        return this.client.commands.controlled.useExit(this, options);
     }
 
     /**
      * Apply a profile.
      * @param profileId The ID of the profile to use.
-     * @param safe If a check should be made to ensure the character info is stored in a profile.
+     * @param safe If a check should be made to ensure the current character info is stored in a profile.
      */
-    async useProfile(profileId: string, safe = true): Promise<Record<"profile", NameBasicResponse>> {
-        return this.call<Record<"profile", NameBasicResponse>>("useProfile", { profileId, safe });
+    async useProfile(profileId: string, safe = true): Promise<Profile> {
+        return this.client.commands.controlled.useProfile(this, profileId, safe)
+            .then(r => this.profiles.fetch(r.id));
     }
 
     /**
      * Apply a room profile. You must own the room and be in it.
      * @param profileId The ID of the room profile to use.
      * @param safe If a check should be made to ensure the current room info is stored in a profile.
+     * @roomOwnershipRequired
      */
-    async useRoomProfile(profileId: string, safe = true): Promise<Record<"profile", NameBasicResponse>> {
-        return this.call<Record<"profile", NameBasicResponse>>("useRoomProfile", { profileId, safe });
+    async useRoomProfile(profileId: string, safe = true): Promise<RoomProfile> {
+        return this.client.commands.controlled.useRoomProfile(this, profileId, safe)
+            .then(r => this.api.get<RoomProfile>(ResourceIDs.ROOM_PROFILE({ id: r.id })));
     }
 
     /**
@@ -1206,16 +1220,16 @@ class ControlledCharacter extends BaseModel implements ControlledCharacterProper
      */
     async wakeup(hidden?: boolean, force = false): Promise<null> {
         if (force && this.state === "awake") return null;
-        return this.call<null>("wakeup", { hidden });
+        return this.client.commands.controlled.wakeup(this, hidden);
     }
 
     /**
      * Send a whisper to a character. You must be in the same room as them.
-     * @param charId The ID of the character to whisper to.
+     * @param charId The ID of the character to whisper to.-
      * @param options The options for the whisper.
      */
-    async whisper(charId: string, options: Commands.ControlledCharacter.WhisperOptions): Promise<null> {
-        return this.call<null>("whisper", { charId, ...options });
+    async whisper(charId: string, options: Commands.Controlled.WhisperOptions): Promise<null> {
+        return this.client.commands.controlled.whisper(this, charId, options);
     }
 }
 

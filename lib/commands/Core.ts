@@ -21,7 +21,7 @@ import { kEvents } from "../util/Util.js";
 import { Properties } from "resclient-ts";
 
 /** Core classes/calls that don't require any id input */
-export default class Core extends Base {
+export default class CoreCommands extends Base {
     private _awakeCharacters!: AwakeCharacters | null;
     private _botUser!: BotUser | null;
     private _coreInfo!: CoreInfo | null;

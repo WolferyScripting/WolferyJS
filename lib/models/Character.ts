@@ -1,7 +1,8 @@
 import BaseModel from "./BaseModel.js";
 import type ControlledCharacter from "./ControlledCharacter.js";
 import type CharacterInfo from "./CharacterInfo.js";
-import { type TagPref } from "./CharacterTags.js";
+import type Watch from "./Watch.js";
+import type { TagPref } from "../util/types.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
 import type WolferyJS from "../WolferyJS.js";
 import type Commands from "../util/commands.js";
@@ -153,7 +154,7 @@ class Character extends BaseModel implements CharacterProperties {
 
     /** Mute this character. */
     async mute(): Promise<null> {
-        return this.client.modules.core.getPlayer().then(player => player.muteChar(this.id));
+        return this.client.commands.core.getPlayer().then(player => player.muteChar(this.id));
     }
 
     /**
@@ -183,17 +184,23 @@ class Character extends BaseModel implements CharacterProperties {
 
     /** Unmute this character. */
     async unmute(): Promise<null> {
-        return this.client.modules.core.getPlayer().then(player => player.unmuteChar(this.id));
+        return this.client.commands.core.getPlayer().then(player => player.unmuteChar(this.id));
     }
 
-    /** Remove this character from your watch list. */
+    /**
+     * Remove this character from your watch list.
+     * @playerRequired
+     */
     async unwatch(): Promise<Character> {
-        return this.client.modules.core.getPlayer().then(player => player.unwatchChar(this.id));
+        return this.client.commands.core.getPlayer().then(player => player.unwatchChar(this.id));
     }
 
-    /** Add this character to your watch list. */
-    async watch(): Promise<Character> {
-        return this.client.modules.core.getPlayer().then(player => player.watchChar(this.id));
+    /**
+     * Add this character to your watch list.
+     * @playerRequired
+     */
+    async watch(): Promise<Watch> {
+        return this.client.commands.core.getPlayer().then(player => player.watchChar(this.id));
     }
 
     /**

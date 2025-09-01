@@ -1,7 +1,10 @@
 import BaseModel from "./BaseModel.js";
+import type ControlledCharacter from "./ControlledCharacter.js";
 import type WolferyJS from "../WolferyJS.js";
 import type { ProfileProperties } from "../generated/models/types.js";
 import { ProfileDefinition } from "../generated/models/definitions.js";
+import { type NameBasicResponse } from "../util/types.js";
+import type Commands from "../util/commands.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface Profile extends BaseModel, ProfileProperties {}
@@ -21,6 +24,37 @@ class Profile extends BaseModel implements ProfileProperties {
 
     get imageURL(): string | null {
         return this.image === "" ? null : `${this.client.fileURL}/core/char/img/${this.image}`;
+    }
+
+    /**
+     * Delete this profile.
+     */
+    async delete(): Promise<NameBasicResponse> {
+        const ctrl = await this.getCtrl();
+        return ctrl.deleteProfile(this.id);
+    }
+
+    async getCtrl(): Promise<ControlledCharacter> {
+        return this.client.findControlledCharacter(ctrl => ctrl.profiles.hasKey(this.id), true);
+
+    }
+
+    /**
+     * Set options for this profile.
+     * @param options The options to set.
+     */
+    async set(options: Commands.Controlled.SetProfileOptions): Promise<Profile> {
+        const ctrl = await this.getCtrl();
+        return ctrl.setProfile(this.id, options);
+    }
+
+    /**
+     * Apply this profile.
+     * @param safe If a check should be made to ensure the current character info is stored in a profile.
+     */
+    async use(safe = true): Promise<Profile> {
+        const ctrl = await this.getCtrl();
+        return ctrl.useProfile(this.id, safe);
     }
 }
 

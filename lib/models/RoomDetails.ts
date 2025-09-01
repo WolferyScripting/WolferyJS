@@ -1,5 +1,7 @@
 import BaseModel from "./BaseModel.js";
 import type HiddenExits from "./HiddenExits.js";
+import type ControlledCharacter from "./ControlledCharacter.js";
+import type Character from "./Character.js";
 import type WolferyJS from "../WolferyJS.js";
 import { RoomDetailsDefinition } from "../generated/models/definitions.js";
 import type { RoomDetailsProperties } from "../generated/models/types.js";
@@ -8,6 +10,7 @@ import ResourceIDs from "../generated/ResourceIDs.js";
 import type RoomScripts from "../collections/RoomScripts.js";
 import type Tenants from "../collections/Tenants.js";
 import type Teleporters from "../collections/Teleporters.js";
+import type Commands from "../util/commands.js";
 import type { ResClient, ResModelOptions } from "resclient-ts";
 
 declare interface RoomDetails extends BaseModel, RoomDetailsProperties {}
@@ -20,6 +23,25 @@ class RoomDetails extends BaseModel implements RoomDetailsProperties {
     // eslint-disable-next-line unicorn/no-object-as-default-parameter
     constructor(client: WolferyJS, api: ResClient, rid: string, options: ResModelOptions = { definition: RoomDetailsDefinition }) {
         super(client, api, rid, options);
+    }
+
+    /**
+     * Delete this rorom.
+     * @areaOwnershipRequired
+     */
+    async delete(): Promise<null> {
+        const ctrl = await this.getCtrl();
+        return ctrl.deleteRoom(this.id);
+    }
+
+    /**
+     * Get the controlled character that owns this area.
+     * @areaOwnershipRequired
+     */
+    async getCtrl(): Promise<ControlledCharacter> {
+        const ctrl = await this.client.findControlledCharacter(c => c.ownedRooms.hasKey(this.id));
+        if (!ctrl) throw new Error(`Failed to get ControlledCharacter owner for room ${this.rid}`);
+        return ctrl;
     }
 
     /**
@@ -74,6 +96,47 @@ class RoomDetails extends BaseModel implements RoomDetailsProperties {
             rid += `?limit=${limit}&offset=${page * limit}`;
         }
         return this.api.get<Tenants>(rid);
+    }
+
+    /**
+     * Request to set the area of this room.
+     * @param areaId The ID of the area to request to set as the area.
+     * @roomOwnershipRequired
+     */
+    async requestSetArea(areaId: string): Promise<null> {
+        const ctrl = await this.getCtrl();
+        return ctrl.requestSetRoomArea(this.id, areaId);
+    }
+
+    /**
+     * Request to set the owner of this room.
+     * @param charId The ID of the character to request to set as the owner.
+     * @roomOwnershipRequired
+     */
+    async requestSetOwner(charId: string): Promise<Character> {
+        const ctrl = await this.getCtrl();
+        return ctrl.requestSetRoomOwner(this.id, charId);
+    }
+
+    /**
+     * Set options for this room.
+     * @param options The options to set.
+     * @roomOwnershipRequired
+     */
+    async set(options: Commands.Controlled.SetRoomOptions): Promise<null> {
+        const ctrl = await this.getCtrl();
+        return ctrl.setRoom(this.id, options);
+    }
+
+    /**
+     * Set the owner of this room.
+     * @param charId The ID of the character to set as the owner.
+     * @roomOwnershipRequired
+     * @builderRoleRequired Unless you own the target character.
+     */
+    async setOwner(charId: string): Promise<Character> {
+        const ctrl = await this.getCtrl();
+        return ctrl.setRoomOwner(this.id, charId);
     }
 }
 

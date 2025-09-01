@@ -4,7 +4,7 @@ import type Character from "../models/Character.js";
 import type Commands from "../util/commands.js";
 import type ControlledCharacter from "../models/ControlledCharacter.js";
 
-export default class Moderator extends Base {
+export default class ModeratorCommands extends Base {
     private _formatTrust(trust: string): Record<"trusted" | "npn" | "bannedIP", boolean> {
         trust = trust.toUpperCase();
         return {
@@ -21,7 +21,7 @@ export default class Moderator extends Base {
      * @moderatorRoleRequired
      */
     async banPlayer(charId: string, reason: string): Promise<unknown> {
-        return this.client.modules.core.getPlayer().then(player => player.call("banPlayer", { charId, reason }));
+        return this.client.commands.core.getPlayer().then(player => player.call("banPlayer", { charId, reason }));
     }
 
     /**
@@ -31,7 +31,7 @@ export default class Moderator extends Base {
      * @moderatorRoleRequired
      */
     async compare(charId: string, compareCharId: string): Promise<Record<"emailMatch" | "ipMatch" | "userMatch", boolean>> {
-        return this.client.modules.core.getPlayer().then(player => player.call<Record<"emailMatch" | "ipMatch" | "userMatch", boolean>>("compare", { charId, compareCharId }));
+        return this.client.commands.core.getPlayer().then(player => player.call<Record<"emailMatch" | "ipMatch" | "userMatch", boolean>>("compare", { charId, compareCharId }));
     }
 
     /**
@@ -40,7 +40,7 @@ export default class Moderator extends Base {
      * @moderatorRoleRequired
      */
     async inspect(charId: string): Promise<CharacterInspection> {
-        return this.client.modules.core.getPlayer().then(player => player.call<RawCharacterInspection>("inspectChar", { charId })
+        return this.client.commands.core.getPlayer().then(player => player.call<RawCharacterInspection>("inspectChar", { charId })
             .then(async r => ({
                 ...r,
                 char:       await player.basicChar(r, "char"),
@@ -56,7 +56,7 @@ export default class Moderator extends Base {
      * @moderatorRoleRequired
      */
     async setPlayer(charId: string, options: Commands.Moderator.SetPlayerOptions): Promise<unknown> {
-        return this.client.modules.core.getPlayer().then(player => player.call("setPlayer", { charId, ...options }));
+        return this.client.commands.core.getPlayer().then(player => player.call("setPlayer", { charId, ...options }));
     }
 
     /**
@@ -68,7 +68,7 @@ export default class Moderator extends Base {
      */
     async suspend(ctrl: ControlledCharacter, charId: string, reason: string): Promise<Character> {
         return ctrl.call<BasicCharacterResponse<"char">>("suspend", { charId, reason })
-            .then(r => this.client.modules.core.getPlayer().then(player => player.basicChar(r, "char")));
+            .then(r => this.client.commands.core.getPlayer().then(player => player.basicChar(r, "char")));
     }
 
     /**
@@ -77,7 +77,7 @@ export default class Moderator extends Base {
      * @moderatorRoleRequired
      */
     async unbanPlayer(charId: string): Promise<unknown> {
-        return this.client.modules.core.getPlayer().then(player => player.call("unbanPlayer", { charId }));
+        return this.client.commands.core.getPlayer().then(player => player.call("unbanPlayer", { charId }));
     }
 
     /**
@@ -88,7 +88,7 @@ export default class Moderator extends Base {
      */
     async unsuspend(ctrl: ControlledCharacter, charId: string): Promise<Character> {
         return ctrl.call<BasicCharacterResponse<"char">>("unsuspend", { charId })
-            .then(r => this.client.modules.core.getPlayer().then(player => player.basicChar(r, "char")));
+            .then(r => this.client.commands.core.getPlayer().then(player => player.basicChar(r, "char")));
     }
 
     /**
@@ -99,7 +99,7 @@ export default class Moderator extends Base {
      * @moderatorRoleRequired
      */
     async warn(charIds: Array<string>, msg: string, pose?: boolean): Promise<unknown> {
-        return this.client.modules.core.getPlayer().then(player => player.call("warn", { charIds, msg, pose }));
+        return this.client.commands.core.getPlayer().then(player => player.call("warn", { charIds, msg, pose }));
     }
 
     /**
@@ -108,7 +108,7 @@ export default class Moderator extends Base {
      * @moderatorRoleRequired
      */
     async wipeCharAvatar(charId: string): Promise<unknown> {
-        return this.client.modules.core.getPlayer().then(player => player.call("wipeCharAvatar", { charId }));
+        return this.client.commands.core.getPlayer().then(player => player.call("wipeCharAvatar", { charId }));
     }
 
     /**
@@ -117,6 +117,6 @@ export default class Moderator extends Base {
      * @moderatorRoleRequired
      */
     async wipeCharImage(charId: string): Promise<unknown> {
-        return this.client.modules.core.getPlayer().then(player => player.call("wipeCharImage", { charId }));
+        return this.client.commands.core.getPlayer().then(player => player.call("wipeCharImage", { charId }));
     }
 }

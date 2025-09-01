@@ -1,8 +1,10 @@
 import BaseModel from "./BaseModel.js";
 import type OwnedCharacter from "./OwnedCharacter.js";
+import type Character from "./Character.js";
 import type WolferyJS from "../WolferyJS.js";
 import type { WatchProperties } from "../generated/models/types.js";
 import { WatchDefinition } from "../generated/models/definitions.js";
+import ResourceIDs from "../generated/ResourceIDs.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface Watch extends BaseModel, WatchProperties {}
@@ -16,13 +18,26 @@ class Watch extends BaseModel implements WatchProperties {
         super(client, api, rid, { definition: WatchDefinition });
     }
 
-    async getWatchedBy(): Promise<Array<OwnedCharacter>> {
-        return this.client.modules.core.getPlayer().then(player => this.watchers.map(id => player.chars.getOrThrow(id)));
+    get charId(): string {
+        return ResourceIDs.WATCH.parts(this.rid).char;
+    }
+
+    get playerId(): string {
+        return ResourceIDs.WATCH.parts(this.rid).player;
+    }
+
+    async getChar(): Promise<Character> {
+        return this.client.getChar(this.charId);
+    }
+
+    async getWatchers(): Promise<Array<OwnedCharacter>> {
+        return this.client.commands.core.getPlayer().then(player => this.watchers.map(id => player.chars.getOrThrow(id)));
     }
 
     // @TODO
-    async unwatch(): Promise<void> {
-        // return this.client.modules.core.getPlayer().then(player => {});
+    async unwatch(): Promise<Character> {
+        return this.client.commands.player.unwatchChar(this.playerId, this.charId)
+            .then(r => this.client.getChar(r.id));
     }
 }
 

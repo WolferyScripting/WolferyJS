@@ -20,8 +20,15 @@ namespace ResourceIDs {
             : { [K in U & string]: string }
         : never;
 
+    export type ArgArray<T extends ReadonlyArray<unknown>> =
+        { [K in keyof T]: T[K] extends Arg<infer N> ? N : never };
+    export type ArgArrayValue<T extends ReadonlyArray<unknown>> =
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        { [K in keyof T]: T[K] extends Arg<any> ? string : never };
     export interface RIDFunction<Parts extends ReadonlyArray<unknown>> {
         (args: ArgObject<Parts>): string;
+        __typesOnlyArgs: ArgArrayValue<Parts>;
+        get names(): ArgArray<Parts>;
         get regex(): RegExp;
         parts(value: string): ArgObject<Parts>;
     }
@@ -44,10 +51,17 @@ namespace ResourceIDs {
             return result;
         };
         const names = exprs.map(expr => (typeof expr === "object" && expr && "__arg__" in expr ? (expr as Arg<string>).__arg__ : undefined)).filter((name): name is string => name !== undefined);
-        Object.defineProperty(func, "regex", {
-            get() {
-                const pattern = strings.reduce((acc, str, i) => acc + str.replaceAll(".", String.raw`\.`) + (i < exprs.length ? `(?<${names[i]}>[^.]+)` : ""), "");
-                return new RegExp(`^${pattern}$`);
+        Object.defineProperties(func, {
+            regex: {
+                get() {
+                    const pattern = strings.reduce((acc, str, i) => acc + str.replaceAll(".", String.raw`\.`) + (i < exprs.length ? `(?<${names[i]}>[^.]+)` : ""), "");
+                    return new RegExp(`^${pattern}$`);
+                }
+            },
+            names: {
+                get() {
+                    return names;
+                }
             }
         });
         func.parts = (value: string) => getRIDParts(func as unknown as RIDFunction<Writable<Parts>>, value);

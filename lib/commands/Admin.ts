@@ -8,14 +8,16 @@ import {
     type Roles,
     type KeyNameResponse,
     type NameBasicResponse,
-    type RealmConfigOverseer
+    type RealmConfigOverseer,
+    type KeyResponse
 } from "../util/types.js";
 import type Room from "../models/Room.js";
 import type OwnedCharacters from "../collections/OwnedCharacters.js";
 import type Character from "../models/Character.js";
-import { type Tag } from "../generated/models/types.js";
+import type GlobalTag from "../models/GlobalTag.js";
+import { modelId } from "../util/Util.js";
 
-export default class Admin extends Base {
+export default class AdminCommands extends Base {
     /**
      * Add a role to a player.
      * @param playerId The ID of the player to add the role to.
@@ -23,7 +25,7 @@ export default class Admin extends Base {
      * @adminRoleRequired
      */
     async addPlayerRole(playerId: string, role: Roles): Promise<unknown> {
-        return this.client.modules.core.getPlayer().then(player => player.call("addPlayerRole", { playerId, role }));
+        return this.client.commands.core.getPlayer().then(player => player.call("addPlayerRole", { playerId, role }));
     }
 
     /**
@@ -33,7 +35,7 @@ export default class Admin extends Base {
      * @adminRoleRequired
      */
     async banPlayer(playerId: string, reason: string): Promise<unknown> {
-        return this.client.modules.core.getPlayer().then(player => player.call("banPlayer", { playerId, msg: reason }));
+        return this.client.commands.core.getPlayer().then(player => player.call("banPlayer", { playerId, msg: reason }));
     }
 
     /**
@@ -43,7 +45,7 @@ export default class Admin extends Base {
      * @adminRoleRequired
      */
     async broadcast(msg: string, title = ""): Promise<unknown> {
-        return this.client.modules.core.getPlayer().then(player => player.call("broadcast", { msg, title }));
+        return this.client.commands.core.getPlayer().then(player => player.call("broadcast", { msg, title }));
     }
 
     /**
@@ -51,11 +53,11 @@ export default class Admin extends Base {
      * @param options The options for creating the global tag.
      * @adminRoleRequired
      */
-    async createGlobalTag(options: Commands.Admin.CreateGlobalTagOptions): Promise<Tag> {
+    async createGlobalTag(options: Commands.Admin.CreateGlobalTagOptions): Promise<GlobalTag> {
         // https://github.com/mucklet/mucklet-client/blob/8a0bc7c8e6b8e56c731ba0229116cfbfc1eae824/src/client/modules/admin/adminCommands/createGlobalTag/CreateGlobalTag.js#L57-L58
         options.group ||= null;
         options.desc ||= null;
-        return this.client.api.call<Tag>(ResourceIDs.TAGS, "create", options);
+        return this.client.api.call<GlobalTag>(ResourceIDs.TAGS, "create", options);
     }
 
     /**
@@ -76,21 +78,22 @@ export default class Admin extends Base {
      * @param key The key for the node.
      * @adminRoleRequired
      */
-    async createTeleport(ctrl: ControlledCharacter, key: string): Promise<Room> {
+    async createTeleport(ctrl: ControlledCharacter, key: string): Promise<{ node: KeyResponse; room: NameBasicResponse; }> {
         // the client doesn't allow a room input, not sure if one aside from the current room is allowed?
         // https://github.com/mucklet/mucklet-client/blob/8a0bc7c8e6b8e56c731ba0229116cfbfc1eae824/src/client/modules/admin/adminCommands/createTeleport/CreateTeleport.js#L37
-        return ctrl.call<{ room: NameBasicResponse; }>("createTeleport", { key, roomId: ctrl.inRoom.id })
-            .then(r => this.client.api.get<Room>(ResourceIDs.ROOM({ id: r.room.id })));
+        // assuming node is returned because if not getting the node for responses would be hell, only room is seen in the client code
+        return ctrl.call<{ node: KeyResponse; room: NameBasicResponse; }>("createTeleport", { key, roomId: ctrl.inRoom.id });
     }
 
     /**
-     * Delete a tag group.
-     * @param key The key of the tag group to delete.
+     * Delete a global tag.
+     * @param tagId The id of the global tag to delete.
      * @adminRoleRequired
      */
-    async deleteGlobalTag(key: string): Promise<KeyNameResponse> {
-        return this.client.api.call<{ group: KeyNameResponse; }>(ResourceIDs.TAG_GROUP({ id: key }), "delete")
-            .then(r => r.group);
+    async deleteGlobalTag(tagId: string): Promise<KeyResponse> {
+        // id response assumed, only key is known
+        return this.client.api.call<{ tag: KeyResponse; }>(ResourceIDs.TAG({ id: tagId }), "delete")
+            .then(r => r.tag);
     }
 
     /**
@@ -109,9 +112,9 @@ export default class Admin extends Base {
      * @param nodeId The ID of the node to delete.
      * @adminRoleRequired
      */
-    async deleteTeleport(ctrl: ControlledCharacter, nodeId: string): Promise<Room> {
-        return ctrl.call<{ room: NameBasicResponse; }>("deleteTeleport", { nodeId })
-            .then(r => this.client.api.get<Room>(ResourceIDs.ROOM({ id: r.room.id })));
+    async deleteTeleport(ctrl: string | ControlledCharacter, nodeId: string): Promise<NameBasicResponse> {
+        return this.client.api.call<{ room: NameBasicResponse; }>(ResourceIDs.CONTROLLED_CHARACTER({ id: modelId(ctrl) }), "deleteTeleport", { nodeId })
+            .then(r => r.room);
     }
 
     /**
@@ -137,7 +140,7 @@ export default class Admin extends Base {
      * @adminRoleRequired
      */
     async getUser(charId: string): Promise<unknown> {
-        return this.client.modules.core.getPlayer().then(player => player.call("getUser", { charId }));
+        return this.client.commands.core.getPlayer().then(player => player.call("getUser", { charId }));
     }
 
     // I figured this would be overseer only, but the command I first saw it used in (ban player) claims it to be usable by admins
@@ -158,7 +161,7 @@ export default class Admin extends Base {
      * @adminRoleRequired
      */
     async removePlayerRole(playerId: string, role: Roles): Promise<unknown> {
-        return this.client.modules.core.getPlayer().then(player => player.call("removePlayerRole", { playerId, role }));
+        return this.client.commands.core.getPlayer().then(player => player.call("removePlayerRole", { playerId, role }));
     }
 
     /**
@@ -168,7 +171,7 @@ export default class Admin extends Base {
      * @adminRoleRequired
      */
     async setChar(charId: string, options: Commands.Admin.SetCharOptions): Promise<Character> {
-        return this.client.modules.core.getPlayer().then(player => player.call<BasicCharacterResponse<"char">>("setChar", { charId, ...options })
+        return this.client.commands.core.getPlayer().then(player => player.call<BasicCharacterResponse<"char">>("setChar", { charId, ...options })
             .then(r => player.basicChar(r, "char")));
     }
 
@@ -178,7 +181,7 @@ export default class Admin extends Base {
      * @adminRoleRequired
      */
     async setConfig(options: Commands.Admin.SetConfigOptions): Promise<unknown> {
-        return this.client.modules.core.getPlayer().then(player => player.call("setConfig", options));
+        return this.client.commands.core.getPlayer().then(player => player.call("setConfig", options));
     }
 
     /**
@@ -187,8 +190,8 @@ export default class Admin extends Base {
      * @param options The attributes to set.
      * @adminRoleRequired
      */
-    async setGlobalTag(tagId: string, options: Commands.Admin.SetGlobalTagOptions): Promise<KeyNameResponse> {
-        return this.client.api.call<{ tag: KeyNameResponse; }>(ResourceIDs.TAG({ id: tagId }), "set", options)
+    async setGlobalTag(tagId: string, options: Commands.Admin.SetGlobalTagOptions): Promise<KeyResponse> {
+        return this.client.api.call<{ tag: KeyResponse; }>(ResourceIDs.TAG({ id: tagId }), "set", options)
             .then(r => r.tag);
     }
 
@@ -200,7 +203,7 @@ export default class Admin extends Base {
      * @adminRoleRequired
      */
     async setPlayer(playerId: string, options: Commands.Moderator.SetPlayerOptions): Promise<unknown> {
-        return this.client.modules.core.getPlayer().then(player => player.call("setPlayer", { playerId, ...options }));
+        return this.client.commands.core.getPlayer().then(player => player.call("setPlayer", { playerId, ...options }));
     }
 
     /**
@@ -220,7 +223,7 @@ export default class Admin extends Base {
      * @moderatorRoleRequired
      */
     async unbanPlayer(playerId: string): Promise<unknown> {
-        return this.client.modules.core.getPlayer().then(player => player.call("unbanPlayer", { playerId }));
+        return this.client.commands.core.getPlayer().then(player => player.call("unbanPlayer", { playerId }));
     }
 
     /**
@@ -229,7 +232,7 @@ export default class Admin extends Base {
      * @adminRoleRequired
      */
     async whereis(charId: string): Promise<{ char: Character; room: Room; }> {
-        return this.client.modules.core.getPlayer().then(player => player.call<BasicCharacterResponse<"char"> & { room: NameBasicResponse; }>("whereis", { charId }))
+        return this.client.commands.core.getPlayer().then(player => player.call<BasicCharacterResponse<"char"> & { room: NameBasicResponse; }>("whereis", { charId }))
             .then(async r => ({ char: await this.client.api.get<Character>(ResourceIDs.CHARACTER({ id: r.char.id })), room: await this.client.api.get<Room>(ResourceIDs.ROOM({ id: r.room.id })) }));
     }
 }

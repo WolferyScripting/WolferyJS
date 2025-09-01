@@ -16,8 +16,13 @@ class Identity extends BaseModel implements IdentityProperties {
         super(client, api, rid, { definition: IdentityDefinition });
     }
 
+    /**
+     * Set options for the player's identity.
+     * @param options The options to set.
+     * @playerRequired
+     */
     async set(options: Commands.Identity.SetOptions): Promise<null> {
-        return this.call<null>("set", options);
+        return this.client.commands.player.setIdentity(this.id, options);
     }
 }
 

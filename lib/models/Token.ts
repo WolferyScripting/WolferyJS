@@ -15,17 +15,21 @@ class Token extends BaseModel implements TokenProperties {
         super(client, api, rid, { definition: TokenDefinition });
     }
 
-    /** Delete this token. */
+    /**
+     * Delete this token.
+     * @playerRequired
+     */
     async delete(): Promise<null> {
-        return this.call<null>("delete");
+        return this.client.commands.misc.deleteToken(this.id);
     }
 
     /**
      * Renew this token.
+     * @playerRequired
      * @note The client attempts to call this but it always returns `system.notImplemented`.
      */
     async renew(): Promise<null> {
-        return this.call<null>("renewToken");
+        return this.client.commands.misc.renewToken(this.id);
     }
 }
 

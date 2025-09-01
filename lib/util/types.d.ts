@@ -32,14 +32,22 @@ export interface KeyNameResponse {
     key: string;
     name: string;
 }
-export type BasicCharacterResponse<K extends string> = Record<K, NameBasicResponse & {
+
+export interface KeyResponse {
+    id: string;
+    key: string;
+}
+
+export interface CharacterResponse {
+    id: string;
+    name: string;
     surname: string;
-}>;
+}
+
+export type BasicCharacterResponse<K extends string> = Record<K, CharacterResponse>;
 
 export type OptionalBasicCharacterResponse<K extends string> = {
-    [T in K]?: NameBasicResponse & {
-        surname: string;
-    }
+    [T in K]?: CharacterResponse;
 };
 
 export interface DeleteNameResponse extends NameBasicResponse {
@@ -311,3 +319,5 @@ export interface PrivatePopulationUpdate {
 }
 
 export interface AreaDetailsPopulationUpdate extends PublicPopulationUpdate, PrivatePopulationUpdate {}
+export type LocationType = "area" | "room";
+export type TagPref = "like" | "dislike";

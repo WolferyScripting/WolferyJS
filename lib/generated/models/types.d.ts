@@ -39,7 +39,7 @@ import type GlobalTag from "../../models/GlobalTag.js";
 import type CustomTag from "../../models/CustomTag.js";
 import type Identity from "../../models/Identity.js";
 import type { IdleState } from "../../util/Constants.js";
-import type { CharacterState, CharacterType, NavIcons, NavDirections, Titles, Roles, MailCharacterType } from "../../util/types.js";
+import type { LocationType, CharacterState, CharacterType, NavIcons, NavDirections, Titles, Roles, MailCharacterType } from "../../util/types.js";
 
 /**
  * A partial room seen as an exit target.
@@ -80,7 +80,7 @@ export interface AreaChildProperties {
     /** A short description of the area child. */
     shortDesc: string;
     /** The type of the area child. */
-    type: "area";
+    type: LocationType;
 }
 
 /**
@@ -156,7 +156,7 @@ export interface CharacterProperties {
     /** The idle state of the character. */
     idle: IdleState;
     /** The last awake timestamp of the character. */
-    lastAwake: number;
+    lastAwake: number | null;
     /** The name of the character. */
     name: string;
     /** The puppeteer of the character. */
@@ -505,7 +505,7 @@ export interface OwnedCharacterProperties {
     /** The room the character is currently in. */
     inRoom: Room;
     /** The timestamp when the character was last awake. */
-    lastAwake: number;
+    lastAwake: number | null;
     /** The name of the character. */
     name: string;
     /** The settings for the character. */

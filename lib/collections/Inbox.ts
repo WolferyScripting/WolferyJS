@@ -3,7 +3,9 @@ import type PlayerMailMessage from "../models/PlayerMailMessage.js";
 import type WolferyJS from "../WolferyJS.js";
 import type Commands from "../util/commands.js";
 import type Character from "../models/Character.js";
-import type { BasicCharacterResponse } from "../util/types.js";
+import { toID } from "../util/Util.js";
+import ResourceIDs from "../generated/ResourceIDs.js";
+import type Player from "../models/Player.js";
 import type { ResClient } from "resclient-ts";
 
 // do not edit the first line of the class comment
@@ -11,13 +13,24 @@ import type { ResClient } from "resclient-ts";
  * The player's mail inbox.
  * @resourceID {@link ResourceIDs.INBOX | INBOX}
  */
-class Inbox extends BaseCollection<PlayerMailMessage> {
+class Inbox extends BaseCollection<PlayerMailMessage, typeof ResourceIDs.PLAYER_MAIL_MESSAGE> {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
-        super(client, api, rid);
+        super(client, api, rid, {
+            idCallback:     toID,
+            ridConstructor: ResourceIDs.PLAYER_MAIL_MESSAGE
+        });
     }
 
-    async getAll(): Promise<Array<PlayerMailMessage>> {
-        return this.client.getAllPaginated<PlayerMailMessage>(this.rid);
+    get playerId(): string {
+        return ResourceIDs.INBOX.parts(this.rid).id;
+    }
+
+    async getPlayer(): Promise<Player> {
+        const player = await this.client.commands.core.getPlayer();
+        if (player.id !== this.playerId) {
+            throw new Error(`Authenticated player id ${player.id} does not match collection player id ${this.playerId}`);
+        }
+        return player;
     }
 
     /**
@@ -27,10 +40,9 @@ class Inbox extends BaseCollection<PlayerMailMessage> {
      * @param options The options for the mail.
      */
     async send(fromCharId: string, toCharId: string, options: Commands.Inbox.SendOptions): Promise<Character> {
-        return this.client.modules.core.getPlayer().then(player =>
-            this.call<BasicCharacterResponse<"toChar">>("send", { toCharId, fromCharId, ...options })
-                .then(r => player.basicChar(r, "toChar"))
-        );
+        const playerId = ResourceIDs.INBOX.parts(this.rid).id;
+        return this.client.commands.player.mail(playerId, fromCharId, toCharId, options)
+            .then(r => this.client.getChar(r.id));
     }
 }
 

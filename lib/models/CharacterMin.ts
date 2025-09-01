@@ -1,7 +1,9 @@
 import BaseModel from "./BaseModel.js";
+import type Character from "./Character.js";
 import type WolferyJS from "../WolferyJS.js";
 import type { CharacterMinProperties } from "../generated/models/types.js";
 import { CharacterMinDefinition } from "../generated/models/definitions.js";
+import ResourceIDs from "../generated/ResourceIDs.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface CharacterMin extends BaseModel, CharacterMinProperties {}
@@ -21,6 +23,11 @@ class CharacterMin extends BaseModel implements CharacterMinProperties {
 
     get fullname(): string {
         return `${this.name} ${this.surname}`.trim();
+    }
+
+    async getChar(): Promise<Character> {
+        const charId = ResourceIDs.CHARACTER_MIN.parts(this.rid).id;
+        return this.client.commands.misc.getChar(charId);
     }
 }
 

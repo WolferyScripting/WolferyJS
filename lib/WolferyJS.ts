@@ -13,10 +13,11 @@ import registerCollections from "./generated/collections/registry.js";
 import registerModels from "./generated/models/registry.js";
 import type { Events } from "./util/events.js";
 import type Notes from "./models/Notes.js";
-import Modules from "./modules/Modules.js";
+import Commands from "./commands/Commands.js";
 import { enableCustomInspectForCollections } from "./collections/BaseCollection.js";
 import { enableCustomInspectForCollectionModels } from "./models/BaseCollectionModel.js";
 import { enableCustomInspectForModels } from "./models/BaseModel.js";
+import type Character from "./models/Character.js";
 import {
     type ClientOptions,
     ResError,
@@ -480,7 +481,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
     private _player!: Player | null;
     private _res!: ResClient | null;
     private _user!: U | null;
-    modules!: Modules;
+    commands!: Commands;
     onUnsubscribe = this._onUnsubscribe.bind(this);
     options!: InstanceOptions;
     constructor(options: Options) {
@@ -586,7 +587,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             .writable("_res", null)
             .writable("_player", null)
             .writable("_user", null)
-            .readOnly("modules", new Modules(this))
+            .readOnly("commands", new Commands(this))
             .readOnly("onUnsubscribe")
             .readOnly("options", instanceOptions);
 
@@ -599,7 +600,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
 
     private async _afterAuthenticate(type: "password" | "token" | "bot"): Promise<void> {
         const promises: Array<Promise<unknown>> = [];
-        const player = type === "password" ? await this.modules.core.getPlayer() : null;
+        const player = type === "password" ? await this.commands.core.getPlayer() : null;
         if (this.anyTracked("awake")) promises.push(this.api.subscribe(ResourceIDs.AWAKE_CHARACTERS, true));
         if (this.anyTracked("broadcast")) promises.push(this.api.subscribe(ResourceIDs.CORE_INFO, true));
         if (this.anyTracked("globalTags")) promises.push(this.api.subscribe(ResourceIDs.TAGS, true));
@@ -624,7 +625,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         }
 
         await Promise.all(promises);
-        await this.modules.core._track(true);
+        await this.commands.core._track(true);
     }
 
     private async _authenticateBot(): Promise<{ user: BotUser; }> {
@@ -636,7 +637,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             token: this.options.authentication.token
         })
             .then(async() => {
-                const user = await this.modules.core.getBotUser();
+                const user = await this.commands.core.getBotUser();
                 this.emit("authenticated");
                 this.emit("authenticated.bot", user);
                 await this._afterAuthenticate("bot");
@@ -656,8 +657,8 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             hash: this.options.authentication.hmac
         })
             .then(async() => {
-                const user = await this.modules.core.getPlayerUser();
-                const player = await this.modules.core.getPlayer();
+                const user = await this.commands.core.getPlayerUser();
+                const player = await this.commands.core.getPlayer();
                 this.emit("authenticated");
                 this.emit("authenticated.player", user, player);
                 await this._afterAuthenticate("password");
@@ -675,7 +676,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             token: this.options.authentication.token
         })
             .then(async() => {
-                const user = await this.modules.core.getTokenUser();
+                const user = await this.commands.core.getTokenUser();
                 this.emit("authenticated");
                 this.emit("authenticated.token", user);
                 await this._afterAuthenticate("token");
@@ -840,8 +841,29 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         this._player = null;
         this._user = null;
         this._res = null;
-        await this.modules.core._track(false);
+        await this.commands.core._track(false);
         this.emit("disconnected");
+    }
+
+    async findControlledCharacter(cb: (ctrl: ControlledCharacter) => Promise<boolean> | boolean, error: true): Promise<ControlledCharacter>;
+    async findControlledCharacter(cb: (ctrl: ControlledCharacter) => Promise<boolean> | boolean, error?: false): Promise<ControlledCharacter | null>;
+    async findControlledCharacter(cb: (ctrl: ControlledCharacter) => Promise<boolean> | boolean, error = false): Promise<ControlledCharacter | null> {
+        if (this.isBot() && this.user) {
+            if (this.user.controlled && await cb(this.user.controlled)) return this.user.controlled;
+            if (error) throw new Error("Could not find ControlledCharacter");
+            return null;
+        }
+
+        if (this.isPlayer() && this.player) {
+            for (const ctrl of this.player.controlled) {
+                if (await cb(ctrl)) return ctrl;
+            }
+            if (error) throw new Error("Could not find ControlledCharacter");
+            return null;
+        }
+
+        if (error) throw new Error("Could not find ControlledCharacter");
+        return null;
     }
 
     async getAllPaginated<T extends ResModel>(resourceId: string, pageSize = 10): Promise<Array<T>> {
@@ -860,18 +882,35 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         return results;
     }
 
+    async getChar(id: string): Promise<Character> {
+        const rid = ResourceIDs.CHARACTER({ id });
+        const cached = this.api.getCached<Character>(rid);
+        if (cached) return cached;
+        return this.api.get<Character>(rid);
+    }
+
+    getControlledCharacter(id: string, error: true): ControlledCharacter;
+    getControlledCharacter(id: string, error?: false): ControlledCharacter | null;
+    getControlledCharacter(id: string, error = false): ControlledCharacter | null {
+        const rid = ResourceIDs.CONTROLLED_CHARACTER({ id });
+        const cached = this.api.getCached<ControlledCharacter>(rid);
+        if (cached) return cached;
+        if (error) throw new Error(`ControlledCharacter with ID ${id} not found`);
+        return null;
+    }
+
     /** If the authentication used was for a {@link BotUser}. */
     isBot(): this is WolferyJS<BotUser> {
         return (this._user && this._user instanceof BotUser) ?? false;
     }
 
     async isCharacterOurs(charId: string): Promise<boolean> {
-        const player = await this.modules.core.getPlayer();
+        const player = await this.commands.core.getPlayer();
         return player.chars.hasKey(charId);
     }
 
     async isCharacterOursControlled(charId: string): Promise<boolean> {
-        const player = await this.modules.core.getPlayer();
+        const player = await this.commands.core.getPlayer();
         return player.controlled.hasKey(charId);
     }
 
@@ -881,7 +920,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
     }
 
     async isPlayerUs(playerId: string): Promise<boolean> {
-        const player = await this.modules.core.getPlayer();
+        const player = await this.commands.core.getPlayer();
         return player.id === playerId;
     }
 
@@ -923,7 +962,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             return this.user!.wakeup(hidden);
         }
 
-        return this.modules.core.getPlayer().then(player => player.controlChar(char.id, true)
+        return this.commands.core.getPlayer().then(player => player.controlChar(char.id, true)
             .then(ctrl => ((ctrl.wakeup(hidden, true), ctrl))));
     }
 }

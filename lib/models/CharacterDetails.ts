@@ -1,6 +1,5 @@
 import BaseModel from "./BaseModel.js";
 import type Character from "./Character.js";
-import ResourceIDs from "../generated/ResourceIDs.js";
 import type WolferyJS from "../WolferyJS.js";
 import type { CharacterDetailsProperties } from "../generated/models/types.js";
 import { CharacterDetailsDefinition } from "../generated/models/definitions.js";
@@ -26,7 +25,7 @@ class CharacterDetails extends BaseModel implements CharacterDetailsProperties {
     }
 
     async getChar(): Promise<Character> {
-        return this.api.get<Character>(ResourceIDs.CHARACTER({ id: this.id }));
+        return this.client.commands.misc.getChar(this.id);
     }
 }
 

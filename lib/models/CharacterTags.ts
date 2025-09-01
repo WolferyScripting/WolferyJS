@@ -5,18 +5,20 @@ import GlobalTag from "./GlobalTag.js";
 import type WolferyJS from "../WolferyJS.js";
 import type Commands from "../util/commands.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
-import { type Tag } from "../generated/models/types.js";
+import type { Tag } from "../generated/models/types.js";
+import type { TagPref } from "../util/types.js";
 import type { ResClient } from "resclient-ts";
 
-export type TagPref = "like" | "dislike";
 // do not edit the first line of the class comment
 /**
  * The tags of a character.
  * @resourceID {@link ResourceIDs.CHARACTER_TAGS | CHARACTER_TAGS}
  */
-class CharacterTags extends BaseCollectionModel<Tag> {
+class CharacterTags extends BaseCollectionModel<Tag, typeof ResourceIDs.TAG> {
     constructor(client: WolferyJS, api: ResClient, rid: string) {
-        super(client, api, rid, item => item instanceof CustomTag || item instanceof GlobalTag);
+        super(client, api, rid, item => item instanceof CustomTag || item instanceof GlobalTag, {
+            ridConstructor: ResourceIDs.TAG
+        });
     }
 
     protected override async _listen(on: boolean): Promise<void> {
