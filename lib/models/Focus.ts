@@ -31,8 +31,8 @@ class Focus extends BaseCollectionModel<FocusOptions> implements FocusProperties
      * Focus a character.
      * @param targetId The ID of the character to focus.
      * @param options The options for focusing.
-     * @returns The character that was focused.
      * @playerRequired
+     * @calls {@link CoreCommands.getPlayer} > {@link Player.focusChar}
      */
     async focus(targetId: string, options?: Omit<Commands.Player.FocusCharOptions, "puppeteerId">): Promise<Character> {
         let charId: string, puppeteerId: string | undefined;
@@ -45,6 +45,10 @@ class Focus extends BaseCollectionModel<FocusOptions> implements FocusProperties
         return this.client.commands.core.getPlayer().then(player => player.focusChar(charId, targetId, { puppeteerId, ...options }));
     }
 
+    /**
+     * Get the {@link FocusChars | chars}.
+     * @calls {@link ResClient.get}
+     */
     async getChars(): Promise<FocusChars> {
         if (this.isPuppet) {
             const { char, puppet } = ResourceIDs.PUPPET_FOCUS.parts(this.rid);
@@ -60,6 +64,7 @@ class Focus extends BaseCollectionModel<FocusOptions> implements FocusProperties
      * @param targetId The ID of the character to unfocus.
      * @returns The character that was unfocused.
      * @playerRequired
+     * @calls {@link CoreCommands.getPlayer} > {@link Player.unfocusChar}
      */
     async unfocus(targetId: string): Promise<Character> {
         let charId: string, puppeteerId: string | undefined;

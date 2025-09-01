@@ -27,12 +27,18 @@ export default class OwnedCharacters extends BaseCollection<OwnedCharacter, type
     /**
      * Create a new character.
      * @param options The options for creating the character.
+     * @playerRequired
+     * @calls {@link getPlayer} > {@link Player.createChar}
      */
     async create(options: Commands.Player.CreateCharOptions): Promise<OwnedCharacter> {
         const player = await this.getPlayer();
         return player.createChar(options);
     }
 
+    /**
+     * Get the player these characters are for.
+     * @calls {@link CoreCommands.getPlayer}
+     */
     async getPlayer(): Promise<Player> {
         const player = await this.client.commands.core.getPlayer();
         if (player.id !== this.playerId) {

@@ -25,6 +25,7 @@ class Tokens extends BaseCollection<Token, typeof ResourceIDs.TOKEN> {
     /**
      * Create a token.
      * @playerRequired
+     * @calls {@link PlayerCommands.createToken}
      */
     async create(): Promise<Token> {
         return this.client.commands.player.createToken(this.playerId);

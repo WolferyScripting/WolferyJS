@@ -27,6 +27,7 @@ class Bot extends BaseModel implements BotProperties {
     /**
      * Delete this bot.
      * @playerRequired
+     * @calls {@link MiscCommands.deleteBot}
      */
     async delete(): Promise<null> {
         return this.client.commands.misc.deleteBot(this.userId, this.charId);
@@ -36,6 +37,7 @@ class Bot extends BaseModel implements BotProperties {
      * Renew this bot.
      * @playerRequired
      * @note The client attempts to call this but it always returns `system.notImplemented`.
+     * @calls {@link MiscCommands.renewBot}
      */
     async renew(): Promise<null> {
         return this.client.commands.misc.renewBot(this.userId, this.charId);

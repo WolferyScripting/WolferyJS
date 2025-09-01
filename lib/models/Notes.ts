@@ -21,18 +21,28 @@ class Notes extends BaseCollectionModel<ResRef<Note>, typeof ResourceIDs.NOTE> {
         await super._listen(on, this.client.anyTracked("notes"));
     }
 
-    async create(charId: string, options: Commands.Player.SetNoteOptions): Promise<Note> {
-        const playerId = ResourceIDs.NOTES.parts(this.rid).id;
-        await this.client.commands.core.getPlayer().then(player => player.setNote(charId, options));
-        return this.fetch(playerId, charId);
+    get playerId(): string {
+        return ResourceIDs.NOTES.parts(this.rid).id;
     }
 
+    /**
+     * Create a note for a character.
+     * @param charId The ID of the character.
+     * @param options The options for the note.
+     * @playerRequired
+     * @calls {@link PlayerCommands.setNote} > {@link fetch}
+     */
+    async create(charId: string, options: Commands.Player.SetNoteOptions): Promise<Note> {
+        return this.client.commands.player.setNote(this.playerId, charId, options)
+            .then(() => this.fetch(this.playerId, charId));
+    }
+
+    /**
+     * Get all notes.
+     * @calls {@link ResRef.get}
+     */
     async fetchAll(): Promise<Array<Note>> {
         return Promise.all(this.list.map(ref => ref.get()));
-    }
-
-    async getAll(): Promise<Array<Note>> {
-        return this.client.getAllPaginated<Note>(this.rid);
     }
 }
 

@@ -30,18 +30,26 @@ export default class RoomProfiles extends BaseCollection<RoomProfile, typeof Res
      * @param name The name of the profile.
      * @param key The key of the profile.
      * @roomOwnershipRequired
+     * @calls {@link getCtrl} > {@link ControlledCharacter.createRoomProfile}
      */
     async create(name: string, key: string): Promise<RoomProfile> {
         const ctrl = await this.getCtrl();
         return ctrl.createRoomProfile(name, key);
     }
 
+    /**
+     * Get the controlled character that owns the room.
+     * @roomOwnershipRequired
+     * @calls {@link WolferyJS.findControlledCharacter}
+     * @throws {@link NoControlledError} If a controlled character cannot be found.
+     */
     async getCtrl(): Promise<ControlledCharacter> {
         return this.client.findControlledCharacter(ctrl => ctrl.ownedRooms.hasKey(this.roomId) && ctrl.inRoom.id === this.roomId, true);
     }
 
     /**
      * Get the room for the profiles.
+     * @calls {@link ResClient.get}
      */
     async getRoom(): Promise<Room> {
         return this.api.get<Room>(ResourceIDs.ROOM({ id: this.roomId }));
@@ -49,6 +57,7 @@ export default class RoomProfiles extends BaseCollection<RoomProfile, typeof Res
 
     /**
      * Get the detailed room for the profiles. A character must be in the room.
+     * @calls {@link ResClient.get}
      */
     async getRoomDetails(): Promise<RoomDetails> {
         return this.api.get<RoomDetails>(ResourceIDs.ROOM_DETAILS({ id: this.roomId }));

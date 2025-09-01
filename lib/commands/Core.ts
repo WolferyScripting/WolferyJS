@@ -93,22 +93,42 @@ export default class CoreCommands extends Base {
         }
     }
 
+    /**
+     * Get the awake characters in the realm.
+     * @calls {@link ResClient.get}
+     */
     async getAwakeCharacters(): Promise<AwakeCharacters> {
         return this.client.api.get<AwakeCharacters>(ResourceIDs.AWAKE_CHARACTERS);
     }
 
+    /**
+     * Get the bot user.
+     * @calls {@link ResClient.call}
+     */
     async getBotUser(): Promise<BotUser> {
         return (this._botUser ??= await this.client.api.call<BotUser>("core", "getBot"));
     }
 
+    /**
+     * Get the core info.
+     * @calls {@link ResClient.get}
+     */
     async getCoreInfo(): Promise<CoreInfo> {
         return this.client.api.get<CoreInfo>(ResourceIDs.CORE_INFO);
     }
 
+    /**
+     * Get the global teleports.
+     * @calls {@link ResClient.get}
+     */
     async getGlobalTeleports(): Promise<GlobalTeleports> {
         return this.client.api.get<GlobalTeleports>(ResourceIDs.NODES);
     }
 
+    /**
+     * Get the info.
+     * @calls {@link getCoreInfo}, {@link getMailInfo}, {@link getNoteInfo}, {@link getReportInfo}, {@link getSupportInfo}, {@link getTagInfo}, {@link getWebClientInfo}
+     */
     async getInfo(): Promise<Info> {
         return {
             core:      await this.getCoreInfo(),
@@ -121,14 +141,26 @@ export default class CoreCommands extends Base {
         };
     }
 
+    /**
+     * Get the mail info.
+     * @calls {@link ResClient.get}
+     */
     async getMailInfo(): Promise<MailInfo> {
         return this.client.api.get<MailInfo>(ResourceIDs.MAIL_INFO);
     }
 
+    /**
+     * Get the note info.
+     * @calls {@link ResClient.get}
+     */
     async getNoteInfo(): Promise<NoteInfo> {
         return this.client.api.get<NoteInfo>(ResourceIDs.NOTE_INFO);
     }
 
+    /**
+     * Get the core authenticated player.
+     * @calls {@link ResClient.call}
+     */
     async getPlayer(): Promise<Player> {
         return (this._player ??= await this.client.api.call<Player>("core", "getPlayer"));
     }
@@ -137,6 +169,7 @@ export default class CoreCommands extends Base {
      * Get the authenticated user.
      * @returns The authenticated user.
      * @note This is an alias for {@link getUser} which throws if the result is not an instance of `User`.
+     * @calls {@link getUser}
      */
     async getPlayerUser(): Promise<User> {
         if (this._playerUser) return this._playerUser;
@@ -145,26 +178,51 @@ export default class CoreCommands extends Base {
         throw new Error(`Expected to get User, got ${user.constructor.name}`);
     }
 
+    /**
+     * Get the report info.
+     * @calls {@link ResClient.get}
+     */
     async getReportInfo(): Promise<ReportInfo> {
         return this.client.api.get<ReportInfo>(ResourceIDs.REPORT_INFO);
     }
 
+    /**
+     * Get the roles of the authenticated user.
+     * @calls {@link ResClient.call}
+     */
     async getRoles(): Promise<Record<"roles" | "idRoles", Array<string> | null>> {
         return this.client.api.call<Record<"roles" | "idRoles", Array<string> | null>>("core", "getRoles");
     }
 
+    /**
+     * Get the support info.
+     * @calls {@link ResClient.get}
+     */
     async getSupportInfo(): Promise<SupportInfo> {
         return this.client.api.get<SupportInfo>(ResourceIDs.SUPPORT_INFO);
     }
 
+    /**
+     * Get the tag groups.
+     * @playerRequired
+     * @calls {@link ResClient.get}
+     */
     async getTagGroups(): Promise<TagGroups> {
         return this.client.api.get<TagGroups>(ResourceIDs.TAG_GROUPS);
     }
 
+    /**
+     * Get the tag info.
+     * @calls {@link ResClient.get}
+     */
     async getTagInfo(): Promise<TagInfo> {
         return this.client.api.get<TagInfo>(ResourceIDs.TAG_INFO);
     }
 
+    /**
+     * Get the global tags.
+     * @calls {@link ResClient.get}
+     */
     async getTags(): Promise<Tags> {
         return this.client.api.get<Tags>(ResourceIDs.TAGS);
     }
@@ -173,6 +231,7 @@ export default class CoreCommands extends Base {
      * Get the authenticated user.
      * @returns The authenticated user.
      * @note This is an alias for {@link getUser} which throws if the result is not an instance of `TokenUser`.
+     * @calls {@link getUser}
      */
     async getTokenUser(): Promise<TokenUser> {
         if (this._tokenUser) return this._tokenUser;
@@ -183,12 +242,16 @@ export default class CoreCommands extends Base {
 
     /**
      * Get the authenticated user. For password authentication this will return {@link User}, for token authentication this will return {@link TokenUser}.
-     * @returns The authenticated user.
+     * @calls {@link ResClient.call}
      */
     async getUser(): Promise<User | TokenUser> {
         return (this._user ??= await this.client.api.call<User | TokenUser>("auth", "getUser"));
     }
 
+    /**
+     * Get the web client info.
+     * @calls {@link ResClient.get}
+     */
     async getWebClientInfo(): Promise<WebClientInfo> {
         return this.client.api.get<WebClientInfo>(ResourceIDs.WEB_CLIENT_INFO);
     }

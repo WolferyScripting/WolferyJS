@@ -26,11 +26,23 @@ export default class Teleporters extends BaseCollection<CharacterMin, typeof Res
         return ResourceIDs.TELEPORTERS.parts(this.rid).id;
     }
 
+    /**
+     * Evict a character.
+     * @param charId The ID of the character to evict.
+     * @roomOwnershipRequired
+     * @calls {@link getCtrl} > {@link ControlledCharacter.evictTeleport}
+     */
     async evict(charId: string): Promise<Character> {
         const ctrl = await this.getCtrl();
         return ctrl.evictTeleport(charId);
     }
 
+    /**
+     * Get the controlled character that owns the room.
+     * @roomOwnershipRequired
+     * @calls {@link WolferyJS.findControlledCharacter}
+     * @throws {@link NoControlledError} If a controlled character cannot be found.
+     */
     async getCtrl(): Promise<ControlledCharacter> {
         const room = await this.getRoom();
         return this.client.findControlledCharacter(ctrl => ctrl.ownedRooms.hasKey(room.id) && ctrl.inRoom.id === room.id, true);
@@ -38,6 +50,7 @@ export default class Teleporters extends BaseCollection<CharacterMin, typeof Res
 
     /**
      * Get the room for these teleporters.
+     * @calls {@link ResClient.get}
      */
     async getRoom(): Promise<Room> {
         return this.client.api.get<Room>(ResourceIDs.ROOM({ id: this.roomId }));
@@ -45,6 +58,7 @@ export default class Teleporters extends BaseCollection<CharacterMin, typeof Res
 
     /**
      * Get the detailed room for these teleporters. A controlled character must be in the room.
+     * @calls {@link ResClient.get}
      */
     async getRoomDetails(): Promise<RoomDetails> {
         return this.client.api.get<RoomDetails>(ResourceIDs.ROOM_DETAILS({ id: this.roomId }));

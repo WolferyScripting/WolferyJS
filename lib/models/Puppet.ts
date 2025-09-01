@@ -24,6 +24,7 @@ class Puppet extends BaseModel implements PuppetProperties {
     /**
      * Set character settings.
      * @param options The settings to apply.
+     * @uses {@link CoreCommands.getPlayer} > {@link Player.setCharSettings}
      */
     async setSettings(options: Omit<Commands.Player.SetCharSettingsOptions, "puppeteerId">): Promise<null> {
         return this.client.commands.core.getPlayer().then(player => player.setCharSettings(this.id, { puppeteerId: this.char.id, ...options }));
@@ -32,7 +33,7 @@ class Puppet extends BaseModel implements PuppetProperties {
     /**
      * Wake up and control this character. This will not error if the character is already controlled or already awake.
      * @param hidden If the character should be hidden from the awake list. Only applicable to bots.
-     * @returns The controlled puppet.
+     * @uses {@link CoreCommands.getPlayer} > {@link Player.controlPuppet} > {@link ControlledCharacter.wakeup}
      */
     async wakeup(hidden?: boolean): Promise<ControlledCharacter> {
         return this.client.commands.core.getPlayer().then(player => player.controlPuppet(this.char.id, this.id, true)).then(ctrl => ((ctrl.wakeup(hidden, true), ctrl)));

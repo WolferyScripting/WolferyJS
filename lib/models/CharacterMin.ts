@@ -25,6 +25,10 @@ class CharacterMin extends BaseModel implements CharacterMinProperties {
         return `${this.name} ${this.surname}`.trim();
     }
 
+    /**
+     * Get the character.
+     * @calls {@link MiscCommands.getChar}
+     */
     async getChar(): Promise<Character> {
         const charId = ResourceIDs.CHARACTER_MIN.parts(this.rid).id;
         return this.client.commands.misc.getChar(charId);

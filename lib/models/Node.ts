@@ -21,6 +21,7 @@ class Node extends BaseModel implements NodeProperties {
 
     /**
      * Delete this teleport node. If the node is global, {@link deleteGlobal} must be used instead.
+     * @calls {@link getCtrl} > {@link ControlledCharacter.removeTeleport}
      */
     async delete(): Promise<null> {
         const ctrl = await this.getCtrl();
@@ -32,6 +33,7 @@ class Node extends BaseModel implements NodeProperties {
      * Delete this global teleport node.
      * @param ctrl The controlled character to delete the global teleport node with.
      * @adminRoleRequired
+     * @calls {@link AdminCommands.deleteTeleport}
      */
     async deleteGlobal(ctrl: string | ControlledCharacter): Promise<NameBasicResponse> {
         return this.client.commands.admin.deleteTeleport(ctrl, this.id);
@@ -39,6 +41,7 @@ class Node extends BaseModel implements NodeProperties {
 
     /**
      * Get the controlled character that owns this node. If null, the node is global.
+     * @calls {@link WolferyJS.findControlledCharacter}
      */
     async getCtrl(): Promise<ControlledCharacter | null> {
         return this.client.findControlledCharacter(c => c.nodes.hasKey(this.id));
@@ -48,15 +51,21 @@ class Node extends BaseModel implements NodeProperties {
     /**
      * Set the attributes of this teleport node.
      * @param options The options to set.
+     * @calls {@link getCtrl} > {@link ControlledCharacter.setTeleport}
      */
     async set(options: Commands.Controlled.SetTeleportOptions): Promise<null> {
         const ctrl = await this.getCtrl();
         if (!ctrl) throw new Error(`Node ${this.rid} is not a character node`);
-        return this.client.commands.controlled.setTeleport(ctrl, this.id, options);
+        return ctrl.setTeleport(this.id, options);
     }
 
-    teleport(ctrl: ControlledCharacter): Promise<null> {
-        return ctrl.nodeTeleport(this.id);
+    /**
+     * Teleport to this node.
+     * @param ctrl The controlled character to teleport.
+     * @calls {@link ControlledCommands.teleport}
+     */
+    teleport(ctrl: string | ControlledCharacter): Promise<null> {
+        return this.client.commands.controlled.teleport(ctrl, { nodeId: this.id });
     }
 }
 

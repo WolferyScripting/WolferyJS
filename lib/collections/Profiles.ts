@@ -27,12 +27,18 @@ export default class Profiles extends BaseCollection<Profile, typeof ResourceIDs
      * Create a profile based on the character's current attributes.
      * @param name The name of the profile.
      * @param key The key of the profile.
+     * @calls {@link getCtrl} > {@link ControlledCharacter.createProfile}
      */
     async create(name: string, key: string): Promise<Profile> {
         const ctrl = await this.getCtrl();
         return ctrl.createProfile(name, key);
     }
 
+    /**
+     * Get the controlled character these profiles belong to.
+     * @calls {@link WolferyJS.findControlledCharacter}
+     * @throws {@link NoControlledError} If a controlled character cannot be found.
+     */
     async getCtrl(): Promise<ControlledCharacter> {
         return this.client.getControlledCharacter(this.ctrlId, true);
     }

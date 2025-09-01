@@ -59,11 +59,16 @@ class OwnedCharacter extends BaseModel implements OwnedCharacterProperties {
      * Delete this character.
      * @param heir The ID of the character to inherit any rooms or items of the deleted character.
      * @playerRequired
+     * @calls {@link CoreCommands.getPlayer} > {@link Player.deleteChar}
      */
     async delete(heir: string): Promise<null> {
         return this.client.commands.core.getPlayer().then(player => player.deleteChar(this.id, heir));
     }
 
+    /**
+     * Get the controlled character.
+     * @calls {@link ResClient.getCached}
+     */
     getControlled(): ControlledCharacter | null {
         return this.client.api.getCached<ControlledCharacter>(ResourceIDs.CONTROLLED_CHARACTER({ id: this.id }));
     }
@@ -72,6 +77,7 @@ class OwnedCharacter extends BaseModel implements OwnedCharacterProperties {
      * Set character settings.
      * @note This requires player access (password authentication).
      * @param options The settings to apply.
+     * @calls {@link CoreCommands.getPlayer} > {@link Player.setCharSettings}
      */
     async setSettings(options: Omit<Commands.Player.SetCharSettingsOptions, "puppeteerId">): Promise<null> {
         return this.client.commands.core.getPlayer().then(player => player.setCharSettings(this.id, options));
@@ -82,6 +88,7 @@ class OwnedCharacter extends BaseModel implements OwnedCharacterProperties {
      * @param hidden If the character should be hidden from the awake list. Only applicable to bots.
      * @param force Ignore already being controlled or woken up.
      * @returns The controlled character.
+     * @calls {@link CoreCommands.getPlayer} > {@link Player.controlChar} > {@link ControlledCharacter.wakeup}
      */
     async wakeup(hidden?: boolean, force = true): Promise<ControlledCharacter> {
         return this.client.commands.core.getPlayer().then(player =>

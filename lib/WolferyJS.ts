@@ -18,6 +18,7 @@ import { enableCustomInspectForCollections } from "./collections/BaseCollection.
 import { enableCustomInspectForCollectionModels } from "./models/BaseCollectionModel.js";
 import { enableCustomInspectForModels } from "./models/BaseModel.js";
 import type Character from "./models/Character.js";
+import { NoControlledError } from "./util/Errors.js";
 import {
     type ClientOptions,
     ResError,
@@ -850,7 +851,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
     async findControlledCharacter(cb: (ctrl: ControlledCharacter) => Promise<boolean> | boolean, error = false): Promise<ControlledCharacter | null> {
         if (this.isBot() && this.user) {
             if (this.user.controlled && await cb(this.user.controlled)) return this.user.controlled;
-            if (error) throw new Error("Could not find ControlledCharacter");
+            if (error) throw new NoControlledError("Could not find ControlledCharacter");
             return null;
         }
 
@@ -858,11 +859,11 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
             for (const ctrl of this.player.controlled) {
                 if (await cb(ctrl)) return ctrl;
             }
-            if (error) throw new Error("Could not find ControlledCharacter");
+            if (error) throw new NoControlledError("Could not find ControlledCharacter");
             return null;
         }
 
-        if (error) throw new Error("Could not find ControlledCharacter");
+        if (error) throw new NoControlledError("Could not find ControlledCharacter");
         return null;
     }
 
@@ -882,6 +883,11 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         return results;
     }
 
+    /**
+     * Get a character.
+     * @param id The ID of the character.
+     * @calls {@link ResClient.getCached} > {@link ResClient.get}
+     */
     async getChar(id: string): Promise<Character> {
         const rid = ResourceIDs.CHARACTER({ id });
         const cached = this.api.getCached<Character>(rid);
@@ -889,6 +895,12 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
         return this.api.get<Character>(rid);
     }
 
+    /**
+     * Get a controlled character.
+     * @param id The ID of the controlled character.
+     * @param error If an error should be thrown if the controlled character is not found.
+     * @calls {@link ResClient.getCached}
+     */
     getControlledCharacter(id: string, error: true): ControlledCharacter;
     getControlledCharacter(id: string, error?: false): ControlledCharacter | null;
     getControlledCharacter(id: string, error = false): ControlledCharacter | null {

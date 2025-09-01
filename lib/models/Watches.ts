@@ -28,6 +28,7 @@ class Watches extends BaseCollectionModel<ResRef<Watch>, typeof ResourceIDs.WATC
      * Add a watch for a character.
      * @param charId The ID of the character to add a watch for.
      * @playerRequired
+     * @calls {@link PlayerCommands.watchChar} > {@link ResClient.get}
      */
     async watch(charId: string): Promise<Watch> {
         return this.client.commands.player.watchChar(this.playerId, charId)

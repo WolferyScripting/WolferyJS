@@ -1,3 +1,4 @@
+export { ResClient, ResModel, ResCollection, ResCollectionModel } from "resclient-ts";
 export { default, default as WolferyJS, type AnyUser } from "./WolferyJS.js";
 export type * from "./WolferyJS.js";
 export { default as ResourceIDs } from "./generated/ResourceIDs.js";

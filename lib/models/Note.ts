@@ -56,14 +56,17 @@ class Note extends BaseModel implements NoteProperties {
      * Append text to the note for this character. The text will be added on a new line.
      * @param text The text to append to the note.
      * @playerRequired
+     * @calls {@link PlayerCommands.appendNote} > {@link WolferyJS.getChar}
      */
     async appendText(text: string): Promise<Character> {
-        return this.client.commands.core.getPlayer().then(player => player.appendNote(this.id, text));
+        return this.client.commands.player.appendNote(this.playerId, this.charId, text)
+            .then(r => this.client.getChar(r.id));
     }
 
     /**
      * Clear the note for this character.
      * @playerRequired
+     * @calls {@link set}
      */
     async clearText(): Promise<Character> {
         return this.set({ text: "" });
@@ -72,9 +75,11 @@ class Note extends BaseModel implements NoteProperties {
     /**
      * Delete this note.
      * @playerRequired
+     * @calls {@link PlayerCommands.deleteNote} > {@link WolferyJS.getChar}
      */
     async delete(): Promise<Character> {
-        return this.client.commands.core.getPlayer().then(player => player.deleteNote(this.id));
+        return this.client.commands.player.deleteNote(this.playerId, this.charId)
+            .then(r => this.client.getChar(r.id));
     }
 
     /** @internal */
@@ -86,9 +91,11 @@ class Note extends BaseModel implements NoteProperties {
      * Set the note for this character.
      * @param options The options to set.
      * @playerRequired
+     * @calls {@link PlayerCommands.setNote} > {@link WolferyJS.getChar}
      */
     async set(options: Commands.Player.SetNoteOptions): Promise<Character> {
-        return this.client.commands.core.getPlayer().then(player => player.setNote(this.id, options));
+        return this.client.commands.player.setNote(this.playerId, this.charId, options)
+            .then(r => this.client.getChar(r.id));
     }
 
     /** @internal */

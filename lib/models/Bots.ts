@@ -23,6 +23,8 @@ class Bots extends BaseCollectionModel<Bot, typeof ResourceIDs.BOT> {
     /**
      * Create a bot token.
      * @param charId The ID of the character the bot is for.
+     * @playerRequired
+     * @calls {@link PlayerCommands.createBot}
      */
     async create(charId: string): Promise<Bot> {
         const playerId = ResourceIDs.BOTS.parts(this.rid).id;

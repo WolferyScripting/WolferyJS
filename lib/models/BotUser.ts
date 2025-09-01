@@ -36,13 +36,17 @@ class BotUser extends BaseModel {
     /**
      * Control the character associated with this BotUser.
      * @param force Ignore the character already being controlled.
-     * @returns The owned character instance associated with this BotUser.
+     * @calls {@link MiscCommands.controlCharBot}
      */
     async controlChar(force = true): Promise<ControlledCharacter> {
         if (force && this.controlled !== null) return this.controlled;
         return this.client.commands.misc.controlCharBot(this);
     }
 
+    /**
+     * Release control of the character associated with this BotUser.
+     * @calls {@link ControlledCharacter.release}
+     */
     async release(): Promise<ControlledCharacter | null> {
         if (this.controlled === null) return null;
         return this.controlled.release();
@@ -52,6 +56,7 @@ class BotUser extends BaseModel {
      * Wake up the character associated with this BotUser.
      * @param hidden If the character should be hidden from the awake list.
      * @param force Ignore the character already being awake.
+     * @calls {@link ControlledCharacter.wakeup}, {@link controlChar} > {@link ControlledCharacter.wakeup}
      */
     async wakeup(hidden?: boolean, force = true): Promise<ControlledCharacter> {
         if (this.controlled !== null) {

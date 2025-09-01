@@ -13,3 +13,11 @@ export class UnsubscribeError extends Error {
         super("Client was forcefully unsubscribed, and no listeners were registered.");
     }
 }
+
+export class NoControlledError extends Error {
+    override name = "NoControlledError";
+    constructor(message?: string, options?: ErrorOptions) {
+        super(message, options);
+    }
+
+}

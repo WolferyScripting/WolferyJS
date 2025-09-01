@@ -20,6 +20,7 @@ class TagGroup extends BaseModel implements TagGroupProperties {
     /**
      * Delete this tag group.
      * @adminRoleRequired
+     * @calls {@link AdminCommands.deleteTagGroup}
      */
     async delete(): Promise<KeyNameResponse> {
         return this.client.commands.admin.deleteTagGroup(this.key);
@@ -29,6 +30,7 @@ class TagGroup extends BaseModel implements TagGroupProperties {
      * Set attributes of this tag group.
      * @param options The options to set.
      * @adminRoleRequired
+     * @calls {@link AdminCommands.setTagGroup}
      */
     async set(options: Commands.Admin.SetTagGroupOptions): Promise<KeyNameResponse> {
         return this.client.commands.admin.setTagGroup(this.key, options);

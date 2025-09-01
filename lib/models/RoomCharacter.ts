@@ -1,4 +1,5 @@
 import BaseModel from "./BaseModel.js";
+import type Character from "./Character.js";
 import type WolferyJS from "../WolferyJS.js";
 import type { RoomCharacterProperties } from "../generated/models/types.js";
 import { RoomCharacterDefinition } from "../generated/models/definitions.js";
@@ -21,6 +22,14 @@ class RoomCharacter extends BaseModel implements RoomCharacterProperties {
 
     get fullname(): string {
         return `${this.name} ${this.surname}`;
+    }
+
+    /**
+     * Get the character.
+     * @calls {@link WolferyJS.getChar}
+     */
+    async getChar(): Promise<Character> {
+        return this.client.getChar(this.id);
     }
 }
 

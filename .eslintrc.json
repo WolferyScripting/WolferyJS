@@ -146,9 +146,8 @@
     "@typescript-eslint/consistent-type-imports": [
       "error",
       {
-        "disallowTypeAnnotations": true,
-        "fixStyle": "separate-type-imports",
-        "prefer": "type-imports"
+        "disallowTypeAnnotations": false,
+        "fixStyle": "inline-type-imports"
       }
     ],
     "arrow-body-style": ["error", "as-needed"],

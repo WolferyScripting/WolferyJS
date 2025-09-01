@@ -22,6 +22,7 @@ class CustomTag extends BaseModel implements TagProperties {
      * Add this tag to a character.
      * @param ctrl A {@link ControlledCharacter} instance or id.
      * @param pref The preference for the tag.
+     * @calls {@link ControlledCommands.setTags}
      */
     async add(ctrl: string | ControlledCharacter, pref: TagPref): Promise<null> {
         return this.client.commands.controlled.setTags(ctrl, { [this.id]: pref });
@@ -30,12 +31,18 @@ class CustomTag extends BaseModel implements TagProperties {
     /**
      * Delete this tag.
      * @note Alias of {@link remove} with `ctrl` autofilled.
+     * @calls {@link remove}
      */
     async delete(): Promise<null> {
         const ctrl = await this.getCtrl();
         return this.remove(ctrl);
     }
 
+    /**
+     * Get the controlled character this tag belong to.
+     * @calls {@link WolferyJS.findControlledCharacter}
+     * @throws {@link NoControlledError} If a controlled character cannot be found.
+     */
     async getCtrl(): Promise<ControlledCharacter> {
         return this.client.findControlledCharacter(c => c.tags.hasKey(this.id), true);
     }
@@ -43,6 +50,7 @@ class CustomTag extends BaseModel implements TagProperties {
     /**
      * Remove this tag from a character.
      * @param ctrl A {@link ControlledCharacter} instance or ID.
+     * @calls {@link ControlledCommands.setTags}
      */
     async remove(ctrl: string | ControlledCharacter): Promise<null> {
         return this.client.commands.controlled.setTags(ctrl, { [this.id]: null });
@@ -51,6 +59,7 @@ class CustomTag extends BaseModel implements TagProperties {
     /**
      * Set attributes for this tag.
      * @param options Options to set for the tag.
+     * @calls {@link MiscCommands.setTag}
      */
     async set(options: Commands.Misc.SetTagOptions): Promise<KeyResponse> {
         return this.client.commands.misc.setTag(this.id, options);

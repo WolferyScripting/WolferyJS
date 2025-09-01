@@ -32,18 +32,26 @@ export default class RoomScripts extends BaseCollection<RoomScript, typeof Resou
      * @param key The key of the script.
      * @param options The options for creating the room script.
      * @roomOwnershipRequired
+     * @calls {@link getCtrl} > {@link ControlledCharacter.createRoomScript}
      */
     async create(key: string, options: Commands.Controlled.CreateRoomScriptOptions): Promise<RoomScriptDetails> {
         const ctrl = await this.getCtrl();
         return ctrl.createRoomScript(key, options);
     }
 
+    /**
+     * Get the controlled character that owns the room.
+     * @roomOwnershipRequired
+     * @calls {@link WolferyJS.findControlledCharacter}
+     * @throws {@link NoControlledError} If a controlled character cannot be found.
+     */
     async getCtrl(): Promise<ControlledCharacter> {
         return this.client.findControlledCharacter(ctrl => ctrl.ownedRooms.hasKey(this.roomId) && ctrl.inRoom.id === this.roomId, true);
     }
 
     /**
      * Get the room for the scripts.
+     * @calls {@link ResClient.get}
      */
     async getRoom(): Promise<Room> {
         return this.api.get<Room>(ResourceIDs.ROOM({ id: this.roomId }));
@@ -51,6 +59,7 @@ export default class RoomScripts extends BaseCollection<RoomScript, typeof Resou
 
     /**
      * Get the detailed room for the scripts. A character must be in the room.
+     * @calls {@link ResClient.get}
      */
     async getRoomDetails(): Promise<RoomDetails> {
         return this.api.get<RoomDetails>(ResourceIDs.ROOM_DETAILS({ id: this.roomId }));

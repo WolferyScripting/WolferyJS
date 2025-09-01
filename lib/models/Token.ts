@@ -18,6 +18,7 @@ class Token extends BaseModel implements TokenProperties {
     /**
      * Delete this token.
      * @playerRequired
+     * @calls {@link MiscCommands.deleteToken}
      */
     async delete(): Promise<null> {
         return this.client.commands.misc.deleteToken(this.id);
@@ -27,6 +28,7 @@ class Token extends BaseModel implements TokenProperties {
      * Renew this token.
      * @playerRequired
      * @note The client attempts to call this but it always returns `system.notImplemented`.
+     * @calls {@link MiscCommands.renewToken}
      */
     async renew(): Promise<null> {
         return this.client.commands.misc.renewToken(this.id);

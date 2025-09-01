@@ -28,18 +28,25 @@ class RoomProfile extends BaseModel implements RoomProfileProperties {
     /**
      * Delete the room profile. The controlled character that owns the room must be in the room.
      * @roomOwnershipRequired
+     * @calls {@link getCtrl} > {@link ControlledCharacter.deleteRoomProfile}
      */
     async delete(): Promise<NameBasicResponse> {
         const ctrl = await this.getCtrl();
         return ctrl.deleteRoomProfile(this.id);
     }
 
+    /**
+     * Get the controlled character in the room containing this profile.
+     * @calls {@link WolferyJS.findControlledCharacter}
+     * @throws {@link NoControlledError} If a controlled character cannot be found.
+     */
     async getCtrl(): Promise<ControlledCharacter> {
         return this.client.findControlledCharacter(async c => c.inRoom.owner.id === c.id && (await c.inRoom.getProfiles()).hasKey(this.id), true);
     }
 
     /**
      * Get the room for the room profile. A controlled character must be in the room.
+     * @calls {@link getCtrl} > {@link ResClient.get}
      */
     async getRoom(): Promise<Room> {
         const ctrl = await this.getCtrl();
@@ -48,6 +55,7 @@ class RoomProfile extends BaseModel implements RoomProfileProperties {
 
     /**
      * Get the detailed room for the room profile. A controlled character must be in the room.
+     * @calls {@link getCtrl}
      */
     async getRoomDetails(): Promise<RoomDetails> {
         const ctrl = await this.getCtrl();
@@ -58,6 +66,7 @@ class RoomProfile extends BaseModel implements RoomProfileProperties {
      * Set options for this room profile. The controlled character that owns the room must be in the room.
      * @param options The options to set.
      * @roomOwnershipRequired
+     * @calls {@link getCtrl} > {@link ControlledCharacter.setRoomProfile}
      */
     async set(options: Commands.Controlled.SetRoomProfileOptions): Promise<NameBasicResponse> {
         const ctrl = await this.getCtrl();
@@ -68,6 +77,7 @@ class RoomProfile extends BaseModel implements RoomProfileProperties {
      * Apply this room profile. The controlled character that owns the room must be in the room.
      * @param safe If a check should be made to ensure the current room info is stored in a profile.
      * @roomOwnershipRequired
+     * @calls {@link getCtrl} > {@link ControlledCharacter.useRoomProfile}
      */
     async use(safe = true): Promise<RoomProfile> {
         const ctrl = await this.getCtrl();

@@ -26,12 +26,18 @@ export default class OwnedRooms extends BaseCollection<Room, typeof ResourceIDs.
     /**
      * Create a new room.
      * @param name The name of the room.
+     * @calls {@link getCtrl} > {@link ControlledCharacter.createRoom}
      */
     async create(name: string): Promise<Room> {
         const ctrl = await this.getCtrl();
         return ctrl.createRoom(name);
     }
 
+    /**
+     * Get the controlled character these rooms belong to.
+     * @calls {@link WolferyJS.findControlledCharacter}
+     * @throws {@link NoControlledError} If a controlled character cannot be found.
+     */
     async getCtrl(): Promise<ControlledCharacter> {
         return this.client.getControlledCharacter(this.ctrlId, true);
     }

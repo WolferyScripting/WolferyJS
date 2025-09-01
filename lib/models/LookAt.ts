@@ -18,7 +18,8 @@ class LookAt extends BaseModel implements LookAtProperties {
 
     /**
      * Get the controlled character for this instance.
-     * @note The LookAt instance does not specify the controlled character, so this function may be brittle. It will not work if the LookAt instance is not current.
+     * @calls {@link WolferyJS.findControlledCharacter}
+     * @throws {@link NoControlledError} If a controlled character cannot be found.
      */
     async getCtrl(): Promise<ControlledCharacter> {
         return this.client.findControlledCharacter(c => c.lookingAt === this, true);
@@ -26,9 +27,11 @@ class LookAt extends BaseModel implements LookAtProperties {
 
     /**
      * Stop looking at the character.
+     * @calls {@link getCtrl} > {@link ControlledCharacter.unlook}
      */
     async unlook(): Promise<null> {
-        return this.getCtrl().then(ctrl => ctrl.unlook());
+        const ctrl = await this.getCtrl();
+        return ctrl.unlook();
     }
 }
 

@@ -30,6 +30,10 @@ class LookedAt extends BaseCollectionModel<boolean> implements LookedAtPropertie
         return Object.entries(this.props).filter(([,v]) => Boolean(v)).map(([k]) => new ResRef(this.api, ResourceIDs.ROOM_CHARACTER({ id: k })));
     }
 
+    /**
+     * Get the characters.
+     * @calls {@link ResRef.get}
+     */
     async getChars(): Promise<Array<RoomCharacter>> {
         return Promise.all(this.refs.map(ref => ref.get()));
     }

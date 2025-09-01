@@ -23,35 +23,52 @@ class ExitDetails extends BaseModel implements ExitDetailsProperties {
     /**
      * Delete the exit. The controlled character that owns the room must be in the room.
      * @roomOwnershipRequired
+     * @calls {@link getCtrl} > {@link ControlledCharacter.deleteExit}
      */
     async delete(): Promise<Exit> {
-        const ctrl = await this.client.findControlledCharacter(c => c.inRoom.exits.hasKey(this.id), true);
+        const ctrl = await this.getCtrl();
         return ctrl.deleteExit(this.id);
     }
 
+    /**
+     * Get the controlled character this exit is in the room of.
+     * @calls {@link WolferyJS.findControlledCharacter}
+     * @throws {@link NoControlledError} If a controlled character cannot be found.
+     */
+    async getCtrl(): Promise<ControlledCharacter> {
+        return this.client.findControlledCharacter(ctrl => ctrl.inRoom.exits.hasKey(this.id), true);
+    }
+
+    /**
+     * Get the exit.
+     * @calls {@link ResClient.get}
+     */
     async getExit(): Promise<Exit> {
         return this.api.get<Exit>(ResourceIDs.EXIT({ id: this.id }));
     }
 
     /**
      * Get the room for the exit. A controlled character must be in the room.
+     * @calls {@link getCtrl} > {@link ResClient.get}
      */
     async getRoom(): Promise<Room> {
-        const ctrl = await this.client.findControlledCharacter(c => c.inRoom.exits.hasKey(this.id), true);
+        const ctrl = await this.getCtrl();
         return this.api.get<Room>(ResourceIDs.ROOM({ id: ctrl.inRoom.id }));
     }
 
     /**
-     * Get the detailed room for the profiles. A controlled character must be in the room.
+     * Get the detailed room for the exit. A controlled character must be in the room.
+     * @calls {@link getCtrl}
      */
     async getRoomDetails(): Promise<RoomDetails> {
-        const ctrl = await this.client.findControlledCharacter(c => c.inRoom.exits.hasKey(this.id), true);
+        const ctrl = await this.getCtrl();
         return ctrl.inRoom;
     }
 
     /**
      * Use this exit.
      * @param ctrl A {@link ControlledCharacter} instance or ID.
+     * @calls {@link ControlledCommands.useExit}
      */
     async use(ctrl: string | ControlledCharacter): Promise<null> {
         return this.client.commands.controlled.useExit(ctrl, { exitId: this.id });

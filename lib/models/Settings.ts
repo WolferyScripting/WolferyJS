@@ -36,6 +36,7 @@ class Settings extends BaseModel implements SettingsProperties {
      * Set settings.
      * @param options The settings to set.
      * @playerRequired
+     * @calls {@link CoreCommands.getPlayer} > {@link Player.setCharSettings}
      */
     async set(options: Omit<Commands.Player.SetCharSettingsOptions, "puppeteerId">): Promise<null> {
         return this.client.commands.core.getPlayer().then(player => player.setCharSettings(this.charId, { puppeteerId: this.puppeteerId ?? undefined, ...options }));

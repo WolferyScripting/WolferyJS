@@ -18,6 +18,7 @@ class TagGroups extends BaseCollectionModel<TagGroup> {
      * Create a tag group.
      * @param options The options to create the tag group with.
      * @adminRoleRequired
+     * @calls {@link AdminCommands.createTagGroup}
      */
     async create(options: Commands.Admin.CreateTagGroupOptions): Promise<TagGroup> {
         return this.client.commands.admin.createTagGroup(options);

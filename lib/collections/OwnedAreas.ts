@@ -26,12 +26,18 @@ export default class OwnedAreas extends BaseCollection<Area, typeof ResourceIDs.
     /**
      * Create a new area.
      * @param name The name of the area.
+     * @calls {@link getCtrl} > {@link ControlledCharacter.createArea}
      */
     async create(name: string): Promise<Area> {
         const ctrl = await this.getCtrl();
         return ctrl.createArea(name);
     }
 
+    /**
+     * Get the controlled character these areas belong to.
+     * @calls {@link WolferyJS.findControlledCharacter}
+     * @throws {@link NoControlledError} If a controlled character cannot be found.
+     */
     async getCtrl(): Promise<ControlledCharacter> {
         return this.client.getControlledCharacter(this.ctrlId, true);
     }

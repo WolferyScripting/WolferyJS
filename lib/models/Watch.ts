@@ -26,15 +26,26 @@ class Watch extends BaseModel implements WatchProperties {
         return ResourceIDs.WATCH.parts(this.rid).player;
     }
 
+    /**
+     * Get the character.
+     * @calls {@link WolferyJS.getChar}
+     */
     async getChar(): Promise<Character> {
         return this.client.getChar(this.charId);
     }
 
+    /**
+     * Get the watchers.
+     * @calls {@link CoreCommands.getPlayer} > {@link OwnedCharacters.getOrThrow}
+     */
     async getWatchers(): Promise<Array<OwnedCharacter>> {
         return this.client.commands.core.getPlayer().then(player => this.watchers.map(id => player.chars.getOrThrow(id)));
     }
 
-    // @TODO
+    /**
+     * Unwatch the character.
+     * @calls {@link PlayerCommands.unwatchChar} > {@link WolferyJS.getChar}
+     */
     async unwatch(): Promise<Character> {
         return this.client.commands.player.unwatchChar(this.playerId, this.charId)
             .then(r => this.client.getChar(r.id));

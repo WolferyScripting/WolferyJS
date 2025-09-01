@@ -535,7 +535,13 @@ declare namespace Commands {
             /** If the whisper should be ooc. */
             pose?: boolean;
         }
+
+        export interface CreateRoomScriptOptions {
+            key: string;
+            source?: string;
+        }
     }
+
     export namespace Player {
         export interface GetCharOptions {
             charId?: string;
@@ -587,7 +593,12 @@ declare namespace Commands {
             name: string;
             surname: string;
         }
+
+        export interface SetPreferenceOptions {
+            mainChar?: string;
+        }
     }
+
     export namespace Misc {
         export interface SetTagOptions {
             desc?: string;

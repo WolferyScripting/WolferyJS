@@ -25,18 +25,25 @@ class RoomScriptDetails extends BaseModel implements RoomScriptDetailsProperties
     /**
      * Delete the room script. The controlled character that owns the room must be in the room.
      * @roomOwnershipRequired
+     * @calls {@link getCtrl} > {@link ControlledCharacter.deleteRoomScript}
      */
     async delete(): Promise<KeyBasicResponse> {
         const ctrl = await this.getCtrl();
         return ctrl.deleteRoomScript(this.id);
     }
 
+    /**
+     * Get the controlled character in the room containing this script.
+     * @calls {@link WolferyJS.findControlledCharacter}
+     * @throws {@link NoControlledError} If a controlled character cannot be found.
+     */
     async getCtrl(): Promise<ControlledCharacter> {
         return this.client.findControlledCharacter(async c => c.inRoom.owner.id === c.id && (await c.inRoom.getScripts()).hasKey(this.id), true);
     }
 
     /**
      * Get the room for the room profile. A controlled character must be in the room.
+     * @calls {@link getCtrl} > {@link ResClient.get}
      */
     async getRoom(): Promise<Room> {
         const ctrl = await this.getCtrl();
@@ -45,12 +52,17 @@ class RoomScriptDetails extends BaseModel implements RoomScriptDetailsProperties
 
     /**
      * Get the detailed room for the room profile. A controlled character must be in the room.
+     * @calls {@link getCtrl}
      */
     async getRoomDetails(): Promise<RoomDetails> {
         const ctrl = await this.getCtrl();
         return ctrl.inRoom;
     }
 
+    /**
+     * Get the room script.
+     * @calls {@link ResClient.get}
+     */
     async getRoomScript(): Promise<RoomScript> {
         return this.api.get<RoomScript>(ResourceIDs.ROOM_SCRIPT({ id: this.id }));
     }
@@ -59,6 +71,7 @@ class RoomScriptDetails extends BaseModel implements RoomScriptDetailsProperties
      * Set options for this room script. The controlled character that owns the room must be in the room.
      * @param options The options to set.
      * @roomOwnershipRequired
+     * @calls {@link getCtrl} > {@link ControlledCharacter.setRoomScript}
      */
     async set(options: Commands.Controlled.SetRoomScriptOptions): Promise<{ room: Room; script: RoomScriptDetails; }> {
         const ctrl = await this.getCtrl();

@@ -17,6 +17,10 @@ class CharacterInfo extends BaseModel implements CharacterInfoProperties {
         super(client, api, rid, { definition: CharacterInfoDefinition });
     }
 
+    /**
+     * Get the character.
+     * @calls {@link MiscCommands.getChar}
+     */
     async getChar(): Promise<Character> {
         const charId = ResourceIDs.CHARACTER_INFO.parts(this.rid).id;
         return this.client.commands.misc.getChar(charId);

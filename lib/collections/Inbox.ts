@@ -25,6 +25,10 @@ class Inbox extends BaseCollection<PlayerMailMessage, typeof ResourceIDs.PLAYER_
         return ResourceIDs.INBOX.parts(this.rid).id;
     }
 
+    /**
+     * Get the player this inbox is for.
+     * @calls {@link CoreCommands.getPlayer}
+     */
     async getPlayer(): Promise<Player> {
         const player = await this.client.commands.core.getPlayer();
         if (player.id !== this.playerId) {
@@ -38,10 +42,11 @@ class Inbox extends BaseCollection<PlayerMailMessage, typeof ResourceIDs.PLAYER_
      * @param fromCharId The ID of the character sending the mail.
      * @param toCharId The ID of the character to send the mail to.
      * @param options The options for the mail.
+     * @playerRequired
+     * @calls {@link PlayerCommands.mail} > {@link WolferyJS.getChar}
      */
     async send(fromCharId: string, toCharId: string, options: Commands.Inbox.SendOptions): Promise<Character> {
-        const playerId = ResourceIDs.INBOX.parts(this.rid).id;
-        return this.client.commands.player.mail(playerId, fromCharId, toCharId, options)
+        return this.client.commands.player.mail(this.playerId, fromCharId, toCharId, options)
             .then(r => this.client.getChar(r.id));
     }
 }

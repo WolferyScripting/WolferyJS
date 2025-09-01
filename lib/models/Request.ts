@@ -33,7 +33,10 @@ class Request extends BaseModel implements RequestProperties {
         this[m]("change", this.onChange);
     }
 
-    /** Accept this request. */
+    /**
+     * Accept this request.
+     * @uses {@link CoreCommands.getPlayer} > {@link Player.acceptRequest}
+     */
     async accept(): Promise<null> {
         return this.client.commands.core.getPlayer().then(player => player.acceptRequest(this.id));
     }
@@ -43,12 +46,18 @@ class Request extends BaseModel implements RequestProperties {
         return this.onStateChange;
     }
 
-    /** Reject this request. */
+    /**
+     * Reject this request.
+     * @uses {@link CoreCommands.getPlayer} > {@link Player.rejectRequest}
+     */
     async reject(): Promise<null> {
         return this.client.commands.core.getPlayer().then(player => player.rejectRequest(this.id));
     }
 
-    /** Revoke this request. */
+    /**
+     * Revoke this request.
+     * @uses {@link CoreCommands.getPlayer} > {@link Player.revokeRequest}
+     */
     async revoke(): Promise<null> {
         return this.client.commands.core.getPlayer().then(player => player.revokeRequest(this.id));
     }

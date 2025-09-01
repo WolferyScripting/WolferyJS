@@ -6,6 +6,7 @@ import type { AreaDetailsProperties } from "../generated/models/types.js";
 import { AreaDetailsDefinition } from "../generated/models/definitions.js";
 import type { DeleteNameResponse } from "../util/types.js";
 import type Commands from "../util/commands.js";
+import { NoControlledError } from "../util/Errors.js";
 import type { ResClient } from "resclient-ts";
 
 declare interface AreaDetails extends BaseModel, AreaDetailsProperties {}
@@ -22,6 +23,7 @@ class AreaDetails extends BaseModel implements AreaDetailsProperties {
     /**
      * Delete this area.
      * @areaOwnershipRequired
+     * @calls {@link getCtrl} > {@link ControlledCharacter.deleteArea} > {@link ControlledCommands.deleteArea}
      */
     async delete(): Promise<DeleteNameResponse> {
         const ctrl = await this.getCtrl();
@@ -31,10 +33,12 @@ class AreaDetails extends BaseModel implements AreaDetailsProperties {
     /**
      * Get the controlled character that owns this area.
      * @areaOwnershipRequired
+     * @calls {@link WolferyJS.findControlledCharacter}
+     * @throws {@link NoControlledError} If a controlled character cannot be found.
      */
     async getCtrl(): Promise<ControlledCharacter> {
         const ctrl = await this.client.findControlledCharacter(c => c.ownedAreas.hasKey(this.id));
-        if (!ctrl) throw new Error(`Failed to get ControlledCharacter owner for area ${this.rid}`);
+        if (!ctrl) throw new NoControlledError(`Failed to get ControlledCharacter owner for area ${this.rid}`);
         return ctrl;
     }
 
@@ -42,6 +46,7 @@ class AreaDetails extends BaseModel implements AreaDetailsProperties {
      * Request to set the owner of this area.
      * @param charId The ID of the character to request to set as the owner.
      * @areaOwnershipRequired
+     * @calls {@link getCtrl} > {@link ControlledCharacter.requestSetAreaOwner}
      */
     async requestSetOwner(charId: string): Promise<Character> {
         const ctrl = await this.getCtrl();
@@ -52,6 +57,7 @@ class AreaDetails extends BaseModel implements AreaDetailsProperties {
      * Request to set the parent of this area.
      * @param areaId The ID of the area to request to set as the parent.
      * @areaOwnershipRequired
+     * @calls {@link getCtrl} > {@link ControlledCharacter.requestSetAreaParent}
      */
     async requestSetParent(areaId: string): Promise<null> {
         const ctrl = await this.getCtrl();
@@ -62,6 +68,7 @@ class AreaDetails extends BaseModel implements AreaDetailsProperties {
      * Set options for this area.
      * @param options The options to set.
      * @areaOwnershipRequired
+     * @calls {@link getCtrl} > {@link ControlledCharacter.setArea}
      */
     async set(options: Commands.Controlled.SetAreaOptions): Promise<null> {
         const ctrl = await this.getCtrl();
@@ -69,10 +76,10 @@ class AreaDetails extends BaseModel implements AreaDetailsProperties {
     }
 
     /**
-     * Set the owner of this area.
+     * Set the owner of this area. Unless you own the target character, the `Builder` role is required.
      * @param charId The ID of the character to set as the owner.
      * @areaOwnershipRequired
-     * @builderRoleRequired Unless you own the target character.
+     * @calls {@link getCtrl} > {@link ControlledCharacter.setAreaOwner}
      */
     async setOwner(charId: string): Promise<Character> {
         const ctrl = await this.getCtrl();

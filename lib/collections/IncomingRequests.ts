@@ -23,6 +23,10 @@ export default class IncomingRequests extends BaseCollection<Request, typeof Res
         return ResourceIDs.INCOMING_REQUESTS.parts(this.rid).id;
     }
 
+    /**
+     * Get the player these requests are for.
+     * @calls {@link CoreCommands.getPlayer}
+     */
     async getPlayer(): Promise<Player> {
         const player = await this.client.commands.core.getPlayer();
         if (player.id !== this.playerId) {

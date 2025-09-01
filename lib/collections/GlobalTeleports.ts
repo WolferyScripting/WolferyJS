@@ -19,6 +19,13 @@ export default class GlobalTeleports extends BaseCollection<Node, typeof Resourc
         });
     }
 
+    /**
+     * Create a global teleport node.
+     * @param ctrl The controlled character creating the teleport node.
+     * @param key The key for the teleport node.
+     * @adminRoleRequired
+     * @calls {@link AdminCommands.createTeleport} > {@link WolferyJS.waitForCached}
+     */
     async create(ctrl: ControlledCharacter, key: string): Promise<Node> {
         return this.client.commands.admin.createTeleport(ctrl, key)
             .then(r => this.client.waitForCached<Node>(ResourceIDs.NODE({ id: r.node.id })));

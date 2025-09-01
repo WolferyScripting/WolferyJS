@@ -23,6 +23,7 @@ class GlobalTag extends BaseModel implements TagProperties {
      * Add this tag to a character.
      * @param ctrl A {@link ControlledCharacter} instance or id.
      * @param pref The preference for the tag.
+     * @calls {@link ControlledCommands.setTags}
      */
     async add(ctrl: string | ControlledCharacter, pref: TagPref): Promise<null> {
         return this.client.commands.controlled.setTags(ctrl, { [this.id]: pref });
@@ -33,15 +34,17 @@ class GlobalTag extends BaseModel implements TagProperties {
      * @param ctrl A {@link ControlledCharacter} instance or id.
      * @param pref The preference for the tag.
      * @param desc The description for the tag.
+     * @calls ?{@link ControlledCharacter.removeTag}, {@link ControlledCommands.createTag}
      */
     async addWithDescription(ctrl: string | ControlledCharacter, pref: TagPref, desc: string): Promise<CustomTag> {
-        if (ctrl instanceof ControlledCharacter) await ctrl.removeTag(this.id);
+        if (ctrl instanceof ControlledCharacter && ctrl.tags.hasKey(this.id)) await ctrl.removeTag(this.id);
         return this.client.commands.controlled.createTag(ctrl, { key: this.key, desc, pref });
     }
 
     /**
      * Delete this tag.
      * @adminRoleRequired
+     * @calls {@link AdminCommands.deleteGlobalTag}
      */
     async delete(): Promise<KeyResponse> {
         return this.client.commands.admin.deleteGlobalTag(this.id);
@@ -50,6 +53,7 @@ class GlobalTag extends BaseModel implements TagProperties {
     /**
      * Remove this tag from a character.
      * @param ctrl A {@link ControlledCharacter} instance or id.
+     * @calls {@link ControlledCommands.setTags}
      */
     async remove(ctrl: string | ControlledCharacter): Promise<null> {
         return this.client.commands.controlled.setTags(ctrl, { [this.id]: null });
@@ -59,6 +63,7 @@ class GlobalTag extends BaseModel implements TagProperties {
      * Set attributes of this tag.
      * @param options The options to set.
      * @adminRoleRequired
+     * @calls {@link AdminCommands.setGlobalTag}
      */
     async set(options: Commands.Admin.SetGlobalTagOptions): Promise<KeyResponse> {
         return this.client.commands.admin.setGlobalTag(this.id, options);

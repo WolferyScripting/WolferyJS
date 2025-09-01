@@ -24,6 +24,10 @@ class CharacterDetails extends BaseModel implements CharacterDetailsProperties {
         return `${this.name} ${this.surname}`.trim();
     }
 
+    /**
+     * Get the character.
+     * @calls {@link MiscCommands.getChar}
+     */
     async getChar(): Promise<Character> {
         return this.client.commands.misc.getChar(this.id);
     }

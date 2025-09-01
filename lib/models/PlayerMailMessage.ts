@@ -23,20 +23,26 @@ class PlayerMailMessage extends BaseModel implements PlayerMailMessageProperties
         return ResourceIDs.PLAYER_MAIL_MESSAGE.parts(this.rid).message;
     }
 
+    get playerId(): string {
+        return ResourceIDs.PLAYER_MAIL_MESSAGE.parts(this.rid).player;
+    }
+
     /**
      * Delete this message.
      * @playerRequired
+     * @calls {@link PlayerCommands.deleteMail}
      */
     async delete(): Promise<null> {
-        return this.client.commands.core.getPlayer().then(player => player.deleteMail(this.id));
+        return this.client.commands.player.deleteMail(this.playerId, this.id);
     }
 
     /**
      * Mark this message as read.
      * @playerRequired
+     * @calls {@link PlayerCommands.readMail}
      */
     async markRead(): Promise<null> {
-        return this.client.commands.core.getPlayer().then(player => player.readMail(this.id));
+        return this.client.commands.player.readMail(this.playerId, this.id);
     }
 
     override update(props: AnyObject, reset?: boolean): AnyObject | null {

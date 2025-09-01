@@ -28,12 +28,18 @@ class Profile extends BaseModel implements ProfileProperties {
 
     /**
      * Delete this profile.
+     * @calls {@link getCtrl} > {@link ControlledCharacter.deleteProfile}
      */
     async delete(): Promise<NameBasicResponse> {
         const ctrl = await this.getCtrl();
         return ctrl.deleteProfile(this.id);
     }
 
+    /**
+     * Get the controlled character this profile belongs to.
+     * @calls {@link WolferyJS.findControlledCharacter}
+     * @throws {@link NoControlledError} If a controlled character cannot be found.
+     */
     async getCtrl(): Promise<ControlledCharacter> {
         return this.client.findControlledCharacter(ctrl => ctrl.profiles.hasKey(this.id), true);
 
@@ -42,6 +48,7 @@ class Profile extends BaseModel implements ProfileProperties {
     /**
      * Set options for this profile.
      * @param options The options to set.
+     * @calls {@link getCtrl} > {@link ControlledCharacter.setProfile}
      */
     async set(options: Commands.Controlled.SetProfileOptions): Promise<Profile> {
         const ctrl = await this.getCtrl();
@@ -51,6 +58,7 @@ class Profile extends BaseModel implements ProfileProperties {
     /**
      * Apply this profile.
      * @param safe If a check should be made to ensure the current character info is stored in a profile.
+     * @calls {@link getCtrl} > {@link ControlledCharacter.useProfile}
      */
     async use(safe = true): Promise<Profile> {
         const ctrl = await this.getCtrl();

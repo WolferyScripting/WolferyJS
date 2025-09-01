@@ -23,6 +23,10 @@ export default class IdentityNotices extends BaseCollection<Notice, typeof Resou
         return ResourceIDs.IDENTITY_NOTICES.parts(this.rid).id;
     }
 
+    /**
+     * Get the player these notices are for.
+     * @calls {@link CoreCommands.getPlayer}
+     */
     async getPlayer(): Promise<Player> {
         const player = await this.client.commands.core.getPlayer();
         if (player.id !== this.playerId) {

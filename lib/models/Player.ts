@@ -10,7 +10,7 @@ import type Request from "./Request.js";
 import type OwnedCharacter from "./OwnedCharacter.js";
 import type Watch from "./Watch.js";
 import ResourceIDs from "../generated/ResourceIDs.js";
-import type { BasicCharacterResponse, LookupCharacter, OptionalBasicCharacterResponse } from "../util/types.js";
+import type { LookupCharacter } from "../util/types.js";
 import type WolferyJS from "../WolferyJS.js";
 import type Commands from "../util/commands.js";
 import type Inbox from "../collections/Inbox.js";
@@ -216,6 +216,7 @@ class Player extends BaseModel implements PlayerProperties {
     /**
      * Accept a request.
      * @param requestId The ID of the request to accept.
+     * @calls {@link PlayerCommands.acceptRequest}
      */
     async acceptRequest(requestId: string): Promise<null> {
         return this.client.commands.player.acceptRequest(this, requestId);
@@ -225,28 +226,18 @@ class Player extends BaseModel implements PlayerProperties {
      * Append to the note for a character. The text will be added on a new line.
      * @param charId The ID of the character to append the note for.
      * @param text The text to append to the note.
+     * @calls {@link PlayerCommands.appendNote} > {@link WolferyJS.getChar}
      */
     async appendNote(charId: string, text: string): Promise<Character> {
         return this.client.commands.player.appendNote(this, charId, text)
-            .then(r => this.api.get<Character>(ResourceIDs.CHARACTER({ id: r.id })));
-    }
-
-    /**
-     * @private
-     * @internal
-     */
-    async basicChar<K extends string>(data: BasicCharacterResponse<K>, key: K): Promise<Character>;
-    async basicChar<K extends string>(data: BasicCharacterResponse<K> | OptionalBasicCharacterResponse<K> | null | undefined, key: K): Promise<Character | null>;
-    async basicChar<K extends string>(data: BasicCharacterResponse<K> | OptionalBasicCharacterResponse<K> | null | undefined, key: K): Promise<Character | null> {
-        if (!data || !data[key]) return null;
-        return this.getChar(data[key].id);
+            .then(r => this.client.getChar(r.id));
     }
 
     /**
      * Control a character.
      * @param charId The ID of the character to control.
      * @param force Ignore if the character is already controlled.
-     * @returns The controlled character.
+     * @calls {@link PlayerCommands.controlChar}
      */
     async controlChar(charId: string, force = false): Promise<ControlledCharacter> {
         if (force && this.controlled.list.some(c => c.id === charId)) {
@@ -261,6 +252,7 @@ class Player extends BaseModel implements PlayerProperties {
      * @param puppetId The ID of the puppet to control.
      * @param force Ignore if the puppet is already controlled.
      * @returns The controlled puppet.
+     * @calls {@link PlayerCommands.controlPuppet}
      */
     async controlPuppet(charId: string, puppetId: string, force = false): Promise<ControlledCharacter> {
         if (force && this.controlled.list.some(p => p.id === puppetId && p.type === "puppet")) {
@@ -272,6 +264,7 @@ class Player extends BaseModel implements PlayerProperties {
     /**
      * Create a new character.
      * @param options The options for creating the character.
+     * @calls {@link PlayerCommands.createChar}
      */
     async createChar(options: Commands.Player.CreateCharOptions): Promise<OwnedCharacter> {
         return this.client.commands.player.createChar(this, options);
@@ -281,6 +274,7 @@ class Player extends BaseModel implements PlayerProperties {
      * Delete a character.
      * @param charId The ID of the character to delete.
      * @param heir The ID of the character to inherit any rooms or items of the deleted character.
+     * @calls {@link PlayerCommands.deleteChar}
      */
     async deleteChar(charId: string, heir: string): Promise<null> {
         return this.client.commands.player.deleteChar(this, charId, heir);
@@ -289,6 +283,7 @@ class Player extends BaseModel implements PlayerProperties {
     /**
      * Delete a mail message.
      * @param messageId The ID of the message to delete.
+     * @calls {@link PlayerCommands.deleteMail}
      */
     async deleteMail(messageId: string): Promise<null> {
         return this.client.commands.player.deleteMail(this, messageId);
@@ -297,6 +292,7 @@ class Player extends BaseModel implements PlayerProperties {
     /**
      * Delete a note. This is the same as setting the text as empty.
      * @param charId The ID of the character to delete the note for.
+     * @calls {@link PlayerCommands.deleteNote} > {@link WolferyJS.getChar}
      */
     async deleteNote(charId: string): Promise<Character> {
         return this.client.commands.player.deleteNote(this, charId)
@@ -308,21 +304,24 @@ class Player extends BaseModel implements PlayerProperties {
      * @param charId The ID of the character to focus with.
      * @param targetId The ID of the character to focus.
      * @param options The options for focusing the character.
-     * @returns The focused character.
+     * @calls {@link PlayerCommands.focusChar} > {@link WolferyJS.getChar}
      */
     async focusChar(charId: string, targetId: string, options?: Commands.Player.FocusCharOptions): Promise<Character> {
         return this.client.commands.player.focusChar(this, charId, targetId, options)
             .then(r => this.client.getChar(r.id));
     }
 
-    /** Get the auth notices for the player. */
+    /**
+     * Get the auth notices for the player.
+     * @calls {@link PlayerCommands.getAuthNotices}
+     */
     async getAuthNotices(): Promise<AuthNotices> {
         return this.client.commands.player.getAuthNotices(this);
     }
 
     /**
      * Get the bots for the player.
-     * @returns The bots for the player.
+     * @calls {@link PlayerCommands.getBots}
      */
     async getBots(): Promise<Bots> {
         return this.client.commands.player.getBots(this);
@@ -332,7 +331,7 @@ class Player extends BaseModel implements PlayerProperties {
      * Get a character.
      * @note This will return a cached value if available.
      * @param charId The ID of the character to get.
-     * @returns The character.
+     * @calls {@link PlayerCommands.getChar}
      */
     async getChar(charId: string): Promise<Character> {
         const rid = ResourceIDs.CHARACTER({ id: charId });
@@ -343,7 +342,7 @@ class Player extends BaseModel implements PlayerProperties {
 
     /**
      * Get the identity notices for the player.
-     * @returns The identity notices for the player.
+     * @calls {@link PlayerCommands.getIdentityNotices}
      */
     async getIdentityNotices(): Promise<IdentityNotices> {
         return this.client.commands.player.getIdentityNotices(this);
@@ -351,7 +350,7 @@ class Player extends BaseModel implements PlayerProperties {
 
     /**
      * Get the inbox for the player.
-     * @returns The inbox for the player.
+     * @calls {@link PlayerCommands.getInbox}
      */
     async getInbox(): Promise<Inbox> {
         return this.client.commands.player.getInbox(this);
@@ -359,6 +358,7 @@ class Player extends BaseModel implements PlayerProperties {
 
     /**
      * Get the incoming requests.
+     * @calls {@link PlayerCommands.getIncomingRequests}
      */
     async getIncomingRequests(): Promise<IncomingRequests> {
         return this.client.commands.player.getIncomingRequests(this);
@@ -367,6 +367,7 @@ class Player extends BaseModel implements PlayerProperties {
     /**
      * Get the note for a character.
      * @param charId The ID of the character to get the note for.
+     * @calls {@link PlayerCommands.getNote}
      */
     async getNote(charId: string): Promise<Note> {
         return this.client.commands.player.getNote(this, charId);
@@ -374,6 +375,7 @@ class Player extends BaseModel implements PlayerProperties {
 
     /**
      * Get the notes for characters.
+     * @calls {@link PlayerCommands.getNotes}
      */
     async getNotes(): Promise<Notes> {
         return this.client.commands.player.getNotes(this);
@@ -381,6 +383,7 @@ class Player extends BaseModel implements PlayerProperties {
 
     /**
      * Get the outgoing requests.
+     * @calls {@link PlayerCommands.getOutgoingRequests}
      */
     async getOutgoingRequests(): Promise<OutgoingRequests> {
         return this.client.commands.player.getOutgoingRequests(this);
@@ -388,6 +391,7 @@ class Player extends BaseModel implements PlayerProperties {
 
     /**
      * Get the management tokens for the player.
+     * @calls {@link PlayerCommands.getTokens}
      */
     async getTokens(): Promise<Tokens> {
         return this.client.commands.player.getTokens(this);
@@ -395,6 +399,7 @@ class Player extends BaseModel implements PlayerProperties {
 
     /**
      * Get the unread mail for the player.
+     * @calls {@link PlayerCommands.getUnreadMail}
      */
     async getUnreadMail(): Promise<UnreadMail> {
         return this.client.commands.player.getUnreadMail(this);
@@ -402,6 +407,7 @@ class Player extends BaseModel implements PlayerProperties {
 
     /**
      * Get the characters being watched.
+     * @calls {@link PlayerCommands.getWatches}
      */
     async getWatches(): Promise<Watches> {
         return this.client.commands.player.getWatches(this);
@@ -410,15 +416,28 @@ class Player extends BaseModel implements PlayerProperties {
     /**
      * Lookup characters by name.
      * @param name The name to lookup.
-     * @returns An array of matching characters.
+     * @calls {@link PlayerCommands.lookupChars}
      */
     async lookupChars(name: string): Promise<Array<LookupCharacter>> {
         return this.client.commands.player.lookupChars(this, name);
     }
 
     /**
+     * Send a mail.
+     * @param fromChar The character sending the mail.
+     * @param toCharId The ID of the character to send the mail to.
+     * @param options The options for the mail.
+     * @calls {@link PlayerCommands.mail} > {@link WolferyJS.getChar}
+     */
+    async mail(fromChar: string | ControlledCharacter, toCharId: string, options: Commands.Player.MailOptions): Promise<Character> {
+        return this.client.commands.player.mail(this, fromChar, toCharId, options)
+            .then(r => this.client.getChar(r.id));
+    }
+
+    /**
      * Mute a character.
      * @param charId The ID of the character to mute.
+     * @calls {@link muteChars}
      */
     async muteChar(charId: string): Promise<null> {
         return this.muteChars({ [charId]: true });
@@ -427,6 +446,7 @@ class Player extends BaseModel implements PlayerProperties {
     /**
      * Manage muted characters. Set an id to true to mute, false to unmute.
      * @param chars
+     * @calls {@link PlayerCommands.muteChars}
      */
     async muteChars(chars: Record<string, boolean>): Promise<null> {
         return this.client.commands.player.muteChars(this, chars);
@@ -435,6 +455,7 @@ class Player extends BaseModel implements PlayerProperties {
     /**
      * Read a mail message.
      * @param messageId The ID of the message to read.
+     * @calls {@link PlayerCommands.readMail}
      */
     async readMail(messageId: string): Promise<null> {
         return this.client.commands.player.readMail(this, messageId);
@@ -443,6 +464,7 @@ class Player extends BaseModel implements PlayerProperties {
     /**
      * Reject a request.
      * @param requestId The ID of the request to reject.
+     * @calls {@link PlayerCommands.rejectRequest}
      */
     async rejectRequest(requestId: string): Promise<null> {
         return this.client.commands.player.rejectRequest(this, requestId);
@@ -451,6 +473,7 @@ class Player extends BaseModel implements PlayerProperties {
     /**
      * Revoke a request.
      * @param requestId The ID of the request to revoke.
+     * @calls {@link PlayerCommands.revokeRequest}
      */
     async revokeRequest(requestId: string): Promise<null> {
         return this.client.commands.player.revokeRequest(this, requestId);
@@ -461,6 +484,7 @@ class Player extends BaseModel implements PlayerProperties {
      * @note This requires player access (password authentication).
      * @param charId The ID of the character to set the settings for.
      * @param options The settings to apply.
+     * @calls {@link PlayerCommands.setCharSettings}
      */
     async setCharSettings(charId: string, options: Commands.Player.SetCharSettingsOptions): Promise<null> {
         return this.client.commands.player.setCharSettings(this, charId, options);
@@ -470,10 +494,11 @@ class Player extends BaseModel implements PlayerProperties {
      * Set the note for a character.
      * @param charId The ID of the character to set the note for.
      * @param options The options for setting the note.
+     * @calls {@link PlayerCommands.setNote} > {@link WolferyJS.getChar}
      */
     async setNote(charId: string, options: Commands.Player.SetNoteOptions): Promise<Character> {
         return this.client.commands.player.setNote(this, charId, options)
-            .then(r => this.api.get<Character>(ResourceIDs.CHARACTER({ id: r.id })));
+            .then(r => this.client.getChar(r.id));
     }
 
     /**
@@ -481,6 +506,7 @@ class Player extends BaseModel implements PlayerProperties {
      * @param charId The ID of the character to unfocus with.
      * @param targetId The ID of the character to unfocus.
      * @param puppeteerId The ID of the puppeteer character, if applicable.
+     * @calls {@link PlayerCommands.unfocusChar} > {@link WolferyJS.getChar}
      */
     async unfocusChar(charId: string, targetId: string, puppeteerId?: string): Promise<Character> {
         return this.client.commands.player.unfocusChar(this, charId, targetId, puppeteerId)
@@ -490,6 +516,7 @@ class Player extends BaseModel implements PlayerProperties {
     /**
      * Unmute a character.
      * @param charId The ID of the character to unmute.
+     * @calls {@link muteChars}
      */
     async unmuteChar(charId: string): Promise<null> {
         return this.muteChars({ [charId]: false });
@@ -498,6 +525,7 @@ class Player extends BaseModel implements PlayerProperties {
     /**
      * Remove a character from your watch list.
      * @param charId The ID of the character to unwatch.
+     * @calls {@link PlayerCommands.unwatchChar} > {@link WolferyJS.getChar}
      */
     async unwatchChar(charId: string): Promise<Character> {
         return this.client.commands.player.unwatchChar(this, charId)
@@ -507,6 +535,7 @@ class Player extends BaseModel implements PlayerProperties {
     /**
      * Add a character to your watch list.
      * @param charId The ID of the character to watch.
+     * @calls {@link PlayerCommands.watchChar} > {@link ResClient.get}
      */
     async watchChar(charId: string): Promise<Watch> {
         return this.client.commands.player.watchChar(this, charId)

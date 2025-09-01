@@ -25,6 +25,10 @@ class CharacterTags extends BaseCollectionModel<Tag, typeof ResourceIDs.TAG> {
         await super._listen(on, this.client.anyTracked("characterTags"));
     }
 
+    get charId(): string {
+        return ResourceIDs.CHARACTER_TAGS.parts(this.rid).id;
+    }
+
     get disliked(): Array<Tag> {
         return Object.entries(this.props as Record<string, Tag>).filter(([key]) => key.split("_")[1] === "dislike").map(([,value]) => value);
     }
@@ -37,6 +41,8 @@ class CharacterTags extends BaseCollectionModel<Tag, typeof ResourceIDs.TAG> {
      * Add a tag to the character.
      * @param tag The tag to add.
      * @param type The type, `like` or `dislike`.
+     * @characterOwnershipRequired
+     * @calls {@link set}
      */
     async add(tag: string, type: TagPref): Promise<null> {
         return this.set({ [tag]: type });
@@ -45,18 +51,26 @@ class CharacterTags extends BaseCollectionModel<Tag, typeof ResourceIDs.TAG> {
     /**
      * Create a custom tag.
      * @param options The options for the tag.
+     * @characterOwnershipRequired
+     * @calls {@link ControlledCommands.createTag}
      */
     async create(options: Commands.CharacterTags.CreateOptions): Promise<Tag> {
-        return this.call<Tag>("create", options);
+        return this.client.commands.controlled.createTag(this.charId, options);
     }
 
+    /**
+     * Get the character.
+     * @calls {@link MiscCommands.getChar}
+     */
     async getChar(): Promise<Character> {
-        return this.api.get<Character>(ResourceIDs.CHARACTER({ id: ResourceIDs.CHARACTER_TAGS.parts(this.rid).id }));
+        return this.client.commands.misc.getChar(this.charId);
     }
 
     /**
      * Remove a tag from the character.
      * @param tag The tag to remove.
+     * @characterOwnershipRequired
+     * @calls {@link set}
      */
     async remove(tag: string): Promise<null> {
         return this.set({ [tag]: null });
@@ -65,9 +79,11 @@ class CharacterTags extends BaseCollectionModel<Tag, typeof ResourceIDs.TAG> {
     /**
      * Set the tags for the character.
      * @param options An object of tag id to `like`, `dislike`, or `null`. Current tags do not need to be provided.
+     * @characterOwnershipRequired
+     * @calls {@link ControlledCommands.setTags}
      */
     async set(options: Record<string, TagPref | null>): Promise<null> {
-        return this.call("setTags", { tags: options });
+        return this.client.commands.controlled.setTags(this.charId, options);
     }
 }
 

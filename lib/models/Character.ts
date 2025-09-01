@@ -3,12 +3,11 @@ import type ControlledCharacter from "./ControlledCharacter.js";
 import type CharacterInfo from "./CharacterInfo.js";
 import type Watch from "./Watch.js";
 import type { TagPref } from "../util/types.js";
-import ResourceIDs from "../generated/ResourceIDs.js";
 import type WolferyJS from "../WolferyJS.js";
 import type Commands from "../util/commands.js";
 import type { CharacterProperties } from "../generated/models/types.js";
 import { CharacterDefinition } from "../generated/models/definitions.js";
-import { kCharacter } from "../util/Util.js";
+import { kCharacter, modelId } from "../util/Util.js";
 import { type ResModelOptions , type ResClient, Properties } from "resclient-ts";
 
 declare interface Character extends BaseModel, CharacterProperties {}
@@ -93,66 +92,82 @@ class Character extends BaseModel implements CharacterProperties {
      * Address this character.
      * @param ctrl The controlled character to address this character.
      * @param options The options for addressing the character.
+     * @calls {@link ControlledCommands.address}
      */
-    async address(ctrl: ControlledCharacter, options: Commands.ControlledCharacter.AddressOptions): Promise<null> {
-        return ctrl.address(this.id, options);
+    async address(ctrl: string | ControlledCharacter, options: Commands.ControlledCharacter.AddressOptions): Promise<null> {
+        return this.client.commands.controlled.address(ctrl, this.id, options);
     }
 
     /**
      * Request to follow this character.
      * @param ctrl The controlled character to follow this character.
+     * @calls {@link ControlledCommands.follow}
      */
-    async follow(ctrl: ControlledCharacter): Promise<null> {
-        return ctrl.follow(this.id);
+    async follow(ctrl: string | ControlledCharacter): Promise<null> {
+        return this.client.commands.controlled.follow(ctrl, this.id);
     }
 
+    /**
+     * Get the character info.
+     * @calls {@link MiscCommands.getCharInfo}
+     */
     async getInfo(): Promise<CharacterInfo> {
-        return this.api.get<CharacterInfo>(ResourceIDs.CHARACTER_INFO({ id: this.id }));
+        return this.client.commands.misc.getCharInfo(this.id);
     }
 
     /**
      * Request to join this character.
      * @param ctrl The controlled character to join this character.
+     * @calls {@link ControlledCommands.join}
      */
-    async join(ctrl: ControlledCharacter): Promise<null> {
-        return ctrl.join(this.id);
+    async join(ctrl: string | ControlledCharacter): Promise<null> {
+        return this.client.commands.controlled.join(ctrl, this.id);
     }
 
     /**
      * Request to lead this character.
      * @param ctrl The controlled character to lead this character.
+     * @calls {@link ControlledCommands.lead}
      */
-    async lead(ctrl: ControlledCharacter): Promise<null> {
-        return ctrl.lead(this.id);
+    async lead(ctrl: string | ControlledCharacter): Promise<null> {
+        return this.client.commands.controlled.lead(ctrl, this.id);
     }
 
     /**
      * Look at this character.
      * @param ctrl The controlled character to look at this character.
+     * @calls {@link ControlledCommands.look}
      */
-    async look(ctrl: ControlledCharacter): Promise<null> {
-        return ctrl.look(this.id);
+    async look(ctrl: string | ControlledCharacter): Promise<null> {
+        return this.client.commands.controlled.look(ctrl, this.id);
     }
 
     /**
      * Send a mail to this character.
      * @param ctrl The controlled character to send the mail.
      * @param options The mail options.
+     * @playerRequired
+     * @calls {@link CoreCommands.getPlayer} > {@link Player.mail}
      */
-    async mail(ctrl: ControlledCharacter, options: Commands.Inbox.SendOptions): Promise<Character> {
-        return ctrl.mail(this.id, options);
+    async mail(ctrl: string | ControlledCharacter, options: Commands.Inbox.SendOptions): Promise<Character> {
+        return this.client.commands.core.getPlayer().then(player => player.mail(ctrl, this.id, options));
     }
 
     /**
      * Send a message to this character.
      * @param ctrl The controlled character to send the message.
      * @param options The options for sending the message.
+     * @calls {@link ControlledCommands.message}
      */
-    async message(ctrl: ControlledCharacter, options: Commands.ControlledCharacter.MessageOptions): Promise<null> {
-        return ctrl.message(this.id, options);
+    async message(ctrl: string | ControlledCharacter, options: Commands.ControlledCharacter.MessageOptions): Promise<null> {
+        return this.client.commands.controlled.message(ctrl, this.id, options);
     }
 
-    /** Mute this character. */
+    /**
+     * Mute this character.
+     * @playerRequired
+     * @calls {@link CoreCommands.getPlayer} > {@link Player.muteChar}
+     */
     async mute(): Promise<null> {
         return this.client.commands.core.getPlayer().then(player => player.muteChar(this.id));
     }
@@ -160,29 +175,36 @@ class Character extends BaseModel implements CharacterProperties {
     /**
      * Stop leading this character.
      * @param ctrl The controlled character to stop leading this character.
+     * @calls {@link ControlledCommands.stopLead}
      */
-    async stopLead(ctrl: ControlledCharacter): Promise<null> {
-        return ctrl.stopLead(this.id);
+    async stopLead(ctrl: string | ControlledCharacter): Promise<null> {
+        return this.client.commands.controlled.stopLead(ctrl, this.id);
     }
 
     /**
      * Request to summon this character.
      * @param ctrl The controlled character to summon this character.
+     * @calls {@link ControlledCommands.summon}
      */
-    async summon(ctrl: ControlledCharacter): Promise<null> {
-        return ctrl.summon(this.id);
+    async summon(ctrl: string | ControlledCharacter): Promise<null> {
+        return this.client.commands.controlled.summon(ctrl, this.id);
     }
 
     /**
      * Unlook at this character.
      * @note This will stop the controlled character looking at any character.
      * @param ctrl The controlled character to unlook at this character.
+     * @calls {@link ControlledCommands.look}
      */
-    async unlook(ctrl: ControlledCharacter): Promise<null> {
-        return ctrl.unlook();
+    async unlook(ctrl: string | ControlledCharacter): Promise<null> {
+        return this.client.commands.controlled.look(ctrl, modelId(ctrl));
     }
 
-    /** Unmute this character. */
+    /**
+     * Unmute this character.
+     * @playerRequired
+     * @calls {@link CoreCommands.getPlayer} > {@link Player.unmuteChar}
+     */
     async unmute(): Promise<null> {
         return this.client.commands.core.getPlayer().then(player => player.unmuteChar(this.id));
     }
@@ -190,6 +212,7 @@ class Character extends BaseModel implements CharacterProperties {
     /**
      * Remove this character from your watch list.
      * @playerRequired
+     * @calls {@link CoreCommands.getPlayer} > {@link Player.unwatchChar}
      */
     async unwatch(): Promise<Character> {
         return this.client.commands.core.getPlayer().then(player => player.unwatchChar(this.id));
@@ -198,6 +221,7 @@ class Character extends BaseModel implements CharacterProperties {
     /**
      * Add this character to your watch list.
      * @playerRequired
+     * @calls {@link CoreCommands.getPlayer} > {@link Player.watchChar}
      */
     async watch(): Promise<Watch> {
         return this.client.commands.core.getPlayer().then(player => player.watchChar(this.id));
@@ -207,9 +231,10 @@ class Character extends BaseModel implements CharacterProperties {
      * Send a whisper to this character. You must be in the same room.
      * @param ctrl The controlled character to send the whisper.
      * @param options The options for the whisper.
+     * @calls {@link ControlledCommands.whisper}
      */
-    async whisper(ctrl: ControlledCharacter, options: Commands.ControlledCharacter.WhisperOptions): Promise<null> {
-        return ctrl.whisper(this.id, options);
+    async whisper(ctrl: string | ControlledCharacter, options: Commands.ControlledCharacter.WhisperOptions): Promise<null> {
+        return this.client.commands.controlled.whisper(ctrl, this.id, options);
     }
 }
 

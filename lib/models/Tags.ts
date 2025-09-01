@@ -25,6 +25,7 @@ class Tags extends BaseCollectionModel<GlobalTag, typeof ResourceIDs.TAG> {
      * Create a new global tag.
      * @param options The options for creating the global tag.
      * @adminRoleRequired
+     * @calls {@link AdminCommands.createGlobalTag}
      */
     async create(options: Commands.Admin.CreateGlobalTagOptions): Promise<GlobalTag> {
         return this.client.commands.admin.createGlobalTag(options);
