@@ -64,7 +64,7 @@
     "@favware/npm-deprecate": "^2.0.0",
     "@mxssfd/typedoc-theme": "^1.1.7",
     "@sinclair/typebox": "^0.34.40",
-    "@swc/core": "^1.13.2",
+    "@swc/core": "^1.13.5",
     "@swc/helpers": "^0.5.17",
     "@types/chai": "^5.2.2",
     "@types/debug": "^4.1.12",
