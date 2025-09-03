@@ -56,7 +56,7 @@
   "license": "MIT",
   "dependencies": {
     "file-type": "^21.0.0",
-    "resclient-ts": "1.1.13",
+    "resclient-ts": "^1.1.15",
     "tslib": "^2.8.1",
     "ws": "^8.18.3"
   },
