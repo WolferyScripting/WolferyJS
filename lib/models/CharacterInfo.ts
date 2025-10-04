@@ -9,7 +9,7 @@ import type { ResClient } from "resclient-ts";
 declare interface CharacterInfo extends BaseModel, CharacterInfoProperties {}
 // do not edit the first line of the class comment
 /**
- * Extra info about a character. Reliability of lfrpDesc seems patchy at best.
+ * Extra info about a character.
  * @resourceID {@link ResourceIDs.CHARACTER_INFO | CHARACTER_INFO}
  */
 class CharacterInfo extends BaseModel implements CharacterInfoProperties {

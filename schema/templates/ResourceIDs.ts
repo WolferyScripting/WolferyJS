@@ -77,7 +77,7 @@ namespace ResourceIDs {
         return match.groups as T extends RIDFunction<infer Parts> ? ArgObject<Parts> : never;
     }
 
-    export const id = arg("id");
+    const id = arg("id");
     /* =args(exclude=id) */
     /* =ids */
 

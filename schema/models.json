@@ -278,7 +278,7 @@
     }
   },
   {
-    "description": "Extra info about a character. Reliability of lfrpDesc seems patchy at best.",
+    "description": "Extra info about a character.",
     "id": ["CHARACTER_INFO(core.char.{id}.info)"],
     "name": "CharacterInfo",
     "props": {

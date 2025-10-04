@@ -212,7 +212,7 @@ export interface CharacterDetailsProperties {
 }
 
 /**
- * Extra info about a character. Reliability of lfrpDesc seems patchy at best.
+ * Extra info about a character.
  */
 export interface CharacterInfoProperties {
     /** About the character. */
