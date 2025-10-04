@@ -575,7 +575,7 @@ export default class WolferyJS<U extends AnyUser = AnyUser> extends TypedEmitter
                 roomCommands:         options.disableTracking ? false : options.track?.roomCommands ?? true,
                 roomProfiles:         options.disableTracking ? false : options.track?.roomProfiles ?? true,
                 roomScripts:          options.disableTracking ? false : options.track?.roomScripts ?? true,
-                tagGroups:            options.disableTracking ? false : authRequired(options.track?.tagGroups ?? true, "password"),
+                tagGroups:            options.disableTracking ? false : options.track?.tagGroups ?? true,
                 tokens:               options.disableTracking ? false : authRequired(options.track?.tokens ?? true, "password"),
                 watches:              options.disableTracking ? false : authRequired(options.track?.watches ?? true, "password")
             },
